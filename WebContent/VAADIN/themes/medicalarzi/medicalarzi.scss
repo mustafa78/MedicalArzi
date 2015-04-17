@@ -1,0 +1,161 @@
+// Global variable overrides. Must be declared before importing Valo.
+
+// Defines the plaintext font size, weight and family. Font size affects general component sizing.
+$v-font-size: 16px;
+$v-font-weight: 300;
+$v-font-family: "Open Sans", sans-serif;
+
+// Defines the border used by all components.
+$v-border: 1px solid (v-shade 0.7);
+$v-border-radius: 4px;
+
+// Affects the color of some component elements, e.g Button, Panel title, etc
+$v-background-color: hsl(210, 0%, 98%);
+// Affects the color of content areas, e.g  Panel and Window content, TextField input etc
+$v-app-background-color: $v-background-color;
+
+// Affects the visual appearance of all components
+$v-gradient: v-linear 8%;
+$v-bevel-depth: 30%;
+$v-shadow-opacity: 5%;
+
+// Defines colors for indicating status (focus, success, failure)
+$v-focus-color: valo-focus-color(); // Calculates a suitable color automatically
+$v-friendly-color: #2c9720;
+$v-error-indicator-color: #ed473b;
+
+// For more information, see: https://vaadin.com/book/-/page/themes.valo.html
+// Example variants can be copy/pasted from https://vaadin.com/wiki/-/wiki/Main/Valo+Examples
+
+@import "../reindeer/reindeer.scss";
+
+@mixin medicalarzi {
+  @include reindeer;
+
+  	//Modify the existing classes (from the reindeer theme)
+	.v-tabsheet-tabsheetpanel {
+		background-color: #DAF1F2;
+	}
+
+	.v-caption, .v-captiontext {
+		font-family: Verdana;
+		font-size: 12px;
+		font-weight: bold;
+    	color: #1D313E;
+  	}
+
+	/* Lay the options horizontally for radio buttons*/
+	.v-select-optiongroup-horizontal .v-select-option {
+	    display: inline-block;
+	}
+
+	/* Avoid wrapping if the layout is too tight */
+	.v-select-optiongroup-horizontal {
+	    white-space: nowrap;
+	}
+
+	/* Some extra spacing is needed */
+	.v-select-optiongroup-horizontal
+	  .v-select-option.v-radiobutton {
+	    padding-right: 10px;
+	}
+
+	.v-textfield-error {
+		background-color: yellow !important;
+	}
+
+
+	// Insert your own theme rules here
+  	.banner {
+		//background-image: url("img/banner-bkgnd-1.png") !important;
+		background: -webkit-linear-gradient(left top, #1F323D, #93ADBE); /* For Safari 5.1 to 6.0 */
+		background: -o-linear-gradient(bottom right, #1F323D, #93ADBE); /* For Opera 11.1 to 12.0 */
+		background: -moz-linear-gradient(bottom right, #1F323D, #93ADBE); /* For Firefox 3.6 to 15 */
+		background: linear-gradient(to right, #1F323D, #93ADBE); /* Standard syntax */
+	}
+
+	.banner-title {
+  		font-family: Algerian;
+		font-size: 60px;
+		//font-weight: bold;
+		color: #E1E2EC;
+		line-height: 1;
+  	}
+
+  	.heading {
+  		font-family: cursive;
+		font-size: 24px;
+		font-weight: bold;
+		color: #19224C;
+  	}
+
+  	.btnLayout {
+  		background-color: #DAF1F2;
+  		border: 0px;
+  	}
+
+  	.tabDescription {
+  		font-size: 16px;
+  		font-weight: bold;
+  		padding: 5px;
+  	}
+
+  	.myForm .v-label {
+  		padding-left: 15px;
+  	}
+
+  	.myFormFooter .clear {
+  		margin-right: 20px;
+  	}
+
+   	.myFormFooter .save {
+  		margin-left: 20px;
+  	}
+
+	.ptntRegistrationBtn {
+		margin-top: 30px;
+	}
+
+	.v-caption-ptntLoginFieldsCaption {
+		padding-top: 15px;
+	}
+
+	.ptntLoginBtn {
+		margin-top: 10px;
+	}
+
+	.ptntLoginLinks {
+		margin-top: 70px;
+		padding-top: 18px;
+		height: 19px;
+	}
+
+	.v-caption-ptntRegForm .v-captiontext{
+		font-family: Verdana;
+		font-size: 18px;
+		font-weight: bold;
+	}
+
+	.footer {
+		font-size: 10px;
+		font-family: Verdana;
+		color: #2D2F31;
+	}
+
+	.errorMsg {
+		margin-top: 108px !important;
+		font-size: 14px;
+		background-color: red;
+	}
+	
+	.errorLabel {
+		font-size: 12px;
+		color: red;
+	}
+	
+	.customForm {
+		margin: 10px;
+		padding: 5px;
+	}
+
+}

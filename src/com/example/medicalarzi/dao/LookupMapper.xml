@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.medicalarzi.dao.LookupMapper" >
+	<cache/>
+	<resultMap id="BaseResultMap" type="Lookup" >
+	    <id column="LKUP_ID" property="lookupId" jdbcType="INTEGER" />
+	    <result column="LKUP_TYPE" property="lookupType" jdbcType="VARCHAR" />
+	    <result column="LKUP_VAL" property="lookupValue" jdbcType="VARCHAR" />
+	    <result column="LKUP_DESC" property="description" jdbcType="VARCHAR" />
+	    <result column="SORT_ORDER" property="sortOrder" jdbcType="INTEGER" />
+	    <result column="ACTIVE_IND" property="activeInd" jdbcType="VARCHAR" />
+	    <result column="CREATE_TS" property="createdDate" jdbcType="TIMESTAMP" />
+	    <result column="LST_UPDT_TS" property="updatedDate" jdbcType="TIMESTAMP" />
+	    <result column="CREATE_USR_ID" property="createdBy" jdbcType="VARCHAR" />
+	    <result column="LST_UPDT_USR_ID" property="updatedBy" jdbcType="VARCHAR" />
+  	</resultMap>
+   	<resultMap id="DistinctLookupTypeResultMap" type="Lookup" >
+    	<result column="LOOKUP_TYPE" property="lookupType" jdbcType="VARCHAR" />
+  	</resultMap>
+  	<resultMap type="Condition" id="ConditionResultMap">
+  		<id column="COND_ID" property="conditionId" jdbcType="INTEGER" />
+	    <result column="COND_PRFX_CD" property="conditionPrefixCd" jdbcType="VARCHAR" />
+	    <result column="COND_NM" property="conditionName" jdbcType="VARCHAR" />
+	    <result column="ACTV_IND" property="activeInd" jdbcType="VARCHAR" />
+	    <result column="CREATE_TS" property="createdDate" jdbcType="TIMESTAMP" />
+	    <result column="LST_UPDT_TS" property="updatedDate" jdbcType="TIMESTAMP" />
+	    <result column="CREATE_USR_ID" property="createdBy" jdbcType="VARCHAR" />
+	    <result column="LST_UPDT_USR_ID" property="updatedBy" jdbcType="VARCHAR" />
+  	</resultMap>
+  	<resultMap type="Procedure" id="ProcedureResultMap">
+  		<id column="PROC_ID" property="procedureId" jdbcType="INTEGER" />
+	    <result column="PROC_PRFX_CD" property="procedurePrefixCd" jdbcType="VARCHAR" />
+	    <result column="PROC_NM" property="procedureName" jdbcType="VARCHAR" />
+	    <result column="ACTV_IND" property="activeInd" jdbcType="VARCHAR" />
+	    <result column="CREATE_TS" property="createdDate" jdbcType="TIMESTAMP" />
+	    <result column="LST_UPDT_TS" property="updatedDate" jdbcType="TIMESTAMP" />
+	    <result column="CREATE_USR_ID" property="createdBy" jdbcType="VARCHAR" />
+	    <result column="LST_UPDT_USR_ID" property="updatedBy" jdbcType="VARCHAR" />
+  	</resultMap>
+
+	<!-- SQL fragments -->
+  	<sql id="Base_Column_List" >
+    	LKUP_ID, LKUP_TYPE, LKUP_VAL, LKUP_DESC, SORT_ORDER, ACTIVE_IND,
+    	CREATE_TS, LST_UPDT_TS, CREATE_USR_ID, LST_UPDT_USR_ID
+  	</sql>
+  	<sql id="Condition_Column_List" >
+    	COND_ID, COND_PRFX_CD, COND_NM, ACTV_IND
+    	CREATE_TS, LST_UPDT_TS, CREATE_USR_ID, LST_UPDT_USR_ID
+  	</sql>  	
+  	<sql id="Procedure_Column_List" >
+    	PROC_ID, PROC_PRFX_CD, PROC_NM, ACTV_IND
+    	CREATE_TS, LST_UPDT_TS, CREATE_USR_ID, LST_UPDT_USR_ID
+  	</sql>
+
+  	<!-- Select Statements -->
+  	<!--Get Distinct Lookup Types. -->
+  	<select id="selectDistinctLookupTypes" resultMap="DistinctLookupTypeResultMap" useCache="true">
+	    select  distinct LKUP_TYPE
+	    from D_LOOKUPS
+	    where ACTIVE_IND = 'Y'
+	    order by LKUP_TYPE
+  	</select>
+  	<!--Get Lookups by Lookup Type. -->
+  	<select id="selectByLookupType" resultMap="BaseResultMap">
+	    select
+	    <include refid="Base_Column_List" />
+	    from D_LOOKUPS
+	    where LKUP_TYPE = #{lookupType,jdbcType=VARCHAR} and ACTIVE_IND = 'Y'
+	    order by SORT_ORDER
+  	</select>
+	<!--Get Lookups by Lookup Type.-->
+   	<select id="selectByLookupTypeValueSort" resultMap="BaseResultMap" useCache="true">
+	    select
+	    <include refid="Base_Column_List" />
+	    from D_LOOKUPS
+	    where LKUP_TYPE = #{lookupType,jdbcType=VARCHAR} and ACTIVE_IND = 'Y'
+	    order by LKUP_VAL
+  	</select>
+	<!--Get Lookups by Lookup Type.-->
+  	<select id="selectByLookupTypeAndLookupValue" resultMap="BaseResultMap" useCache="true">
+	    select
+	    <include refid="Base_Column_List" />
+	    from D_LOOKUPS
+	    where LKUP_TYPE = #{lookupType,jdbcType=VARCHAR} and LKUP_VAL = #{lookupValue,jdbcType=VARCHAR}
+  	</select>
+	<!--Get Lookups by Lookup ID.-->
+ 	<select id="selectByLookupId" resultMap="BaseResultMap" useCache="true">
+	    select
+	    <include refid="Base_Column_List" />
+	    from D_LOOKUPS
+	    where LKUP_ID = #{lookupId,jdbcType=INTEGER} and ACTIVE_IND = 'Y'
+  	</select>
+	<!--Get Lookups by Lookup ID.-->
+ 	<select id="selectByLookupValue" resultMap="BaseResultMap" useCache="true">
+	    select
+	    <include refid="Base_Column_List" />
+	    from D_LOOKUPS
+	    where LKUP_VALUE = #{lookupValue,jdbcType=VARCHAR} and ACTIVE_IND = 'Y'
+  	</select>
+  	
+  	<!-- Select all conditions -->
+  	<select id="selectAllMedicalConditions" resultMap="ConditionResultMap" useCache="true">
+	    select
+	    <include refid="Condition_Column_List" />
+	    from D_COND
+	    where ACTV_IND = 'Y'
+  	</select>
+  	
+  	<!-- Select all procedure -->
+  	<select id="selectAllMedicalProcedures" resultMap="ProcedureResultMap" useCache="true">
+	    select
+	    <include refid="Procedure_Column_List" />
+	    from D_PROC
+	    where ACTV_IND = 'Y'
+  	</select>
+
+  	<!-- Insert Statements -->
+  	<insert id="insertLookup" parameterType="Lookup">
+      insert into D_LOOKUPS (LKUP_ID, LKUP_TYPE, LKUP_VAL, CREATE_TS, CREATE_USR_ID
+      ) SELECT max(LKUP_ID) + 1,  #{lookupType,jdbcType=VARCHAR},
+      #{lookupValue,jdbcType=VARCHAR},now(), #{userAdded,jdbcType=VARCHAR}
+		FROM D_LOOKUPS
+  		<selectKey keyProperty="id" resultType="int" order="AFTER">
+ 			select max(id) FROM D_LOOKUPS
+    	</selectKey>
+  	</insert>
+
+  	<!-- Update Statements -->
+    <update id="updateLookup" parameterType="Lookup">
+      update D_LOOKUPS set LKUP_VAL = #{lookupValue,jdbcType=VARCHAR},
+      LKUP_DESC = #{description,jdbcType=VARCHAR}, SORT_ORDER = #{sortOrder,jdbcType=INTEGER},
+      LST_UPDT_TS = now(), LST_UPDT_USR_ID = #{updatedBy,jdbcType=VARCHAR}
+      where LKUP_ID = #{id}
+  	</update>
+</mapper>

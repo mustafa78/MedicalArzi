@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.medicalarzi.dao.ArziMapper" >
+	<resultMap id="BaseResultMap" type="Arzi" >
+	    <id column="ARZI_ID" property="arziId" jdbcType="INTEGER" />
+	    <result column="ITS_NBR" property="itsNumber" jdbcType="INTEGER" />
+	    <result column="DR_ITS_NBR" property="drItsNumber" jdbcType="INTEGER" />
+	    <result column="CREATE_USR_ID" property="createdBy" jdbcType="VARCHAR" />
+	    <result column="CREATE_TS" property="createdDate" jdbcType="TIMESTAMP" />
+	    <result column="LST_UPDT_USR_ID" property="updatedBy" jdbcType="VARCHAR" />
+	    <result column="LST_UPDT_TS" property="updatedDate" jdbcType="TIMESTAMP" />
+	    
+  	</resultMap>
+</mapper>

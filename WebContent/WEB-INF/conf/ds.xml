@@ -1,0 +1,15 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
+  	 <bean id="ds.map" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiName" value="java:comp/env/jdbc/map" />
+        <property name="proxyInterface" value="javax.sql.DataSource" />
+    </bean>
+<!--
+    If your application implements usecases that require support for global transactions (like moving data between two or more databases, or from a queue to a database, etc) then you need to run your app within an environment which provides support for distributed transactions.
+    The org.springframework.transaction.jta.JtaTransactionManager should be used when you intend to use global transactions.
+    However not all applications have a need for global transactions. Many of them will only require managing data within a single persistence storage. If that's the case you could also choose to use org.springframework.jdbc.datasource.DataSourceTransactionManager
+     -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="ds.map" />
+    </bean>
+</beans>

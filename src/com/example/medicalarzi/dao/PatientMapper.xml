@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.medicalarzi.dao.PatientMapper" >
+	<resultMap id="patientInfoLight" type="Patient" >
+	    <id column="PTNT_ITS_NBR" property="itsNumber" jdbcType="INTEGER" />
+	    <result column="FIRST_NM" property="firstName" jdbcType="VARCHAR" />
+	    <result column="MDL_NM" property="middleName" jdbcType="VARCHAR" />
+	    <result column="LAST_NM" property="lastName" jdbcType="VARCHAR" />
+	    <result column="DOB" property="dob" jdbcType="DATE" />
+	    <result column="GNDR_IND" property="genderInd" jdbcType="VARCHAR" />
+	    <result column="HASH_PSWD" property="updatedBy" jdbcType="VARCHAR" />
+	    <result column="HOME_PHN" property="phoneNum" jdbcType="VARCHAR" />
+	    <result column="CELL_PHN" property="cellNum" jdbcType="VARCHAR" />
+	    <result column="FAX" property="faxNum" jdbcType="VARCHAR" />
+	    <result column="EMAIL_ADDR1" property="emailAddress" jdbcType="VARCHAR" />
+	    <result column="ADDR_LN_1" property="homeAddress1" jdbcType="VARCHAR" />
+	    <result column="ADDR_LN_2" property="homeAddress2" jdbcType="VARCHAR" />
+	    <result column="CITY" property="city" jdbcType="VARCHAR" />
+	    <result column="ST_CD" property="state" jdbcType="VARCHAR" />
+	    <result column="CNTY_ID" property="updatedDate" jdbcType="INTEGER" />
+	    <result column="ZIP_CD" property="zip" jdbcType="VARCHAR" />
+	    <result column="JAMAAT_NM" property="jamaatName" jdbcType="VARCHAR" />
+	    <result column="ACTV_IND" property="activeInd" jdbcType="VARCHAR" javaType="BOOLEAN" />
+	    <result column="CREATE_USR_ID" property="createdBy" jdbcType="VARCHAR" />
+	    <result column="CREATE_TS" property="createdDate" jdbcType="TIMESTAMP" />
+	    <result column="LST_UPDT_USR_ID" property="updatedBy" jdbcType="VARCHAR" />
+	    <result column="LST_UPDT_TS" property="updatedDate" jdbcType="TIMESTAMP" />
+	    <association property="ptntTitle" column="ptntTitleId" javaType="Lookup">
+			<id 	property="id" 			column="ptntTitleId" />
+			<result property="lookupValue" column="ptntTitleName" />
+		</association>
+		<association property="ptntMiddleNmTitle" column="ptntMiddleNmTitleId" javaType="Lookup">
+			<id 	property="id" 			column="ptntMiddleNmTitleId" />
+			<result property="lookupValue" column="ptntMiddleNmTitleName" />
+		</association>
+  	</resultMap>
+
+  	<sql id="ptntColumnList">
+  		PTNT_ITS_NBR,
+  		TTL_ID AS "ptntTitleId",
+  		FIRST_NM,
+  		MDL_NM_TTL_ID AS "ptntMiddleNmTitleId",
+  		MDL_NM,
+  		LAST_NM,
+  		DOB,
+  		GNDR_IND,
+  		HOME_PHN,
+  		CELL_PHN,
+  		FAX,
+  		EMAIL_ADDR1,
+  		ADDR_LN_1,
+  		ADDR_LN_2,
+  		CITY,
+  		ST_CD,
+  		CNTY_ID,
+  		ZIP_CD,
+  		JAMAAT_NM,
+  		ACTV_IND,
+  		CREATE_USR_ID,
+  		CREATE_TS,
+  		LST_UPDT_USR_ID,
+  		LST_UPDT_TS
+  	</sql>
+
+	<!-- All the tables name and column names should be in CAPS or else it would not work in MySQL -->
+	
+  	<!-- Insert -->
+	<insert id="insertPatientRecord" parameterType="Patient">
+		<![CDATA[
+			insert into D_PTNT (
+				PTNT_ITS_NBR,
+				TTL_ID,
+				FIRST_NM,
+				MDL_NM,
+				MDL_NM_TTL_ID,
+				LAST_NM,
+				DOB,
+				EMAIL_ADDR1,
+				HASH_PSWD
+			) values (
+			#{itsNumber,jdbcType=INTEGER},
+			#{ptntTitle.id,jdbcType=INTEGER},
+			#{firstName,jdbcType=VARCHAR},
+			#{ptntMiddleNmTitle.id,jdbcType=INTEGER},
+			#{middleName,jdbcType=VARCHAR},
+			#{lastName,jdbcType=VARCHAR},
+			#{dob.id,jdbcType=DATE},
+			#{emailAddress,jdbcType=VARCHAR},
+			encode(#{password,jdbcType=VARCHAR}, #{passString,jdbcType=VARCHAR}) ) ]]>
+	</insert>
+
+	<!-- Select -->
+	<select id="checkPatientPassword" resultType="string">
+		<![CDATA[
+			select case
+				when
+					encode(#{password,jdbcType=VARCHAR}, #{passString,jdbcType=VARCHAR})=HASH_PSWD
+				then
+					'true'
+				else
+					'false'
+			end
+			from D_PTNT where PTNT_ITS_NBR=#{itsNumber,jdbcType=INTEGER} ]]>
+	</select>
+
+	<select id="retrievePatientInfo" resultMap="patientInfoLight">
+		select
+			<include refid="ptntColumnList" />
+		from D_PTNT
+		where PTNT_ITS_NBR = #{itsNumber,jdbcType=INTEGER}
+	</select>
+
+	<select id="retrievePassword" resultType="string">
+		select
+			decode(HASH_PSWD, #{passString,jdbcType=VARCHAR})
+		from D_PTNT
+		where PTNT_ITS_NBR = #{itsNumber,jdbcType=INTEGER}
+	</select>
+
+</mapper>

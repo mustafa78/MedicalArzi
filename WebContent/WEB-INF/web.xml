@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee"
+xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+    <display-name>MedicalArzi</display-name>
+    <context-param>
+        <description>Vaadin production mode</description>
+        <param-name>productionMode</param-name>
+        <param-value>false</param-value>
+    </context-param>
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>/WEB-INF/conf/applicationContext.xml</param-value>
+    </context-param>
+	<context-param>
+	    <param-name>javax.faces.INTERPRET_EMPTY_STRING_SUBMITTED_VALUES_AS_NULL</param-name>
+	    <param-value>true</param-value>
+	</context-param>    
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <servlet>
+        <servlet-name>MedicalarziServlet</servlet-name>
+        <servlet-class>com.vaadin.spring.servlet.SpringAwareVaadinServlet</servlet-class>
+        <init-param>
+            <description>Vaadin UI class to use</description>
+            <param-name>UI</param-name>
+            <param-value>com.example.medicalarzi.ui.SimpleLoginUI</param-value>
+        </init-param>
+        <init-param>
+            <description>Legacy mode to return the value of the property as a string from AbstractProperty.toString()</description>
+            <param-name>legacyPropertyToString</param-name>
+            <param-value>false</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>MedicalarziServlet</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+</web-app>

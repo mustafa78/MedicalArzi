@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.medicalarzi.dao.SecurityMapper" >
+	<resultMap id="BaseResultMap" type="SecurityRole" >
+	    <id column="SEC_ROL_ID" property="secRoleId" jdbcType="INTEGER" />
+	    <result column="SEC_ROL_NM" property="secRoleName" jdbcType="VARCHAR" />
+	    <result column="MODULE_NM" property="moduleName" jdbcType="VARCHAR" />
+	    <result column="CREATE_USR_ID" property="createdBy" jdbcType="VARCHAR" />
+	    <result column="CREATE_TS" property="createdDate" jdbcType="TIMESTAMP" />
+	    <result column="LST_UPDT_USR_ID" property="updatedBy" jdbcType="VARCHAR" />
+	    <result column="LST_UPDT_TS" property="updatedDate" jdbcType="TIMESTAMP" />
+  	</resultMap>
+
+  	<sql id="Base_Column_List" >
+    	SEC_ROL_ID, SEC_ROL_NM, MODULE_NAME
+  	</sql>
+
+  	<select id="selectAllRoles" resultMap="BaseResultMap"  >
+	    select
+	    <include refid="Base_Column_List" />
+	    from D_SEC_ROLE
+	    order by SEC_ROL_NM
+  	</select>
+
+	<select id="selectSecurityRolesForUser" resultType="SecurityRole" parameterType="long" >
+		select distinct
+	    	sr.role_id as secRoleId, sr.role_nm as secRoleName
+	  	from
+	  		F_PTNT_SEC_ROLE psr, D_SEC_ROLE sr
+	    where
+	    	sr.sec_rol_id = psr.ptnt_sec_rol_id
+	 			and
+	 		psr.ptnt_its_nbr = #{itsId}
+   </select>
+
+
+</mapper>
