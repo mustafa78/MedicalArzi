@@ -26,12 +26,12 @@
 	    <result column="LST_UPDT_USR_ID" property="updatedBy" jdbcType="VARCHAR" />
 	    <result column="LST_UPDT_TS" property="updatedDate" jdbcType="TIMESTAMP" />
 	    <association property="ptntTitle" column="ptntTitleId" javaType="Lookup">
-			<id 	property="id" 			column="ptntTitleId" />
-			<result property="lookupValue" column="ptntTitleName" />
+			<id 	property="lookupId" 	column="ptntTitleId" />
+			<result property="lookupValue" 	column="ptntTitleName" />
 		</association>
 		<association property="ptntMiddleNmTitle" column="ptntMiddleNmTitleId" javaType="Lookup">
-			<id 	property="id" 			column="ptntMiddleNmTitleId" />
-			<result property="lookupValue" column="ptntMiddleNmTitleName" />
+			<id 	property="lookupId" 	column="ptntMiddleNmTitleId" />
+			<result property="lookupValue" 	column="ptntMiddleNmTitleName" />
 		</association>
   	</resultMap>
 
@@ -71,17 +71,17 @@
 				PTNT_ITS_NBR,
 				TTL_ID,
 				FIRST_NM,
-				MDL_NM,
 				MDL_NM_TTL_ID,
+				MDL_NM,
 				LAST_NM,
 				DOB,
 				EMAIL_ADDR1,
 				HASH_PSWD
 			) values (
 			#{itsNumber,jdbcType=INTEGER},
-			#{ptntTitle.id,jdbcType=INTEGER},
+			#{ptntTitle.lookupId,jdbcType=INTEGER},
 			#{firstName,jdbcType=VARCHAR},
-			#{ptntMiddleNmTitle.id,jdbcType=INTEGER},
+			#{ptntMiddleNmTitle.lookupId,jdbcType=INTEGER},
 			#{middleName,jdbcType=VARCHAR},
 			#{lastName,jdbcType=VARCHAR},
 			#{dob.id,jdbcType=DATE},

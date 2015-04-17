@@ -15,6 +15,7 @@
 		<typeAlias alias="MedicalHistory" type="com.example.medicalarzi.model.MedicalHistory" />
 		<typeAlias alias="MedicalSpeciality" type="com.example.medicalarzi.model.MedicalSpeciality" />
 		<typeAlias alias="Patient" type="com.example.medicalarzi.model.Patient" />
+		<typeAlias alias="Doctor" type="com.example.medicalarzi.model.Doctor" />
 		<typeAlias alias="PatientSecurityRole" type="com.example.medicalarzi.model.PatientSecurityRole" />
 		<typeAlias alias="Procedure" type="com.example.medicalarzi.model.Procedure" />
 		<typeAlias alias="SecurityRole" type="com.example.medicalarzi.model.SecurityRole" />

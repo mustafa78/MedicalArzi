@@ -25,11 +25,11 @@
 	    <result column="CREATE_TS" property="createdDate" jdbcType="TIMESTAMP" />
 	    <result column="LST_UPDT_USR_ID" property="updatedBy" jdbcType="VARCHAR" />
 	    <result column="LST_UPDT_TS" property="updatedDate" jdbcType="TIMESTAMP" />
-	    <association property="ptntTitle" column="ptntTitleId" javaType="Lookup">
+	    <association property="drTitle" column="ptntTitleId" javaType="Lookup">
 			<id 	property="id" 			column="ptntTitleId" />
 			<result property="lookupValue" column="ptntTitleName" />
 		</association>
-		<association property="ptntMiddleNmTitle" column="ptntMiddleNmTitleId" javaType="Lookup">
+		<association property="drMiddleNmTitle" column="ptntMiddleNmTitleId" javaType="Lookup">
 			<id 	property="id" 			column="ptntMiddleNmTitleId" />
 			<result property="lookupValue" column="ptntMiddleNmTitleName" />
 		</association>
@@ -65,9 +65,9 @@
 	<!-- All the tables name and column names should be in CAPS or else it would not work in MySQL -->
 	
   	<!-- Insert -->
-	<insert id="insertPatientRecord" parameterType="Patient">
+	<insert id="insertDoctorRecord" parameterType="Doctor">
 		<![CDATA[
-			insert into D_PTNT (
+			insert into D_DR (
 				PTNT_ITS_NBR,
 				TTL_ID,
 				FIRST_NM,
