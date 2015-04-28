@@ -33,6 +33,7 @@
 			<id 	property="lookupId" 	column="ptntMiddleNmTitleId" />
 			<result property="lookupValue" 	column="ptntMiddleNmTitleName" />
 		</association>
+		<collection column="PTNT_ITS_NBR" property="roles" ofType="SecurityRole" javaType="java.util.ArrayList" select="com.example.medicalarzi.dao.SecurityMapper.selectSecurityRolesForUser" />
   	</resultMap>
 
   	<sql id="ptntColumnList">
@@ -59,7 +60,9 @@
   		CREATE_USR_ID,
   		CREATE_TS,
   		LST_UPDT_USR_ID,
-  		LST_UPDT_TS
+  		LST_UPDT_TS,
+  		(SELECT LKUP_VAL FROM D_LOOKUPS WHERE LKUP_ID = TTL_ID) AS "ptntTitleName",
+  		(SELECT LKUP_VAL FROM D_LOOKUPS WHERE LKUP_ID = MDL_NM_TTL_ID) AS "ptntMiddleNmTitleName"
   	</sql>
 
 	<!-- All the tables name and column names should be in CAPS or else it would not work in MySQL -->
