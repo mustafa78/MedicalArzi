@@ -3,6 +3,7 @@
  */
 package com.example.medicalarzi.view;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,7 +125,8 @@ public class SimpleLoginView extends CustomComponent implements View,
 				Notification notif = new Notification(null,
 						"User registration is successfull",
 						Type.HUMANIZED_MESSAGE);
-				// notif.setStyleName("errorMsg");
+				notif.setStyleName("userFriendlyMsg");
+				notif.setDelayMsec(20000);
 				notif.setPosition(Position.TOP_LEFT);
 				notif.show(Page.getCurrent());
 			}
@@ -223,8 +225,8 @@ public class SimpleLoginView extends CustomComponent implements View,
 		validationMessage.setStyleName("errorLabel");
 
 		// Add both to a panel
-		VerticalLayout fields = new VerticalLayout(validationMessage, itsNumber,
-				password, loginButton, buttonsLayout);
+		VerticalLayout fields = new VerticalLayout(validationMessage,
+				itsNumber, password, loginButton, buttonsLayout);
 		fields.setCaption("Please enter your login credentials.");
 		fields.setSpacing(true);
 		fields.setMargin(new MarginInfo(true, true, true, false));
@@ -273,12 +275,12 @@ public class SimpleLoginView extends CustomComponent implements View,
 
 		if (event.getButton().equals(forgotPasswordLink)) {
 			logger.debug("Forgot Password clicked......");
-			
+
 			getUI().getNavigator().navigateTo(ForgotPasswordView.NAME);
-			
+
 		} else if (event.getButton().equals(registrationLink)) {
 			logger.debug("Register Now clicked......");
-			
+
 			getUI().getNavigator().navigateTo(PatientRegistrationView.NAME);
 		}
 
@@ -298,7 +300,8 @@ public class SimpleLoginView extends CustomComponent implements View,
 					Long.valueOf(itsNumber), password,
 					MedicalArziConstants.MAP_ENCODE_PASSWORD_KEY);
 
-			boolean isValid = result.equals("true") ? true : false;
+			boolean isValid = StringUtils.isNotBlank(result)
+					&& result.equals("true") ? true : false;
 
 			if (isValid) {
 
@@ -307,18 +310,39 @@ public class SimpleLoginView extends CustomComponent implements View,
 
 				if (ptnt != null) {
 					StringBuffer fullName = new StringBuffer();
-					if (ptnt.getPtntTitle() != null) {
-						fullName.append(ptnt.getPtntTitle().getName());
+					
+					if (ptnt.getPtntTitle() != null
+							&& !(StringUtils.equalsIgnoreCase(ptnt
+									.getPtntTitle().getLookupValue(),
+									MedicalArziConstants.MAP_DAWAT_TITLE_BHAI) || StringUtils
+									.equalsIgnoreCase(
+											ptnt.getPtntTitle()
+													.getLookupValue(),
+											MedicalArziConstants.MAP_DAWAT_TITLE_BEHEN))) {
+						fullName.append(ptnt.getPtntTitle().getLookupValue());
 						fullName.append(" ");
 					}
+					
 					fullName.append(ptnt.getFirstName());
-					if (ptnt.getPtntMiddleNmTitle() != null) {
-						fullName.append(ptnt.getPtntMiddleNmTitle().getName());
+					
+					if (ptnt.getPtntMiddleNmTitle() != null
+							&& !(StringUtils.equalsIgnoreCase(ptnt
+									.getPtntMiddleNmTitle().getLookupValue(),
+									MedicalArziConstants.MAP_DAWAT_TITLE_BHAI) || StringUtils
+									.equalsIgnoreCase(
+											ptnt.getPtntMiddleNmTitle()
+													.getLookupValue(),
+											MedicalArziConstants.MAP_DAWAT_TITLE_BEHEN))) {
+						fullName.append(ptnt.getPtntMiddleNmTitle()
+								.getLookupValue());
+						fullName.append(" ");
+						
+					} else {
+						fullName.append(" ");
+						fullName.append(ptnt.getMiddleName());
 						fullName.append(" ");
 					}
-					else {
-						fullName.append(" ");
-					}
+					
 					fullName.append(ptnt.getLastName());
 
 					// Store the full name of the current user and his ITS
