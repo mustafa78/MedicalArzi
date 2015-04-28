@@ -87,13 +87,11 @@ public class Patient implements Serializable {
 
 	private String additionalComments;
 
-	private Condition condition;
-
-	private Procedure procedure;
-
 	private MedicalHistory medicalHistory;
 
 	private List<SecurityRole> roles;
+	
+	private List<Arzi> arzis;
 
 	//Only for UI purpose
 	private String passString;
@@ -360,36 +358,6 @@ public class Patient implements Serializable {
 		this.additionalComments = additionalComments;
 	}
 
-	/**
-	 * @return the condition
-	 */
-	public Condition getCondition() {
-		return condition;
-	}
-
-	/**
-	 * @param condition
-	 *            the condition to set
-	 */
-	public void setCondition(Condition condition) {
-		this.condition = condition;
-	}
-
-	/**
-	 * @return the procedure
-	 */
-	public Procedure getProcedure() {
-		return procedure;
-	}
-
-	/**
-	 * @param procedure
-	 *            the procedure to set
-	 */
-	public void setProcedure(Procedure procedure) {
-		this.procedure = procedure;
-	}
-
 	public String getJamaatName() {
 		return jamaatName;
 	}
@@ -502,6 +470,14 @@ public class Patient implements Serializable {
 
 	public void setPassString(String passString) {
 		this.passString = passString;
+	}
+
+	public List<Arzi> getArzis() {
+		return arzis;
+	}
+
+	public void setArzis(List<Arzi> arzis) {
+		this.arzis = arzis;
 	}
 
 }
