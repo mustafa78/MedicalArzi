@@ -100,5 +100,5 @@ public interface LookupMapper {
 	 * 
 	 * @return com.example.medicalarzi.model.BodyPart
 	 */
-	public List<BodyPart> selectAllHumanBodyParts();
+	public List<BodyPart> selectAllBodyParts();
 }

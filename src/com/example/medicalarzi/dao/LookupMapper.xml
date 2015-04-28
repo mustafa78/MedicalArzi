@@ -17,6 +17,16 @@
    	<resultMap id="DistinctLookupTypeResultMap" type="Lookup" >
     	<result column="LOOKUP_TYPE" property="lookupType" jdbcType="VARCHAR" />
   	</resultMap>
+  	<resultMap type="BodyPart" id="BodyPartResultMap">
+  		<id column="BDY_PRT_ID" property="bodyPartId" jdbcType="INTEGER" />
+	    <result column="BDY_PRT_PRFX_CD" property="bodyPartPrefixCd" jdbcType="VARCHAR" />
+	    <result column="BDY_PRT_NM" property="bodyPartName" jdbcType="VARCHAR" />
+	    <result column="ACTV_IND" property="activeInd" jdbcType="VARCHAR" />
+	    <result column="CREATE_TS" property="createdDate" jdbcType="TIMESTAMP" />
+	    <result column="LST_UPDT_TS" property="updatedDate" jdbcType="TIMESTAMP" />
+	    <result column="CREATE_USR_ID" property="createdBy" jdbcType="VARCHAR" />
+	    <result column="LST_UPDT_USR_ID" property="updatedBy" jdbcType="VARCHAR" />
+  	</resultMap>
   	<resultMap type="Condition" id="ConditionResultMap">
   		<id column="COND_ID" property="conditionId" jdbcType="INTEGER" />
 	    <result column="COND_PRFX_CD" property="conditionPrefixCd" jdbcType="VARCHAR" />
@@ -43,12 +53,16 @@
     	LKUP_ID, LKUP_TYPE, LKUP_VAL, LKUP_DESC, SORT_ORDER, ACTIVE_IND,
     	CREATE_TS, LST_UPDT_TS, CREATE_USR_ID, LST_UPDT_USR_ID
   	</sql>
+  	<sql id="BodyPart_Column_List" >
+    	BDY_PRT_ID, BDY_PRT_PRFX_CD, BDY_PRT_NM, ACTV_IND,
+    	CREATE_TS, LST_UPDT_TS, CREATE_USR_ID, LST_UPDT_USR_ID
+  	</sql>
   	<sql id="Condition_Column_List" >
-    	COND_ID, COND_PRFX_CD, COND_NM, ACTV_IND
+    	COND_ID, COND_PRFX_CD, COND_NM, ACTV_IND,
     	CREATE_TS, LST_UPDT_TS, CREATE_USR_ID, LST_UPDT_USR_ID
   	</sql>  	
   	<sql id="Procedure_Column_List" >
-    	PROC_ID, PROC_PRFX_CD, PROC_NM, ACTV_IND
+    	PROC_ID, PROC_PRFX_CD, PROC_NM, ACTV_IND,
     	CREATE_TS, LST_UPDT_TS, CREATE_USR_ID, LST_UPDT_USR_ID
   	</sql>
 
@@ -98,8 +112,16 @@
 	    where LKUP_VALUE = #{lookupValue,jdbcType=VARCHAR} and ACTIVE_IND = 'Y'
   	</select>
   	
+  	<!-- Select all body parts -->
+  	<select id="selectAllBodyParts" resultMap="BodyPartResultMap">
+	    select
+	    <include refid="BodyPart_Column_List" />
+	    from D_BDY_PRT
+	    where ACTV_IND = 'Y'
+  	</select>
+  	
   	<!-- Select all conditions -->
-  	<select id="selectAllMedicalConditions" resultMap="ConditionResultMap" useCache="true">
+  	<select id="selectAllMedicalConditions" resultMap="ConditionResultMap">
 	    select
 	    <include refid="Condition_Column_List" />
 	    from D_COND
@@ -107,7 +129,7 @@
   	</select>
   	
   	<!-- Select all procedure -->
-  	<select id="selectAllMedicalProcedures" resultMap="ProcedureResultMap" useCache="true">
+  	<select id="selectAllMedicalProcedures" resultMap="ProcedureResultMap">
 	    select
 	    <include refid="Procedure_Column_List" />
 	    from D_PROC
