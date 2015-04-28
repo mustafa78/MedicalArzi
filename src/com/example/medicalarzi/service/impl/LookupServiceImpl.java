@@ -9,7 +9,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
 
 import com.example.medicalarzi.dao.LookupMapper;
+import com.example.medicalarzi.model.BodyPart;
+import com.example.medicalarzi.model.Condition;
 import com.example.medicalarzi.model.Lookup;
+import com.example.medicalarzi.model.Procedure;
 import com.example.medicalarzi.service.LookupService;
 
 /**
@@ -88,6 +91,24 @@ public class LookupServiceImpl implements LookupService {
 	public void updateLookup(Lookup lookup) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public List<BodyPart> getListOfAllBodyParts() {
+		List<BodyPart> listOfBodyParts = lookupMapper.selectAllBodyParts();
+		return listOfBodyParts;
+	}
+
+	@Override
+	public List<Condition> getListOfAllMedicalConditions() {
+		List<Condition> listOfMedicalConditions = lookupMapper.selectAllMedicalConditions();
+		return listOfMedicalConditions;
+	}
+
+	@Override
+	public List<Procedure> getListOfAllMedicalProcedures() {
+		List<Procedure> listOfProcedures = lookupMapper.selectAllMedicalProcedures();
+		return listOfProcedures;
 	}
 
 }

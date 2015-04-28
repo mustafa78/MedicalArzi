@@ -5,7 +5,10 @@ package com.example.medicalarzi.service;
 
 import java.util.List;
 
+import com.example.medicalarzi.model.BodyPart;
+import com.example.medicalarzi.model.Condition;
 import com.example.medicalarzi.model.Lookup;
+import com.example.medicalarzi.model.Procedure;
 
 
 /**
@@ -55,5 +58,27 @@ public interface LookupService {
 	 * @param lookup
 	 */
 	public void updateLookup(Lookup lookup);
+	
+	/**
+	 * This method is responsible for getting all the list of the human body
+	 * parts.
+	 * 
+	 * @return java.util.List
+	 */
+	public List<BodyPart> getListOfAllBodyParts();
+	
+	/**
+	 * This method is responsible for getting all the medical conditions.
+	 * 
+	 * @return java.util.List
+	 */
+	public List<Condition> getListOfAllMedicalConditions();
+	
+	/**
+	 * This method is responsible for getting all the available medical procedures.
+	 * 
+	 * @return java.util.List
+	 */
+	public List<Procedure> getListOfAllMedicalProcedures();
 
 }
