@@ -36,6 +36,7 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
@@ -61,6 +62,8 @@ public class ForgotPasswordView extends CustomComponent implements View,
 
 	private VerticalLayout mainLayout;
 
+	private HorizontalLayout buttonLayout;
+
 	private ArziFooterComponent footer;
 
 	private FormLayout viewLayout;
@@ -71,7 +74,9 @@ public class ForgotPasswordView extends CustomComponent implements View,
 
 	private TextField emailAddress;
 
-	private Button sendEmailBtn;
+	private Button backToLoginBtn;
+
+	private Button resetPasswdBtn;
 
 	private static Properties properties = PropertyLoader
 			.loadProperties(MedicalArziConstants.MAP_PROPERTIES);
@@ -88,10 +93,10 @@ public class ForgotPasswordView extends CustomComponent implements View,
 	}
 
 	/**
-	 * This method should first build the main layout, set the composition
-	 * root and then do any custom initialization.
+	 * This method should first build the main layout, set the composition root
+	 * and then do any custom initialization.
 	 *
-	 */		
+	 */
 	public void init() {
 		buildMainLayout();
 		mainLayout.setStyleName(Reindeer.LAYOUT_BLUE);
@@ -129,10 +134,14 @@ public class ForgotPasswordView extends CustomComponent implements View,
 		mainLayout.addComponent(header);
 
 		// viewLayout
-		viewLayout = buildViewLayout();
+		buildViewLayout();
 		mainLayout.addComponent(viewLayout);
-		mainLayout.setExpandRatio(viewLayout, 4.0f);
+		//mainLayout.setExpandRatio(viewLayout, 4.0f);
 		mainLayout.setComponentAlignment(viewLayout, Alignment.MIDDLE_CENTER);
+
+		buildButtonLayout();
+		mainLayout.addComponent(buttonLayout);
+		mainLayout.setComponentAlignment(buttonLayout, Alignment.TOP_CENTER);		
 
 		// footer
 		footer = new ArziFooterComponent();
@@ -145,10 +154,31 @@ public class ForgotPasswordView extends CustomComponent implements View,
 		return mainLayout;
 	}
 
+	private void buildButtonLayout() {
+		buttonLayout = new HorizontalLayout();
+		buttonLayout.setImmediate(false);
+		buttonLayout.setSpacing(true);
+		
+		// backToLoginBtn
+		backToLoginBtn = new Button("", this);
+		backToLoginBtn.setIcon(new ThemeResource("img/back-button.png"));
+		backToLoginBtn.setStyleName(Reindeer.BUTTON_LINK);
+		buttonLayout.addComponent(backToLoginBtn);
+		buttonLayout.setComponentAlignment(backToLoginBtn, Alignment.MIDDLE_RIGHT);
+
+		// resetPasswdBtn
+		resetPasswdBtn = new Button("", this);
+		resetPasswdBtn.setIcon(new ThemeResource(
+				"img/reset-password-button.png"));
+		resetPasswdBtn.setStyleName(Reindeer.BUTTON_LINK);
+		buttonLayout.addComponent(resetPasswdBtn);
+		buttonLayout.setComponentAlignment(backToLoginBtn, Alignment.MIDDLE_LEFT);
+	}
+
 	/**
 	 *
 	 */
-	private FormLayout buildViewLayout() {
+	private void buildViewLayout() {
 		viewLayout = new FormLayout();
 		viewLayout.setImmediate(true);
 		viewLayout.setCaption("Forgot Password:");
@@ -183,20 +213,16 @@ public class ForgotPasswordView extends CustomComponent implements View,
 		emailAddress.setWidth("300px");
 		viewLayout.addComponent(emailAddress);
 
-		// sendEmailBtn
-		sendEmailBtn = new Button("", this);
-		sendEmailBtn.setIcon(new ThemeResource("img/sendemail-button.png"));
-		sendEmailBtn.setStyleName(Reindeer.BUTTON_LINK);
-		viewLayout.addComponent(sendEmailBtn);
-
-		return viewLayout;
 	}
 
 	@Override
 	public void buttonClick(ClickEvent event) {
-		if (event.getButton().equals(sendEmailBtn)) {
-			
-			if(StringUtils.isEmpty(emailAddress.getValue())) {
+		if (event.getButton().equals(backToLoginBtn)) {
+			getUI().getNavigator().navigateTo(SimpleLoginView.NAME);
+		}
+		else if (event.getButton().equals(resetPasswdBtn)) {
+
+			if (StringUtils.isEmpty(emailAddress.getValue())) {
 				setEmailAddressField();
 			}
 			// Retrieve the patient's (or user's) password and send an email
@@ -204,8 +230,8 @@ public class ForgotPasswordView extends CustomComponent implements View,
 			String password = patientService.emailForgotPassword(
 					Long.valueOf(itsNumber.getValue()),
 					MedicalArziConstants.MAP_ENCODE_PASSWORD_KEY);
-			
-			//Email the password
+
+			// Email the password
 			emailPasswordToPatient(password);
 
 		}
@@ -285,10 +311,10 @@ public class ForgotPasswordView extends CustomComponent implements View,
 	 * 
 	 */
 	private void setEmailAddressField() {
-		
-		Patient patient = patientService.getPatientInfo(Long
-				.valueOf(itsNumber.getValue()));
-		
+
+		Patient patient = patientService.getPatientInfo(Long.valueOf(itsNumber
+				.getValue()));
+
 		if (patient != null) {
 			logger.debug("Get the email address and set it in the field. The email address for ITS number -> "
 					+ patient.getItsNumber()
@@ -301,8 +327,8 @@ public class ForgotPasswordView extends CustomComponent implements View,
 
 			emailAddress.setReadOnly(true);
 
-			logger.debug("Email address -> "
-					+ patient.getEmailAddress() + " successfully set.");
+			logger.debug("Email address -> " + patient.getEmailAddress()
+					+ " successfully set.");
 		}
 	}
 
