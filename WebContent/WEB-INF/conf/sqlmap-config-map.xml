@@ -9,6 +9,7 @@
 
 	<typeAliases>
 		<typeAlias alias="Arzi" type="com.example.medicalarzi.model.Arzi" />
+		<typeAlias alias="ArziType" type="com.example.medicalarzi.model.ArziType" />
 		<typeAlias alias="BodyPart" type="com.example.medicalarzi.model.BodyPart" />
 		<typeAlias alias="Condition" type="com.example.medicalarzi.model.Condition" />
 		<typeAlias alias="Procedure" type="com.example.medicalarzi.model.Procedure" />
