@@ -18,8 +18,12 @@ public interface MedicalArziConstants {
 
 	final static public String MAP_PROPERTIES = "com.example.medicalarzi.resources.MAPConf";
 	
-	//Lookup types
+	//Lookup types & value constants
 	final static public String MAP_DAWAT_TITLE = "DAWAT TITLE";
+	
+	final static public String MAP_DAWAT_TITLE_BHAI = "Bhai";
+	
+	final static public String MAP_DAWAT_TITLE_BEHEN = "Behen";
 
 	// For sending email.
 	final static public String EMAIL_HOST = "EmailHost";
