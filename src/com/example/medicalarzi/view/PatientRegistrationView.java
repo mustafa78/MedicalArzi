@@ -81,7 +81,7 @@ public class PatientRegistrationView extends CustomComponent implements View,
 
 	private Button registerBtn;
 
-	private Button clearBtn;
+	private Button backBtn;
 
 	private PasswordField confirmPassword;
 
@@ -372,12 +372,12 @@ public class PatientRegistrationView extends CustomComponent implements View,
 		buttonsLayout = new HorizontalLayout();
 
 		// clearBtn
-		clearBtn = new Button(new ThemeResource("img/clear-button.png"));
-		clearBtn.setStyleName(Reindeer.BUTTON_LINK);
-		clearBtn.addClickListener(this);
-		clearBtn.setImmediate(true);
-		buttonsLayout.addComponent(clearBtn);
-		buttonsLayout.setComponentAlignment(clearBtn, Alignment.MIDDLE_RIGHT);
+		backBtn = new Button(new ThemeResource("img/back-button.png"));
+		backBtn.setStyleName(Reindeer.BUTTON_LINK);
+		backBtn.addClickListener(this);
+		backBtn.setImmediate(true);
+		buttonsLayout.addComponent(backBtn);
+		buttonsLayout.setComponentAlignment(backBtn, Alignment.MIDDLE_RIGHT);
 
 		// registerBtn
 		registerBtn = new Button("", this);
@@ -395,8 +395,11 @@ public class PatientRegistrationView extends CustomComponent implements View,
 
 	@Override
 	public void buttonClick(ClickEvent event) {
-		if (event.getButton().equals(clearBtn)) {
+		if (event.getButton().equals(backBtn)) {
 			getUI().getNavigator().navigateTo(SimpleLoginView.NAME);
+			
+			MedicalArziUtils.setSessionAttribute(
+					"isRegistrationSuccess", false);			
 		}
 		if (event.getButton().equals(registerBtn)) {
 
