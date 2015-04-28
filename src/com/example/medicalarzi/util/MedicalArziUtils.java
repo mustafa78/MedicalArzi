@@ -10,8 +10,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.example.medicalarzi.model.ArziType;
+import com.example.medicalarzi.model.BodyPart;
+import com.example.medicalarzi.model.Condition;
 import com.example.medicalarzi.model.Lookup;
 import com.example.medicalarzi.model.Patient;
+import com.example.medicalarzi.model.Procedure;
 import com.vaadin.data.Container;
 import com.vaadin.data.Validator;
 import com.vaadin.data.util.BeanItemContainer;
@@ -94,10 +98,21 @@ public class MedicalArziUtils {
 		if (objClass == Lookup.class)
 			container = new BeanItemContainer<Lookup>(
 					(Class<? super Lookup>) objClass);
+		else if (objClass == BodyPart.class)
+			container = new BeanItemContainer<BodyPart>(
+					(Class<? super BodyPart>) objClass);
+		else if (objClass == Condition.class)
+			container = new BeanItemContainer<Condition>(
+					(Class<? super Condition>) objClass);
+		else if (objClass == Procedure.class)
+			container = new BeanItemContainer<Procedure>(
+					(Class<? super Procedure>) objClass);
+		else if (objClass == ArziType.class)
+			container = new BeanItemContainer<ArziType>(
+					(Class<? super ArziType>) objClass);
 
 		return container;
 	}
-
 
 	/**
 	 * This method provides the thread-safe access to the session attributes.
