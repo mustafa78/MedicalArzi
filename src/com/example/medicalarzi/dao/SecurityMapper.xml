@@ -24,13 +24,13 @@
 
 	<select id="selectSecurityRolesForUser" resultType="SecurityRole" parameterType="long" >
 		select distinct
-	    	sr.role_id as secRoleId, sr.role_nm as secRoleName
+	    	sr.sec_rol_id as secRoleId, sr.sec_rol_nm as secRoleName
 	  	from
-	  		F_PTNT_SEC_ROLE psr, D_SEC_ROLE sr
+	  		F_PTNT_SEC_ROL psr, D_SEC_ROL sr
 	    where
 	    	sr.sec_rol_id = psr.ptnt_sec_rol_id
 	 			and
-	 		psr.ptnt_its_nbr = #{itsId}
+	 		psr.ptnt_its_nbr = #{ptntItsNumber}
    </select>
 
 
