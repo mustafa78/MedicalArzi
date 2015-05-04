@@ -8,20 +8,22 @@
 	</settings>
 
 	<typeAliases>
+		<typeAlias alias="ArziHeader" type="com.example.medicalarzi.model.ArziHeader" />
 		<typeAlias alias="Arzi" type="com.example.medicalarzi.model.Arzi" />
 		<typeAlias alias="ArziType" type="com.example.medicalarzi.model.ArziType" />
 		<typeAlias alias="BodyPart" type="com.example.medicalarzi.model.BodyPart" />
 		<typeAlias alias="Condition" type="com.example.medicalarzi.model.Condition" />
 		<typeAlias alias="Procedure" type="com.example.medicalarzi.model.Procedure" />
 		<typeAlias alias="MedicalHistory" type="com.example.medicalarzi.model.MedicalHistory" />
-		<typeAlias alias="MedicalSpeciality" type="com.example.medicalarzi.model.MedicalSpeciality" />
+		<typeAlias alias="Speciality" type="com.example.medicalarzi.model.Speciality" />
 		<typeAlias alias="Patient" type="com.example.medicalarzi.model.Patient" />
-		<typeAlias alias="Doctor" type="com.example.medicalarzi.model.Doctor" />
+		<typeAlias alias="Reviewer" type="com.example.medicalarzi.model.Reviewer" />
 		<typeAlias alias="PatientSecurityRole" type="com.example.medicalarzi.model.PatientSecurityRole" />
 		<typeAlias alias="Procedure" type="com.example.medicalarzi.model.Procedure" />
 		<typeAlias alias="SecurityRole" type="com.example.medicalarzi.model.SecurityRole" />
 		<typeAlias alias="Status" type="com.example.medicalarzi.model.Status" />
 		<typeAlias alias="Lookup" type="com.example.medicalarzi.model.Lookup" />
+		<typeAlias alias="GregHijDate" type="com.example.medicalarzi.model.GregHijDate" />
 	</typeAliases>
 
 	<typeHandlers>
