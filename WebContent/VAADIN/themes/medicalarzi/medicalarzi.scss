@@ -186,7 +186,10 @@ $v-error-indicator-color: #ed473b;
 	}
 	
 	.mapTabsheet .v-tabsheet-tabitem-selected .v-captiontext {
-		color: #FFFFFF;
+		color: #F1F2F4;
+		padding-left: 5px;
+		/*To set the text shadow to default values as for it is defined for borderless tabsheet and is causing some conflict*/
+		text-shadow: initial; 
 	}
 	
 	.v-panel-content-arziContent {
