@@ -1,14 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.example.medicalarzi.dao.ArziMapper" >
-	<resultMap id="BaseResultMap" type="Arzi" >
+	<!-- Result Map -->
+	<resultMap id="ArziHdrResultMap" type="ArziHeader" >
 	    <id column="ARZI_ID" property="arziId" jdbcType="INTEGER" />
 	    <result column="ITS_NBR" property="itsNumber" jdbcType="INTEGER" />
-	    <result column="DR_ITS_NBR" property="drItsNumber" jdbcType="INTEGER" />
+	    <result column="RVWR_ITS_NBR" property="reviewerItsNumber" jdbcType="INTEGER" />
 	    <result column="CREATE_USR_ID" property="createdBy" jdbcType="VARCHAR" />
 	    <result column="CREATE_TS" property="createdDate" jdbcType="TIMESTAMP" />
 	    <result column="LST_UPDT_USR_ID" property="updatedBy" jdbcType="VARCHAR" />
 	    <result column="LST_UPDT_TS" property="updatedDate" jdbcType="TIMESTAMP" />
-	    
+	    <association property="arziType" column="arziTypeId" javaType="ArziType">
+			<id 	property="arziTypeId" 	column="arziTypeId" />
+			<result property="arzTypeName" 	column="arzTypeName" />
+		</association>
+	    <association property="procedure" column="procedureId" javaType="Procedure">
+			<id 	property="procedureId" 	column="procedureId" />
+			<result property="procedurePrefixCd" 	column="procedurePrefixCd" />
+			<result property="procedureName" 	column="procedureName" />
+		</association>
+		<association property="condition" column="conditionId" javaType="Condition">
+			<id 	property="conditionId" 	column="conditionId" />
+			<result property="conditionPrefixCd" 	column="conditionPrefixCd" />
+			<result property="conditionName" 	column="conditionName" />
+		</association>
   	</resultMap>
 </mapper>

@@ -89,7 +89,7 @@
 			encode(#{password,jdbcType=VARCHAR}, #{passString,jdbcType=VARCHAR}) ) ]]>
 	</insert>
 
-	<!-- Select -->
+	<!-- Select statements-->
 	<select id="checkPatientPassword" resultType="string">
 		<![CDATA[
 			select case
