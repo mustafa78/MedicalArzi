@@ -1,8 +1,6 @@
 package com.example.medicalarzi.view;
 
 import java.text.NumberFormat;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
@@ -10,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import com.example.medicalarzi.component.ArziDateField;
 import com.example.medicalarzi.component.ArziFooterComponent;
 import com.example.medicalarzi.component.ArziHeaderComponent;
 import com.example.medicalarzi.model.Lookup;
@@ -26,7 +25,6 @@ import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.fieldgroup.PropertyId;
-import com.vaadin.data.util.converter.Converter;
 import com.vaadin.data.util.converter.StringToLongConverter;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -287,38 +285,7 @@ public class PatientRegistrationView extends CustomComponent implements View,
 		viewLayout.addComponent(lastName);
 
 		// dob
-		dob = new PopupDateField("Date of Birth:") {
-
-			private static final long serialVersionUID = 6412534995473779492L;
-
-			@Override
-			protected Date handleUnparsableDateString(String dateString)
-					throws Converter.ConversionException {
-				// Try custom parsing
-				String fields[] = dateString.split("/");
-				if (fields.length >= 3) {
-					try {
-						int day = Integer.parseInt(fields[0]);
-						int month = Integer.parseInt(fields[1]) - 1;
-						int year = Integer.parseInt(fields[2]);
-						GregorianCalendar c = new GregorianCalendar(year,
-								month, day);
-						return c.getTime();
-					} catch (NumberFormatException e) {
-						throw new Converter.ConversionException("Not a number");
-					}
-				}
-
-				// Bad date
-				throw new Converter.ConversionException(
-						"Your date needs two slashes");
-			}
-		};
-		// Don't be too tight about the user-input
-		dob.setLenient(true);
-		// Display only year, month, and day in slash-delimited format
-		dob.setDateFormat("dd/MM/yyyy");
-		dob.setInputPrompt("dd/MM/yyyy");
+		dob = new ArziDateField("Date of Birth:") ;
 		dob.setImmediate(true);
 		dob.addBlurListener(new InstallPatientValidatorBlurListener(dob, "dob"));
 		viewLayout.addComponent(dob);
