@@ -8,11 +8,14 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import com.example.medicalarzi.component.ArziDateField;
 import com.example.medicalarzi.component.ArziFooterComponent;
 import com.example.medicalarzi.component.ArziHeaderComponent;
 import com.example.medicalarzi.component.CustomFormComponent;
+import com.example.medicalarzi.model.ArziType;
 import com.example.medicalarzi.model.BodyPart;
 import com.example.medicalarzi.model.Condition;
+import com.example.medicalarzi.model.Lookup;
 import com.example.medicalarzi.model.Procedure;
 import com.example.medicalarzi.service.LookupService;
 import com.example.medicalarzi.service.PatientService;
@@ -37,9 +40,9 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
@@ -82,12 +85,12 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 	private Panel ptntMedicalInfoSection;
 
 	private CustomFormComponent ptntMedicalInfoForm;
-	
+
 	// Buttons layout
 	private HorizontalLayout buttonsLayout;
-	
+
 	private Button submitBtn;
-	
+
 	private Button saveBtn;
 
 	private Button cancelBtn;
@@ -99,11 +102,35 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 	@PropertyId("itsNumber")
 	private TextField itsNumber;
 
+	@PropertyId("firstName")
 	private TextField firstName;
 
+	@PropertyId("middleName")
 	private TextField middleName;
 
+	@PropertyId("lastName")
 	private TextField lastName;
+
+	@PropertyId("gender")
+	private OptionGroup gender;
+
+	@PropertyId("dob")
+	private ArziDateField dob;
+
+	@PropertyId("homeAddress1")
+	private TextField addressLn1;
+
+	@PropertyId("homeAddress2")
+	private TextField addressLn2;
+
+	@PropertyId("city")
+	private TextField city;
+
+	@PropertyId("state")
+	private TextField state;
+
+	@PropertyId("zip")
+	private TextField zip;
 
 	// Medical information fields
 	@PropertyId("arziType")
@@ -117,8 +144,8 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 
 	@PropertyId("condition")
 	private ComboBox condition;
-	
-	private TextArea description;
+
+	//private TextArea description;
 
 	// Service stubs
 	@Autowired
@@ -213,8 +240,10 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 
 		// viewLayout
 		buildViewlayout();
-		tabSheet.addTab(viewLayout, "New Arzi", null);
-		tabSheet.addTab(new Label("Test tab"), "Test Tab", null);
+		tabSheet.addTab(viewLayout, "New Arzi", new ThemeResource(
+				"icons/newArzi.png"));
+		tabSheet.addTab(new Label("Inbox"), "Inbox", new ThemeResource(
+				"icons/inbox.png"));
 	}
 
 	/**
@@ -235,7 +264,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 
 		// ptntMedicalSection
 		buildPatientMedicalSection();
-		
+
 		// buttonsLayout
 		buildButtonsLayout();
 	}
@@ -290,6 +319,31 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		middleName.setWidth("300px");
 		leftFormLayout.addComponent(middleName);
 
+		gender = new OptionGroup("Gender:");
+		gender.setContainerDataSource(MedicalArziUtils
+				.getContainer(Lookup.class));
+		gender.addItems(lookupService
+				.getByLookupType(MedicalArziConstants.MAP_GENDER));
+		gender.setItemCaptionMode(ItemCaptionMode.PROPERTY);
+		gender.setItemCaptionPropertyId("description");
+		gender.setStyleName("horizontal");
+		leftFormLayout.addComponent(gender);
+
+		// addressLn1
+		addressLn1 = new TextField("Address Ln1:");
+		addressLn1.setWidth("300px");
+		leftFormLayout.addComponent(addressLn1);
+
+		// addressLn2
+		addressLn2 = new TextField("Address Ln2:");
+		addressLn2.setWidth("300px");
+		leftFormLayout.addComponent(addressLn2);
+
+		// zip
+		zip = new TextField("Pincode/Zip:");
+		zip.setWidth("300px");
+		leftFormLayout.addComponent(zip);
+
 		/**
 		 * Add the fields to the right FormLayout.
 		 * 
@@ -303,9 +357,24 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		firstName.setWidth("300px");
 		rightFormLayout.addComponent(firstName);
 
-		lastName = new TextField("Last Name:");
+		lastName = new TextField("Surname/Last Name:");
 		lastName.setWidth("300px");
 		rightFormLayout.addComponent(lastName);
+
+		dob = new ArziDateField("Date of Birth:");
+		dob.setImmediate(true);
+		dob.setDescription("Please enter the date in the dd/MM/yyy format.");
+		rightFormLayout.addComponent(dob);
+
+		// city
+		city = new TextField("City:");
+		city.setWidth("300px");
+		rightFormLayout.addComponent(city);
+
+		// state
+		state = new TextField("State:");
+		state.setWidth("300px");
+		rightFormLayout.addComponent(state);
 	}
 
 	/**
@@ -332,28 +401,25 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		FormLayout leftFormLayout = (FormLayout) MedicalArziUtils.findById(
 				ptntMedicalInfoForm,
 				MedicalArziConstants.CUSTOM_FORM_LEFTFORM_LAYOUT_ID);
+		// arziType
+		arziType = new ComboBox("Arzi Type:");
+		arziType.setContainerDataSource(MedicalArziUtils
+				.getContainer(ArziType.class));
+		arziType.addItems(lookupService.getListOfAllArziTypes());
+		arziType.setInputPrompt("Please select the arzi type.");
+		arziType.setItemCaptionMode(ItemCaptionMode.PROPERTY);
+		arziType.setItemCaptionPropertyId("arziTypeName");
+		leftFormLayout.addComponent(arziType);
 
 		// bodyPart
 		bodyPart = new ComboBox("Body Part:");
 		bodyPart.setContainerDataSource(MedicalArziUtils
 				.getContainer(BodyPart.class));
-		bodyPart.addItems(lookupService
-				.getListOfAllBodyParts());
+		bodyPart.addItems(lookupService.getListOfAllBodyParts());
 		bodyPart.setInputPrompt("Please select the affected body part.");
 		bodyPart.setItemCaptionMode(ItemCaptionMode.PROPERTY);
 		bodyPart.setItemCaptionPropertyId("bodyPartName");
 		leftFormLayout.addComponent(bodyPart);
-		
-		// procedure
-		procedure = new ComboBox("Medical Procedure:");
-		procedure.setContainerDataSource(MedicalArziUtils
-				.getContainer(Procedure.class));
-		procedure.addItems(lookupService
-				.getListOfAllMedicalProcedures());
-		procedure.setInputPrompt("Please select the medical procedure.");
-		procedure.setItemCaptionMode(ItemCaptionMode.PROPERTY);
-		procedure.setItemCaptionPropertyId("procedureName");
-		leftFormLayout.addComponent(procedure);		
 
 		/**
 		 * Add the fields to the right FormLayout.
@@ -366,14 +432,23 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		condition = new ComboBox("Medical Condition:");
 		condition.setContainerDataSource(MedicalArziUtils
 				.getContainer(Condition.class));
-		condition.addItems(lookupService
-				.getListOfAllMedicalConditions());
+		condition.addItems(lookupService.getListOfAllMedicalConditions());
 		condition.setInputPrompt("Please select your medical condition.");
 		condition.setItemCaptionMode(ItemCaptionMode.PROPERTY);
 		condition.setItemCaptionPropertyId("conditionName");
 		rightFormLayout.addComponent(condition);
+
+		// procedure
+		procedure = new ComboBox("Medical Procedure:");
+		procedure.setContainerDataSource(MedicalArziUtils
+				.getContainer(Procedure.class));
+		procedure.addItems(lookupService.getListOfAllMedicalProcedures());
+		procedure.setInputPrompt("Please select the medical procedure.");
+		procedure.setItemCaptionMode(ItemCaptionMode.PROPERTY);
+		procedure.setItemCaptionPropertyId("procedureName");
+		rightFormLayout.addComponent(procedure);
 	}
-	
+
 	private void buildButtonsLayout() {
 
 		buttonsLayout = new HorizontalLayout();
@@ -386,7 +461,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		buttonsLayout.addComponent(cancelBtn);
 		buttonsLayout.setExpandRatio(cancelBtn, 1.0f);
 		buttonsLayout.setComponentAlignment(cancelBtn, Alignment.MIDDLE_RIGHT);
-		
+
 		// saveBtn
 		saveBtn = new Button("", this);
 		saveBtn.setIcon(new ThemeResource("img/save.png"));
@@ -405,25 +480,22 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 
 		buttonsLayout.setSpacing(true);
 		buttonsLayout.setStyleName("ptntRegistrationBtn");
-		
+
 		// adds buttonLayout to the viewLayout
 		viewLayout.addComponent(buttonsLayout);
-		viewLayout.setComponentAlignment(buttonsLayout, Alignment.MIDDLE_CENTER);
-	}	
+		viewLayout
+				.setComponentAlignment(buttonsLayout, Alignment.MIDDLE_CENTER);
+	}
 
 	@Override
 	public void buttonClick(ClickEvent event) {
 		if (event.getButton().equals(cancelBtn)) {
-			getUI().getNavigator().navigateTo(SimpleLoginView.NAME);
 			
-			MedicalArziUtils.setSessionAttribute(
-					"isRegistrationSuccess", false);			
-		}
-		else if(event.getButton().equals(saveBtn)) {
-			//Insert a new arzi into the database and change the status to save
-		}
-		else if(event.getButton().equals(submitBtn)) {
-			//Insert a new arzi into the database and change the status to submitted
+		} else if (event.getButton().equals(saveBtn)) {
+			// Insert a new arzi into the database and change the status to save
+		} else if (event.getButton().equals(submitBtn)) {
+			// Insert a new arzi into the database and change the status to
+			// submitted
 		}
 	}
 
