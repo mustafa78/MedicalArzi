@@ -5,6 +5,7 @@ package com.example.medicalarzi.service;
 
 import java.util.List;
 
+import com.example.medicalarzi.model.ArziType;
 import com.example.medicalarzi.model.BodyPart;
 import com.example.medicalarzi.model.Condition;
 import com.example.medicalarzi.model.Lookup;
@@ -80,5 +81,12 @@ public interface LookupService {
 	 * @return java.util.List
 	 */
 	public List<Procedure> getListOfAllMedicalProcedures();
+	
+	/**
+	 * This method is responsible for getting all the possible arzi types.
+	 *  
+	 * @return java.util.List
+	 */
+	public List<ArziType> getListOfAllArziTypes();
 
 }
