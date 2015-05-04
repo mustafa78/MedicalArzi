@@ -43,7 +43,7 @@ public class Patient implements Serializable {
 	@NotEmpty(message="Please enter your last name/ surname.")
 	private String lastName;
 
-	private String genderInd;
+	private String gender;
 
 	@Past(message="The DOB must be in the past.")
 	private Date dob;
@@ -164,18 +164,18 @@ public class Patient implements Serializable {
 	}
 
 	/**
-	 * @return the genderInd
+	 * @return the gender
 	 */
-	public String getGenderInd() {
-		return genderInd;
+	public String getGender() {
+		return gender;
 	}
 
 	/**
-	 * @param genderInd
-	 *            the genderInd to set
+	 * @param gender
+	 *            the gender to set
 	 */
-	public void setGenderInd(String genderInd) {
-		this.genderInd = genderInd;
+	public void setGender(String gender) {
+		this.gender = gender;
 	}
 
 	/**
