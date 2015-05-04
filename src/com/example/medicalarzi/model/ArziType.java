@@ -19,7 +19,7 @@ public class ArziType implements Serializable {
 	
 	private Long arziTypeId;
 	
-	private String arzTypeName;
+	private String arziTypeName;
 	
 	private String createdBy;
 
@@ -44,12 +44,12 @@ public class ArziType implements Serializable {
 		this.arziTypeId = arziTypeId;
 	}
 
-	public String getArzTypeName() {
-		return arzTypeName;
+	public String getArziTypeName() {
+		return arziTypeName;
 	}
 
-	public void setArzTypeName(String arzTypeName) {
-		this.arzTypeName = arzTypeName;
+	public void setArziTypeName(String arziTypeName) {
+		this.arziTypeName = arziTypeName;
 	}
 
 	public String getCreatedBy() {
