@@ -47,6 +47,14 @@
 	    <result column="CREATE_USR_ID" property="createdBy" jdbcType="VARCHAR" />
 	    <result column="LST_UPDT_USR_ID" property="updatedBy" jdbcType="VARCHAR" />
   	</resultMap>
+  	<resultMap type="ArziType" id="ArziTypeResultMap">
+  		<id column="ARZI_TYP_ID" property="arziTypeId" jdbcType="INTEGER" />
+  		<result column="ARZI_TYP" property="arziTypeName" jdbcType="VARCHAR" />
+  		<result column="CREATE_TS" property="createdDate" jdbcType="TIMESTAMP" />
+	    <result column="LST_UPDT_TS" property="updatedDate" jdbcType="TIMESTAMP" />
+	    <result column="CREATE_USR_ID" property="createdBy" jdbcType="VARCHAR" />
+	    <result column="LST_UPDT_USR_ID" property="updatedBy" jdbcType="VARCHAR" />
+  	</resultMap>
 
 	<!-- SQL fragments -->
   	<sql id="Base_Column_List" >
@@ -63,6 +71,10 @@
   	</sql>  	
   	<sql id="Procedure_Column_List" >
     	PROC_ID, PROC_PRFX_CD, PROC_NM, ACTV_IND,
+    	CREATE_TS, LST_UPDT_TS, CREATE_USR_ID, LST_UPDT_USR_ID
+  	</sql>
+  	<sql id="ArziType_Column_List" >
+    	ARZI_TYP_ID, ARZI_TYP,
     	CREATE_TS, LST_UPDT_TS, CREATE_USR_ID, LST_UPDT_USR_ID
   	</sql>
 
@@ -134,6 +146,13 @@
 	    <include refid="Procedure_Column_List" />
 	    from D_PROC
 	    where ACTV_IND = 'Y'
+  	</select>
+  	
+  	<!-- Select all arzi types -->
+  	<select id="selectAllArziTypes" resultMap="ArziTypeResultMap">
+	    select
+	    <include refid="ArziType_Column_List" />
+	    from D_ARZI_TYP
   	</select>
 
   	<!-- Insert Statements -->

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.example.medicalarzi.model.ArziType;
 import com.example.medicalarzi.model.BodyPart;
 import com.example.medicalarzi.model.Condition;
 import com.example.medicalarzi.model.Lookup;
@@ -101,4 +102,10 @@ public interface LookupMapper {
 	 * @return com.example.medicalarzi.model.BodyPart
 	 */
 	public List<BodyPart> selectAllBodyParts();
+	
+	/**
+	 * 
+	 * @return com.example.medicalarzi.model.ArziType
+	 */
+	public List<ArziType> selectAllArziTypes();
 }
