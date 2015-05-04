@@ -21,6 +21,8 @@ public interface MedicalArziConstants {
 	//Lookup types & value constants
 	final static public String MAP_DAWAT_TITLE = "DAWAT TITLE";
 	
+	final static public String MAP_GENDER = "GENDER";
+	
 	final static public String MAP_DAWAT_TITLE_BHAI = "Bhai";
 	
 	final static public String MAP_DAWAT_TITLE_BEHEN = "Behen";
