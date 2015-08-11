@@ -1,8 +1,10 @@
 package com.example.medicalarzi.view;
 
 import java.text.NumberFormat;
+import java.util.Date;
 import java.util.Locale;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,21 +14,29 @@ import com.example.medicalarzi.component.ArziDateField;
 import com.example.medicalarzi.component.ArziFooterComponent;
 import com.example.medicalarzi.component.ArziHeaderComponent;
 import com.example.medicalarzi.component.CustomFormComponent;
+import com.example.medicalarzi.model.Arzi;
 import com.example.medicalarzi.model.ArziType;
 import com.example.medicalarzi.model.BodyPart;
 import com.example.medicalarzi.model.Condition;
+import com.example.medicalarzi.model.GregHijDate;
 import com.example.medicalarzi.model.Lookup;
+import com.example.medicalarzi.model.Patient;
 import com.example.medicalarzi.model.Procedure;
+import com.example.medicalarzi.model.Status;
 import com.example.medicalarzi.service.LookupService;
 import com.example.medicalarzi.service.PatientService;
 import com.example.medicalarzi.util.MedicalArziConstants;
 import com.example.medicalarzi.util.MedicalArziUtils;
 import com.vaadin.annotations.Theme;
+import com.vaadin.data.fieldgroup.BeanFieldGroup;
+import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.fieldgroup.PropertyId;
 import com.vaadin.data.util.converter.StringToLongConverter;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.server.Page;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.shared.Position;
 import com.vaadin.spring.annotation.VaadinUIScope;
 import com.vaadin.spring.navigator.annotation.SpringView;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
@@ -34,6 +44,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.FormLayout;
@@ -144,8 +155,18 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 
 	@PropertyId("condition")
 	private ComboBox condition;
+	
+	@PropertyId("conditionStartDate.gregorianCalDate")
+	private ArziDateField conditionStartDate;
 
-	//private TextArea description;
+	// private TextArea description;
+
+	// Binding Fields
+	private BeanFieldGroup<Patient> ptntFieldsBinder;
+
+	private BeanFieldGroup<Arzi> arziFieldsBinder;
+	
+	private Patient patient;
 
 	// Service stubs
 	@Autowired
@@ -155,6 +176,32 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 	@Autowired
 	@Qualifier("service.LookupService")
 	private LookupService lookupService;
+	
+	
+	//Getters
+	public TextField getItsNumber() {
+		return itsNumber;
+	}
+	
+	public TextField getFirstName() {
+		return firstName;
+	}
+
+	public TextField getMiddleName() {
+		return middleName;
+	}
+
+	public TextField getLastName() {
+		return lastName;
+	}
+
+	public ArziDateField getDob() {
+		return dob;
+	}
+
+	public OptionGroup getGender() {
+		return gender;
+	}	
 
 	/**
 	 * The constructor should first build the main layout, set the composition
@@ -167,12 +214,19 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 
 	@Override
 	public void enter(ViewChangeEvent event) {
+		// Get the patient's full name from the session
+		patient = (Patient)getSession().getAttribute(
+				MedicalArziConstants.SESS_ATTR_PTNT_INFO);
+		
 		// Initialize the components in the view
 		init();
+		
+		getItsNumber().setValue(String.valueOf(patient.getItsNumber()));
+		getGender().select(patient.getGender());
+		
+		setFieldsReadOnly(true);
 
-		// Get the patient's full name from the session
-		String patientName = String.valueOf(getSession().getAttribute(
-				MedicalArziConstants.SESS_ATTR_PTNT_FULL_NAME));
+		String patientName = constructPtntFullName(patient);
 
 		logger.debug("Patient \"" + patientName
 				+ " has logged in successfully.");
@@ -225,6 +279,41 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		mainLayout.addComponent(footer);
 		mainLayout.setComponentAlignment(footer, Alignment.MIDDLE_CENTER);
 
+		bindFieldsToModel();
+	}
+
+	/**
+	 * This method is responsible for binding the member fields to the Patient
+	 * and Arzi Model because we update the the patient information in the
+	 * D_PTNT table and the arzi information in the F_ARZI_HDR table.
+	 */
+	private void bindFieldsToModel() {
+		logger.debug("Binding the patient and the arzi fields to their respective models.");
+
+		/* Bind the patient fields */
+		ptntFieldsBinder = new BeanFieldGroup<Patient>(Patient.class);
+		// Add bean item that is bound.
+		ptntFieldsBinder.setItemDataSource(patient);
+		// Bind all the member fields whose type extends Field to the property
+		// id of the item.
+		// The mapping is done based on the @PropertyId annotation
+		ptntFieldsBinder.bindMemberFields(this);
+		// Set the buffered mode on, if using the bean validation JSR-3.0 with
+		// vaadin. Does not work when fields are immediately updated with the
+		// bean.
+		ptntFieldsBinder.setBuffered(true);
+
+		/* Bind the arzi fields. */
+		Arzi arzi = new Arzi();
+		arziFieldsBinder = new BeanFieldGroup<Arzi>(Arzi.class);
+		/**=======>IMPORTANT: Binding for nested bean will work by switching  "setItemDataSource" and "bindMemberFields".
+		 * 
+		 * =======>First bindMembers then add dataSource.
+		 * **/
+		arziFieldsBinder.bindMemberFields(this);
+		arziFieldsBinder.setItemDataSource(arzi);
+		arziFieldsBinder.setBuffered(true);
+		
 	}
 
 	/**
@@ -298,8 +387,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 
 		// itsNumber
 		itsNumber = new TextField("ITS Number:");
-		itsNumber.setNullRepresentation("");
-		itsNumber.setImmediate(true);
+		itsNumber.setReadOnly(true);
 		itsNumber.setRequired(true);
 		itsNumber.setMaxLength(8);
 		itsNumber.setConverter(new StringToLongConverter() {
@@ -332,16 +420,19 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		// addressLn1
 		addressLn1 = new TextField("Address Ln1:");
 		addressLn1.setWidth("300px");
+		addressLn1.setNullRepresentation("");
 		leftFormLayout.addComponent(addressLn1);
 
 		// addressLn2
 		addressLn2 = new TextField("Address Ln2:");
 		addressLn2.setWidth("300px");
+		addressLn2.setNullRepresentation("");
 		leftFormLayout.addComponent(addressLn2);
 
 		// zip
 		zip = new TextField("Pincode/Zip:");
 		zip.setWidth("300px");
+		zip.setNullRepresentation("");
 		leftFormLayout.addComponent(zip);
 
 		/**
@@ -354,10 +445,12 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 
 		// firstName
 		firstName = new TextField("First Name:");
+		firstName.setReadOnly(true);
 		firstName.setWidth("300px");
 		rightFormLayout.addComponent(firstName);
 
 		lastName = new TextField("Surname/Last Name:");
+		lastName.setReadOnly(true);
 		lastName.setWidth("300px");
 		rightFormLayout.addComponent(lastName);
 
@@ -369,11 +462,13 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		// city
 		city = new TextField("City:");
 		city.setWidth("300px");
+		city.setNullRepresentation("");
 		rightFormLayout.addComponent(city);
 
 		// state
 		state = new TextField("State:");
 		state.setWidth("300px");
+		state.setNullRepresentation("");
 		rightFormLayout.addComponent(state);
 	}
 
@@ -420,6 +515,11 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		bodyPart.setItemCaptionMode(ItemCaptionMode.PROPERTY);
 		bodyPart.setItemCaptionPropertyId("bodyPartName");
 		leftFormLayout.addComponent(bodyPart);
+		
+		conditionStartDate = new ArziDateField("Condition Start Date:");
+		conditionStartDate.setImmediate(true);
+		conditionStartDate.setDescription("Please enter the date in the dd/MM/yyy format.");
+		leftFormLayout.addComponent(conditionStartDate);
 
 		/**
 		 * Add the fields to the right FormLayout.
@@ -463,16 +563,16 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		buttonsLayout.setComponentAlignment(cancelBtn, Alignment.MIDDLE_RIGHT);
 
 		// saveBtn
-		saveBtn = new Button("", this);
-		saveBtn.setIcon(new ThemeResource("img/save.png"));
+		saveBtn = new Button(new ThemeResource("img/save.png"));
+		saveBtn.addClickListener(this);
 		saveBtn.setStyleName(Reindeer.BUTTON_LINK);
 		buttonsLayout.addComponent(saveBtn);
 		buttonsLayout.setExpandRatio(saveBtn, 0.2f);
 		buttonsLayout.setComponentAlignment(saveBtn, Alignment.MIDDLE_CENTER);
 
 		// submitBtn
-		submitBtn = new Button("", this);
-		submitBtn.setIcon(new ThemeResource("img/submit.png"));
+		submitBtn = new Button(new ThemeResource("img/submit.png"));
+		submitBtn.addClickListener(this);
 		submitBtn.setStyleName(Reindeer.BUTTON_LINK);
 		buttonsLayout.addComponent(submitBtn);
 		buttonsLayout.setExpandRatio(submitBtn, 1.0f);
@@ -490,13 +590,121 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 	@Override
 	public void buttonClick(ClickEvent event) {
 		if (event.getButton().equals(cancelBtn)) {
+
+		} else if (event.getButton().equals(saveBtn)
+				|| event.getButton().equals(submitBtn)) {
 			
-		} else if (event.getButton().equals(saveBtn)) {
-			// Insert a new arzi into the database and change the status to save
-		} else if (event.getButton().equals(submitBtn)) {
 			// Insert a new arzi into the database and change the status to
-			// submitted
+			// save/submitted
+			try {
+				// FieldGroup buffered mode is on, so commit() is required.
+				// Throws CommitException
+				ptntFieldsBinder.commit();
+
+				Patient ptntInfo = ptntFieldsBinder.getItemDataSource()
+						.getBean();
+				
+				//Update the D_PTNT table
+				patientService.updatePatientInfo(ptntInfo);
+
+				// FieldGroup buffered mode is on, so commit() is required.
+				// Throws CommitException
+				arziFieldsBinder.commit();
+
+				Arzi arzi = arziFieldsBinder.getItemDataSource().getBean();
+				
+				GregHijDate ghReqSubmitDt = lookupService
+						.getRequestedGregorianHijriCalendar(new Date());
+				
+				arzi.setRequestSubmitDate(ghReqSubmitDt);
+				arzi.setCurrentStatusDate(ghReqSubmitDt);
+				
+				// Get the entire data for the GregHijDate based on the
+				// gregorian date.
+				arzi.setConditionStartDate(lookupService
+						.getRequestedGregorianHijriCalendar(arzi
+								.getConditionStartDate().getGregorianCalDate()));
+				
+				Status arziStatus = new Status();
+				arziStatus.setStatusId(new Long(1000));
+				arzi.setCurrentStatus(arziStatus);
+				
+				logger.debug("Inserting a new arzi for patient with ITS number-> \""
+						+ ptntInfo.getItsNumber() + "\"");
+				
+				//Insert the new arzi for the patient
+				patientService.createNewArzi(arzi);
+
+			} catch (CommitException ce) {
+				logger.error(ce);
+				Notification notif = new Notification(
+						null,
+						"Fields marked with asterisk (*) are required. Please enter the required values and fix the errors before proceeding further.",
+						Type.ERROR_MESSAGE);
+				notif.setStyleName("errorMsg");
+				notif.setPosition(Position.TOP_LEFT);
+				notif.show(Page.getCurrent());
+			}
 		}
+	}
+	
+	/**
+	 * This method is responsible for constructing the patients full name based
+	 * on his first name, last name, title and his middle name and middle name
+	 * title
+	 * 
+	 * @param ptnt
+	 * @return
+	 */
+	private String constructPtntFullName(Patient ptnt) {
+		StringBuffer fullName = new StringBuffer();
+		
+		if (ptnt.getPtntTitle() != null
+				&& !(StringUtils.equalsIgnoreCase(ptnt
+						.getPtntTitle().getLookupValue(),
+						MedicalArziConstants.MAP_DAWAT_TITLE_BHAI) || StringUtils
+						.equalsIgnoreCase(
+								ptnt.getPtntTitle()
+										.getLookupValue(),
+								MedicalArziConstants.MAP_DAWAT_TITLE_BEHEN))) {
+			fullName.append(ptnt.getPtntTitle().getLookupValue());
+			fullName.append(" ");
+		}
+		
+		fullName.append(ptnt.getFirstName());
+		
+		if (ptnt.getPtntMiddleNmTitle() != null
+				&& !(StringUtils.equalsIgnoreCase(ptnt
+						.getPtntMiddleNmTitle().getLookupValue(),
+						MedicalArziConstants.MAP_DAWAT_TITLE_BHAI) || StringUtils
+						.equalsIgnoreCase(
+								ptnt.getPtntMiddleNmTitle()
+										.getLookupValue(),
+								MedicalArziConstants.MAP_DAWAT_TITLE_BEHEN))) {
+			fullName.append(ptnt.getPtntMiddleNmTitle()
+					.getLookupValue());
+			fullName.append(" ");
+			
+		} else {
+			fullName.append(" ");
+			fullName.append(ptnt.getMiddleName());
+			fullName.append(" ");
+		}
+		
+		fullName.append(ptnt.getLastName());
+		
+		return fullName.toString();
+	}
+	
+	/**
+	 * 
+	 */
+	private void setFieldsReadOnly(boolean flag) {
+		getItsNumber().setReadOnly(true);
+		getFirstName().setReadOnly(true);
+		getMiddleName().setReadOnly(true);
+		getLastName().setReadOnly(true);
+		//getGender().setReadOnly(true);
 	}
 
 }
