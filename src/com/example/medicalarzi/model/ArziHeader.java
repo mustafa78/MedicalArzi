@@ -6,6 +6,9 @@ package com.example.medicalarzi.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
 /**
  * @author mkanchwa
  *
@@ -31,9 +34,11 @@ public class ArziHeader implements Serializable {
 
 	private Status currentStatus;
 
-	private GregHijDate requestSubmitDate;
+	private GregHijDate requestSubmitDate = new GregHijDate();
 
-	private GregHijDate currentStatusDate;
+	private GregHijDate currentStatusDate = new GregHijDate();
+
+	private GregHijDate conditionStartDate = new GregHijDate();
 
 	protected String createdBy;
 
@@ -152,6 +157,20 @@ public class ArziHeader implements Serializable {
 
 	public void setUpdatedDate(Date updatedDate) {
 		this.updatedDate = updatedDate;
+	}
+
+	public GregHijDate getConditionStartDate() {
+		return conditionStartDate;
+	}
+
+	public void setConditionStartDate(GregHijDate conditionStartDate) {
+		this.conditionStartDate = conditionStartDate;
+	}
+
+	@Override
+	public String toString() {
+		return (new ReflectionToStringBuilder(this,
+				RecursiveToStringStyle.MULTI_LINE_STYLE)).toString();
 	}
 
 }
