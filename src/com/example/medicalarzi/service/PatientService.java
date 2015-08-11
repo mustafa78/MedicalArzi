@@ -3,6 +3,7 @@
  */
 package com.example.medicalarzi.service;
 
+import com.example.medicalarzi.model.Arzi;
 import com.example.medicalarzi.model.Patient;
 
 /**
@@ -62,5 +63,20 @@ public interface PatientService {
 	 * @return
 	 */
 	public String emailForgotPassword(Long itsNumber, String passString);
+	
+	/**
+	 * This method is responsible for updating the patient information.
+	 * 
+	 * @param ptnt
+	 */
+	public void updatePatientInfo(Patient ptnt);
+	
+	/**
+	 * This method is responsible for creating a new arzi for the patient based
+	 * on the patient's ITS number.
+	 * 
+	 * @param newArzi
+	 */
+	public void createNewArzi(Arzi newArzi);
 
 }

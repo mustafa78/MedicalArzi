@@ -6,7 +6,9 @@ package com.example.medicalarzi.service.impl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
 
+import com.example.medicalarzi.dao.ArziMapper;
 import com.example.medicalarzi.dao.PatientMapper;
+import com.example.medicalarzi.model.Arzi;
 import com.example.medicalarzi.model.Patient;
 import com.example.medicalarzi.service.PatientService;
 
@@ -20,6 +22,8 @@ public class PatientServiceImpl implements PatientService {
 			.getLogger(PatientServiceImpl.class);
 
 	private PatientMapper ptntMapper;
+	
+	private ArziMapper arziMapper;
 
 	/**
 	 *
@@ -34,6 +38,15 @@ public class PatientServiceImpl implements PatientService {
 
 	public void setPtntMapper(PatientMapper ptntMapper) {
 		this.ptntMapper = ptntMapper;
+	}
+
+	
+	public ArziMapper getArziMapper() {
+		return arziMapper;
+	}
+
+	public void setArziMapper(ArziMapper arziMapper) {
+		this.arziMapper = arziMapper;
 	}
 
 	/*
@@ -104,6 +117,28 @@ public class PatientServiceImpl implements PatientService {
 				+ itsNumber + " is => " + password);
 
 		return password;
+	}
+
+	@Override
+	public void updatePatientInfo(Patient ptnt) {
+		logger.debug("Updating the information for patient with ITS Number: "
+				+ ptnt.getItsNumber());
+
+		ptntMapper.updatePatientSelective(ptnt);
+
+		logger.debug("Patient information for -> " + ptnt.getFirstName() + " "
+				+ ptnt.getLastName() + " is successfully updated");
+	}
+
+	@Override
+	public void createNewArzi(Arzi newArzi) {
+		logger.debug("Registering the patient with ITS number: "
+				+ newArzi.getItsNumber());
+
+		arziMapper.insertPatientsNewArzi(newArzi);
+
+		logger.debug("Arzi for patient with ITS number -> "
+				+ newArzi.getItsNumber() + " successfully registered");
 	}
 
 }
