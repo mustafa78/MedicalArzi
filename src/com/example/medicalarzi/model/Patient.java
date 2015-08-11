@@ -4,6 +4,7 @@
 package com.example.medicalarzi.model;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.List;
 
@@ -11,6 +12,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -25,27 +28,27 @@ public class Patient implements Serializable {
 	 */
 	private static final long serialVersionUID = -241043149012578605L;
 
-	@NotNull(message="Please enter the ITS number.")
+	@NotNull(message = "Please enter the ITS number.")
 	private Long itsNumber;
 
 	private Lookup ptntTitle;
 
-	@Size(min=1, max=30)
-	@NotEmpty(message="Please enter your first name.")
+	@Size(min = 1, max = 30)
+	@NotEmpty(message = "Please enter your first name.")
 	private String firstName;
 
 	private Lookup ptntMiddleNmTitle;
 
-	@Size(min=0, max=30)
+	@Size(min = 0, max = 30)
 	private String middleName;
 
-	@Size(min=1, max=30)
-	@NotEmpty(message="Please enter your last name/ surname.")
+	@Size(min = 1, max = 30)
+	@NotEmpty(message = "Please enter your last name/ surname.")
 	private String lastName;
 
-	private String gender;
+	private Lookup gender;
 
-	@Past(message="The DOB must be in the past.")
+	@Past(message = "The DOB must be in the past.")
 	private Date dob;
 
 	private String phoneNum;
@@ -54,8 +57,8 @@ public class Patient implements Serializable {
 
 	private String cellNum;
 
-	@NotEmpty(message="Please enter a email address.")
-	@Email(message="Please enter a valid email address.")
+	@NotEmpty(message = "Please enter a email address.")
+	@Email(message = "Please enter a valid email address.")
 	private String emailAddress;
 
 	private String homeAddress1;
@@ -72,7 +75,7 @@ public class Patient implements Serializable {
 
 	private Boolean activeInd;
 
-	@NotEmpty(message="Please enter the password.")
+	@NotEmpty(message = "Please enter the password.")
 	private String password;
 
 	private String createdBy;
@@ -90,10 +93,10 @@ public class Patient implements Serializable {
 	private MedicalHistory medicalHistory;
 
 	private List<SecurityRole> roles;
-	
+
 	private List<Arzi> arzis;
 
-	//Only for UI purpose
+	// Only for UI purpose
 	private String passString;
 
 	/**
@@ -166,7 +169,7 @@ public class Patient implements Serializable {
 	/**
 	 * @return the gender
 	 */
-	public String getGender() {
+	public Lookup getGender() {
 		return gender;
 	}
 
@@ -174,7 +177,7 @@ public class Patient implements Serializable {
 	 * @param gender
 	 *            the gender to set
 	 */
-	public void setGender(String gender) {
+	public void setGender(Lookup gender) {
 		this.gender = gender;
 	}
 
@@ -430,7 +433,8 @@ public class Patient implements Serializable {
 	}
 
 	/**
-	 * @param roles the roles to set
+	 * @param roles
+	 *            the roles to set
 	 */
 	public void setRoles(List<SecurityRole> roles) {
 		this.roles = roles;
@@ -444,7 +448,8 @@ public class Patient implements Serializable {
 	}
 
 	/**
-	 * @param ptntTitle the ptntTitle to set
+	 * @param ptntTitle
+	 *            the ptntTitle to set
 	 */
 	public void setPtntTitle(Lookup ptntTitle) {
 		this.ptntTitle = ptntTitle;
@@ -458,7 +463,8 @@ public class Patient implements Serializable {
 	}
 
 	/**
-	 * @param ptntMiddleNmTitle the ptntMiddleNmTitle to set
+	 * @param ptntMiddleNmTitle
+	 *            the ptntMiddleNmTitle to set
 	 */
 	public void setPtntMiddleNmTitle(Lookup ptntMiddleNmTitle) {
 		this.ptntMiddleNmTitle = ptntMiddleNmTitle;
@@ -478,6 +484,16 @@ public class Patient implements Serializable {
 
 	public void setArzis(List<Arzi> arzis) {
 		this.arzis = arzis;
+	}
+
+	@Override
+	public String toString() {
+		return (new ReflectionToStringBuilder(this,
+				RecursiveToStringStyle.MULTI_LINE_STYLE) {
+			protected boolean accept(Field f) {
+				return super.accept(f) && !f.getName().equals("password");
+			}
+		}).toString();
 	}
 
 }
