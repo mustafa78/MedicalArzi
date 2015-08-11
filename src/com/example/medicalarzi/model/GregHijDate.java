@@ -29,7 +29,7 @@ public class GregHijDate implements Serializable {
 	
 	private Long hijriDateId;
 	
-	private Date hijriCalDate;
+	private String hijriCalDate;
 	
 	private Integer hijriCalYear;
 	
@@ -116,12 +116,12 @@ public class GregHijDate implements Serializable {
 	}
 
 
-	public Date getHijriCalDate() {
+	public String getHijriCalDate() {
 		return hijriCalDate;
 	}
 
 
-	public void setHijriCalDate(Date hijriCalDate) {
+	public void setHijriCalDate(String hijriCalDate) {
 		this.hijriCalDate = hijriCalDate;
 	}
 
