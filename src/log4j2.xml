@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Configuration status="DEBUG">
 	<Properties>
-		<Property name="log-path">C:/logs/map_logs/</Property>
+		<Property name="log-path">C:/logs/map_logs</Property>
 	</Properties>
     <Appenders>
         <Console name="CONSOLE" target="SYSTEM_OUT">
@@ -12,6 +12,7 @@
                 <pattern>%d{dd/MMM/yyyy HH:mm:ss,SSS}- %c{1}: %m%n</pattern>
             </PatternLayout>
             <Policies>
+            	<TimeBasedTriggeringPolicy />
                 <SizeBasedTriggeringPolicy size="1 MB" />
             </Policies>
             <DefaultRolloverStrategy max="10" />
