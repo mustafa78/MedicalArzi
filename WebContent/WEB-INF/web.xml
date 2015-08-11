@@ -36,4 +36,11 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
         <servlet-name>MedicalarziServlet</servlet-name>
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
+    <description>MySQL Medical Arzi Dbase</description>
+  	<resource-ref>
+    	<description>MAP DB Connection</description>
+      	<res-ref-name>jdbc/map</res-ref-name>
+      	<res-type>javax.sql.DataSource</res-type>
+      	<res-auth>Container</res-auth>
+	</resource-ref>
 </web-app>
