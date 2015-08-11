@@ -363,10 +363,10 @@ public class PatientRegistrationView extends CustomComponent implements View,
 	@Override
 	public void buttonClick(ClickEvent event) {
 		if (event.getButton().equals(backBtn)) {
-			getUI().getNavigator().navigateTo(SimpleLoginView.NAME);
-			
 			MedicalArziUtils.setSessionAttribute(
-					"isRegistrationSuccess", false);			
+					"isRegistrationSuccess", false);
+			
+			getUI().getNavigator().navigateTo(SimpleLoginView.NAME);
 		}
 		if (event.getButton().equals(registerBtn)) {
 
