@@ -21,8 +21,10 @@
               username="mkanchwa" password="admin"
               url="jdbc:mysql://160.153.93.128:3306/MAP"
               driverClassName="com.mysql.jdbc.Driver"
-              initialSize="5" maxWait="5000"
-              maxActive="120" maxIdle="5"
+              initialSize="5" maxWait="90000"
+              maxActive="10" minIdle="0" maxIdle="5"
               validationQuery="select 1"
-              poolPreparedStatements="true"/>
+              poolPreparedStatements="true" 
+              autoReconnectForPool="true"
+              autoReconnect="true"/>
 </Context>
