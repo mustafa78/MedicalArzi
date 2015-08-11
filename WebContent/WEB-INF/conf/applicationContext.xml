@@ -42,10 +42,16 @@
 			value="com.example.medicalarzi.dao.LookupMapper" />
 		<property name="sqlSessionFactory" ref="sqlSession.map" />
 	</bean>
+	<bean id="arziMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface"
+			value="com.example.medicalarzi.dao.ArziMapper" />
+		<property name="sqlSessionFactory" ref="sqlSession.map" />
+	</bean>
 
-	<!-- Service -->
+	<!-- Services -->
 	<bean id="service.PatientServiceImpl" class="com.example.medicalarzi.service.impl.PatientServiceImpl" scope="singleton">
    		<property name="ptntMapper" ref="ptntMapper"/>
+   		<property name="arziMapper" ref="arziMapper"/>
    	</bean>
 	<bean id="service.PatientService" class="org.springframework.aop.framework.ProxyFactoryBean" scope="singleton">
       	<property name="target">
