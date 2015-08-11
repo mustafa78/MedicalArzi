@@ -3,14 +3,15 @@
  */
 package com.example.medicalarzi.service;
 
+import java.util.Date;
 import java.util.List;
 
 import com.example.medicalarzi.model.ArziType;
 import com.example.medicalarzi.model.BodyPart;
 import com.example.medicalarzi.model.Condition;
+import com.example.medicalarzi.model.GregHijDate;
 import com.example.medicalarzi.model.Lookup;
 import com.example.medicalarzi.model.Procedure;
-
 
 /**
  * @author mkanchwa
@@ -26,7 +27,8 @@ public interface LookupService {
 	public List<Lookup> getListOfLookupTypes();
 
 	/**
-	 * This method is responsible for getting the correct Lookup based on the lookup id.
+	 * This method is responsible for getting the correct Lookup based on the
+	 * lookup id.
 	 *
 	 * @param lookupId
 	 *
@@ -35,7 +37,8 @@ public interface LookupService {
 	public Lookup getByLookupId(Long lookupId);
 
 	/**
-	 * This method is responsible for getting the list of lookups based on the lookup type.
+	 * This method is responsible for getting the list of lookups based on the
+	 * lookup type.
 	 *
 	 * @param lookupType
 	 *
@@ -44,8 +47,8 @@ public interface LookupService {
 	public List<Lookup> getByLookupType(String lookupType);
 
 	/**
-	 * This method is responsible for getting the sorted list of lookups based on the
-	 * lookup type based on the defined sorting sequence.
+	 * This method is responsible for getting the sorted list of lookups based
+	 * on the lookup type based on the defined sorting sequence.
 	 *
 	 * @param lookupType
 	 *
@@ -59,7 +62,7 @@ public interface LookupService {
 	 * @param lookup
 	 */
 	public void updateLookup(Lookup lookup);
-	
+
 	/**
 	 * This method is responsible for getting all the list of the human body
 	 * parts.
@@ -67,26 +70,37 @@ public interface LookupService {
 	 * @return java.util.List
 	 */
 	public List<BodyPart> getListOfAllBodyParts();
-	
+
 	/**
 	 * This method is responsible for getting all the medical conditions.
 	 * 
 	 * @return java.util.List
 	 */
 	public List<Condition> getListOfAllMedicalConditions();
-	
+
 	/**
-	 * This method is responsible for getting all the available medical procedures.
+	 * This method is responsible for getting all the available medical
+	 * procedures.
 	 * 
 	 * @return java.util.List
 	 */
 	public List<Procedure> getListOfAllMedicalProcedures();
-	
+
 	/**
 	 * This method is responsible for getting all the possible arzi types.
-	 *  
+	 * 
 	 * @return java.util.List
 	 */
 	public List<ArziType> getListOfAllArziTypes();
+
+	/**
+	 * This method returns the custom GregHijDate object based on the given
+	 * calendar date.
+	 * 
+	 * @param calendarDate
+	 * 
+	 * @return GregHijDate
+	 */
+	public GregHijDate getRequestedGregorianHijriCalendar(Date calendarDate);
 
 }

@@ -55,6 +55,23 @@
 	    <result column="CREATE_USR_ID" property="createdBy" jdbcType="VARCHAR" />
 	    <result column="LST_UPDT_USR_ID" property="updatedBy" jdbcType="VARCHAR" />
   	</resultMap>
+  	<resultMap type="GregHijDate" id="GregHijDateResultMap">
+  		<id column="DT_ID" property="gregorianDateId" jdbcType="INTEGER" />
+  		<result column="CAL_DT" property="gregorianCalDate" jdbcType="DATE" />
+  		<result column="CAL_YR" property="gregorianCalYear" jdbcType="INTEGER" />
+  		<result column="CAL_MNTH_NBR" property="gregorianCalMnthNbr" jdbcType="INTEGER" />
+  		<result column="CAL_MNTH_NM" property="gregorianCalMnthName" jdbcType="VARCHAR" />
+  		<result column="HIJRI_DATE_ID" property="hijriDateId" jdbcType="INTEGER" />
+  		<result column="HIJRI_DT" property="hijriCalDate" jdbcType="VARCHAR" />
+  		<result column="HIJRI_YR" property="hijriCalYear" jdbcType="INTEGER" />
+  		<result column="HIJRI_MNTH_NBR" property="hijriCalMnthNbr" jdbcType="INTEGER" />
+  		<result column="HIJRI_MNTH_NM" property="hijriCalMnthName" jdbcType="VARCHAR" />
+  		<result column="MIQAAT_MNTH_DY" property="miqaatMnthDay" jdbcType="VARCHAR" />
+  		<result column="CREATE_TS" property="createdDate" jdbcType="TIMESTAMP" />
+	    <result column="LST_UPDT_TS" property="updatedDate" jdbcType="TIMESTAMP" />
+	    <result column="CREATE_USR_ID" property="createdBy" jdbcType="VARCHAR" />
+	    <result column="LST_UPDT_USR_ID" property="updatedBy" jdbcType="VARCHAR" />
+  	</resultMap>
 
 	<!-- SQL fragments -->
   	<sql id="Base_Column_List" >
@@ -75,6 +92,10 @@
   	</sql>
   	<sql id="ArziType_Column_List" >
     	ARZI_TYP_ID, ARZI_TYP,
+    	CREATE_TS, LST_UPDT_TS, CREATE_USR_ID, LST_UPDT_USR_ID
+  	</sql>
+  	<sql id="Date_Column_List" >
+    	DT_ID, CAL_DT, CAL_YR, CAL_MNTH_NBR, CAL_MNTH_NM, HIJRI_DATE_ID, HIJRI_DT, HIJRI_YR, HIJRI_MNTH_NBR, HIJRI_MNTH_NM, MIQAAT_MNTH_DY
     	CREATE_TS, LST_UPDT_TS, CREATE_USR_ID, LST_UPDT_USR_ID
   	</sql>
 
@@ -153,6 +174,13 @@
 	    select
 	    <include refid="ArziType_Column_List" />
 	    from D_ARZI_TYP
+  	</select>
+  	
+  	<select id="selectGregHijBasedOnCalDt" resultMap="GregHijDateResultMap" parameterType="Date">
+	    select
+	    <include refid="Date_Column_List" />
+	    from D_DATE 
+	    where CAL_DT = #{calDate, jdbcType=DATE}
   	</select>
 
   	<!-- Insert Statements -->

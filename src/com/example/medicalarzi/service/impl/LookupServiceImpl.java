@@ -3,6 +3,7 @@
  */
 package com.example.medicalarzi.service.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -12,6 +13,7 @@ import com.example.medicalarzi.dao.LookupMapper;
 import com.example.medicalarzi.model.ArziType;
 import com.example.medicalarzi.model.BodyPart;
 import com.example.medicalarzi.model.Condition;
+import com.example.medicalarzi.model.GregHijDate;
 import com.example.medicalarzi.model.Lookup;
 import com.example.medicalarzi.model.Procedure;
 import com.example.medicalarzi.service.LookupService;
@@ -116,6 +118,11 @@ public class LookupServiceImpl implements LookupService {
 	public List<ArziType> getListOfAllArziTypes() {
 		List<ArziType> listOfArziTypes = lookupMapper.selectAllArziTypes();
 		return listOfArziTypes;
+	}
+
+	@Override
+	public GregHijDate getRequestedGregorianHijriCalendar(Date calendarDate) {
+		 return lookupMapper.selectGregHijBasedOnCalDt(calendarDate);
 	}
 
 }

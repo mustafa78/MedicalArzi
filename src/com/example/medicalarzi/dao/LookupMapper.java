@@ -1,5 +1,6 @@
 package com.example.medicalarzi.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
@@ -7,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import com.example.medicalarzi.model.ArziType;
 import com.example.medicalarzi.model.BodyPart;
 import com.example.medicalarzi.model.Condition;
+import com.example.medicalarzi.model.GregHijDate;
 import com.example.medicalarzi.model.Lookup;
 import com.example.medicalarzi.model.Procedure;
 
@@ -108,4 +110,11 @@ public interface LookupMapper {
 	 * @return com.example.medicalarzi.model.ArziType
 	 */
 	public List<ArziType> selectAllArziTypes();
+	
+	/**
+	 * 
+	 * @param calDate
+	 * @return
+	 */
+	public GregHijDate selectGregHijBasedOnCalDt(Date calDate);
 }
