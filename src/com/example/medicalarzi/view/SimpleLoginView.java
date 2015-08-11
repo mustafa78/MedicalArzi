@@ -309,50 +309,12 @@ public class SimpleLoginView extends CustomComponent implements View,
 						.valueOf(itsNumber));
 
 				if (ptnt != null) {
-					StringBuffer fullName = new StringBuffer();
-					
-					if (ptnt.getPtntTitle() != null
-							&& !(StringUtils.equalsIgnoreCase(ptnt
-									.getPtntTitle().getLookupValue(),
-									MedicalArziConstants.MAP_DAWAT_TITLE_BHAI) || StringUtils
-									.equalsIgnoreCase(
-											ptnt.getPtntTitle()
-													.getLookupValue(),
-											MedicalArziConstants.MAP_DAWAT_TITLE_BEHEN))) {
-						fullName.append(ptnt.getPtntTitle().getLookupValue());
-						fullName.append(" ");
-					}
-					
-					fullName.append(ptnt.getFirstName());
-					
-					if (ptnt.getPtntMiddleNmTitle() != null
-							&& !(StringUtils.equalsIgnoreCase(ptnt
-									.getPtntMiddleNmTitle().getLookupValue(),
-									MedicalArziConstants.MAP_DAWAT_TITLE_BHAI) || StringUtils
-									.equalsIgnoreCase(
-											ptnt.getPtntMiddleNmTitle()
-													.getLookupValue(),
-											MedicalArziConstants.MAP_DAWAT_TITLE_BEHEN))) {
-						fullName.append(ptnt.getPtntMiddleNmTitle()
-								.getLookupValue());
-						fullName.append(" ");
-						
-					} else {
-						fullName.append(" ");
-						fullName.append(ptnt.getMiddleName());
-						fullName.append(" ");
-					}
-					
-					fullName.append(ptnt.getLastName());
-
-					// Store the full name of the current user and his ITS
-					// number in the service session
-					MedicalArziUtils.setSessionAttribute(
-							MedicalArziConstants.SESS_ATTR_PTNT_FULL_NAME,
-							fullName.toString());
 					MedicalArziUtils.setSessionAttribute(
 							MedicalArziConstants.SESS_ATTR_PTNT_ITS_NUM,
 							itsNumber);
+					
+					MedicalArziUtils.setSessionAttribute(
+							MedicalArziConstants.SESS_ATTR_PTNT_INFO, ptnt);
 				}
 				// Navigate to main view
 				getUI().getNavigator().navigateTo(MedicalArziLandingView.NAME);
