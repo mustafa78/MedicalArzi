@@ -56,4 +56,11 @@ public interface PatientMapper {
 	 */
 	public String retrievePassword(@Param("itsNumber") Long itsNumber,
 			@Param("passString") String passString);
+	
+	/**
+	 * This method is responsible for updating the patient information.
+	 * 
+	 * @param ptnt
+	 */
+	public void updatePatientSelective(Patient ptnt);
 }

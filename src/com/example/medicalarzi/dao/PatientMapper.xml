@@ -7,7 +7,6 @@
 	    <result column="MDL_NM" property="middleName" jdbcType="VARCHAR" />
 	    <result column="LAST_NM" property="lastName" jdbcType="VARCHAR" />
 	    <result column="DOB" property="dob" jdbcType="DATE" />
-	    <result column="GNDR_IND" property="genderInd" jdbcType="VARCHAR" />
 	    <result column="HASH_PSWD" property="updatedBy" jdbcType="VARCHAR" />
 	    <result column="HOME_PHN" property="phoneNum" jdbcType="VARCHAR" />
 	    <result column="CELL_PHN" property="cellNum" jdbcType="VARCHAR" />
@@ -25,6 +24,10 @@
 	    <result column="CREATE_TS" property="createdDate" jdbcType="TIMESTAMP" />
 	    <result column="LST_UPDT_USR_ID" property="updatedBy" jdbcType="VARCHAR" />
 	    <result column="LST_UPDT_TS" property="updatedDate" jdbcType="TIMESTAMP" />
+	    <association property="gender" column="genderInd" javaType="Lookup">
+			<id 	property="lookupId" 	column="genderInd" />
+			<result property="lookupValue" 	column="genderVal" />
+		</association>
 	    <association property="ptntTitle" column="ptntTitleId" javaType="Lookup">
 			<id 	property="lookupId" 	column="ptntTitleId" />
 			<result property="lookupValue" 	column="ptntTitleName" />
@@ -44,7 +47,7 @@
   		MDL_NM,
   		LAST_NM,
   		DOB,
-  		GNDR_IND,
+  		GNDR_IND_ID AS "genderInd",
   		HOME_PHN,
   		CELL_PHN,
   		FAX,
@@ -62,7 +65,8 @@
   		LST_UPDT_USR_ID,
   		LST_UPDT_TS,
   		(SELECT LKUP_VAL FROM D_LOOKUPS WHERE LKUP_ID = TTL_ID) AS "ptntTitleName",
-  		(SELECT LKUP_VAL FROM D_LOOKUPS WHERE LKUP_ID = MDL_NM_TTL_ID) AS "ptntMiddleNmTitleName"
+  		(SELECT LKUP_VAL FROM D_LOOKUPS WHERE LKUP_ID = MDL_NM_TTL_ID) AS "ptntMiddleNmTitleName",
+  		(SELECT LKUP_VAL FROM D_LOOKUPS WHERE LKUP_ID = GNDR_IND_ID) AS "genderVal"
   	</sql>
 
 	<!-- All the tables name and column names should be in CAPS or else it would not work in MySQL -->
@@ -87,10 +91,39 @@
 			#{ptntMiddleNmTitle.lookupId,jdbcType=INTEGER},
 			#{middleName,jdbcType=VARCHAR},
 			#{lastName,jdbcType=VARCHAR},
-			#{dob.id,jdbcType=DATE},
+			#{dob,jdbcType=DATE},
 			#{emailAddress,jdbcType=VARCHAR},
 			encode(#{password,jdbcType=VARCHAR}, #{passString,jdbcType=VARCHAR}) ) ]]>
 	</insert>
+	
+	<!-- Update -->
+	<update id="updatePatientSelective" parameterType="Patient">
+    	update D_PTNT
+	    <set>
+	      	<if test="dob != null">
+        		dob = #{dob,jdbcType=DATE},
+      		</if>
+      		<if test="gender != null">
+      			gndr_ind_id = #{gender.lookupId,jdbcType=VARCHAR},
+      		</if>
+      		<if test="homeAddress1 != null">
+      			addr_ln_1 = #{homeAddress1,jdbcType=VARCHAR},
+      		</if>
+      		<if test="homeAddress2 != null">
+      			addr_ln_2 = #{homeAddress2,jdbcType=VARCHAR},
+      		</if>
+      		<if test="city != null">
+      			city = #{city,jdbcType=VARCHAR},
+      		</if>
+      		<if test="state != null">
+      			st_cd = #{state,jdbcType=VARCHAR},
+      		</if>
+      		<if test="zip != null">
+      			zip_cd = #{zip,jdbcType=VARCHAR}
+      		</if>
+      		 where PTNT_ITS_NBR = #{itsNumber,jdbcType=INTEGER}
+	    </set>
+    </update>
 
 	<!-- Select -->
 	<select id="checkPatientPassword" resultType="string">
