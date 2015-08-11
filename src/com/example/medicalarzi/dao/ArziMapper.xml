@@ -5,7 +5,6 @@
 	<resultMap id="ArziHdrResultMap" type="ArziHeader" >
 	    <id column="ARZI_ID" property="arziId" jdbcType="INTEGER" />
 	    <result column="ITS_NBR" property="itsNumber" jdbcType="INTEGER" />
-	    <result column="RVWR_ITS_NBR" property="reviewerItsNumber" jdbcType="INTEGER" />
 	    <result column="CREATE_USR_ID" property="createdBy" jdbcType="VARCHAR" />
 	    <result column="CREATE_TS" property="createdDate" jdbcType="TIMESTAMP" />
 	    <result column="LST_UPDT_USR_ID" property="updatedBy" jdbcType="VARCHAR" />
@@ -24,5 +23,53 @@
 			<result property="conditionPrefixCd" 	column="conditionPrefixCd" />
 			<result property="conditionName" 	column="conditionName" />
 		</association>
+		<association property="currentStatusDate" column="currStatusDtId" javaType="GregHijDate">
+			<id 	property="gregorianDateId" 	column="currStatusDtId" />
+			<result	property="gregorianCalDate" column="CAL_DT"  jdbcType="TIMESTAMP" />
+			<result property="hijriCalDate" 	column="HIJRI_DT" jdbcType="VARCHAR" />
+		</association>
   	</resultMap>
+  	<resultMap id="ArziResultMap" type="Arzi" extends="ArziHdrResultMap">
+  		<result column="ITS_NBR" property="reviewerItsNumber" jdbcType="INTEGER" />
+  		<association property="reviewDate" column="reviewDateId" javaType="GregHijDate">
+  			<id 	property="gregorianDateId" 	column="reviewDateId" />
+			<result	property="gregorianCalDate" column="CAL_DT"  jdbcType="TIMESTAMP" />
+			<result property="hijriCalDate" 	column="HIJRI_DT" jdbcType="VARCHAR" />
+		</association>
+		<association property="statusChangeDate" column="statusChangeDateId" javaType="GregHijDate">
+			<id 	property="gregorianDateId" 	column="statusChangeDateId" />
+			<result	property="gregorianCalDate" column="CAL_DT"  jdbcType="TIMESTAMP" />
+			<result property="hijriCalDate" 	column="HIJRI_DT"  jdbcType="VARCHAR" />
+		</association>
+  	</resultMap>
+  	
+	<!-- Insert -->
+	<insert id="insertPatientsNewArzi" parameterType="Arzi">
+		<![CDATA[
+			insert into F_ARZI_HDR (
+				ITS_NBR,
+				PROC_ID,
+				ARZI_TYP_ID,
+				BDY_PRT_ID,
+				COND_ID,
+				COND_STRT_DT_ID,
+				CREATE_TS,
+				CREATE_USR_ID,
+				RQST_SMT_DT_ID,
+				CURR_STATUS_ID,
+				CURR_STATUS_DT_ID
+			) values (
+			#{itsNumber,jdbcType=INTEGER},
+			#{procedure.procedureId,jdbcType=INTEGER},
+			#{arziType.arziTypeId,jdbcType=INTEGER},
+			#{bodyPart.bodyPartId,jdbcType=INTEGER},
+			#{condition.conditionId,jdbcType=INTEGER},
+			#{conditionStartDate.gregorianDateId,jdbcType=INTEGER},
+			now(),
+			#{createdBy,jdbcType=VARCHAR},
+			#{requestSubmitDate.gregorianDateId,jdbcType=INTEGER},
+			#{currentStatus.statusId,jdbcType=INTEGER},
+			#{currentStatusDate.gregorianDateId,jdbcType=INTEGER}
+			 ) ]]>
+	</insert>  	
 </mapper>
