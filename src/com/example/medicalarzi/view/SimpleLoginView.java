@@ -19,7 +19,6 @@ import com.vaadin.annotations.Theme;
 import com.vaadin.data.validator.RegexpValidator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.server.Page;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.Position;
 import com.vaadin.shared.ui.MarginInfo;
@@ -34,7 +33,6 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
@@ -122,13 +120,12 @@ public class SimpleLoginView extends CustomComponent implements View,
 
 		if (event.getOldView() instanceof PatientRegistrationView) {
 			if ((Boolean) getSession().getAttribute("isRegistrationSuccess")) {
-				Notification notif = new Notification(null,
+				//Create a user friendly notification
+				MedicalArziUtils.createAndShowNotification(null,
 						"User registration is successfull",
-						Type.HUMANIZED_MESSAGE);
-				notif.setStyleName("userFriendlyMsg");
-				notif.setDelayMsec(20000);
-				notif.setPosition(Position.TOP_LEFT);
-				notif.show(Page.getCurrent());
+						Type.HUMANIZED_MESSAGE, Position.TOP_LEFT,
+						"userFriendlyMsg", -1);
+
 			}
 		}
 	}

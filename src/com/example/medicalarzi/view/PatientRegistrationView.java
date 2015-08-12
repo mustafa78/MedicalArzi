@@ -28,7 +28,6 @@ import com.vaadin.data.fieldgroup.PropertyId;
 import com.vaadin.data.util.converter.StringToLongConverter;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.server.Page;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.Position;
 import com.vaadin.spring.annotation.VaadinUIScope;
@@ -401,7 +400,8 @@ public class PatientRegistrationView extends CustomComponent implements View,
 				if (!patientService.checkIfPtntAlreadyRegistered(patient
 						.getItsNumber())) {
 
-					logger.debug("New registration. Calling the registerPatient() on the Patient Service for the patient with ITS number: "
+					logger.debug("New registration. Calling the registerPatient() on the Patient Service "
+							+ "for the patient with ITS number: "
 							+ patient.getItsNumber());
 
 					patientService.registerPatient(patient);
@@ -416,13 +416,14 @@ public class PatientRegistrationView extends CustomComponent implements View,
 					getUI().getNavigator().navigateTo(SimpleLoginView.NAME);
 
 				} else {
-					Notification notif = new Notification(null,
-							"The ITS number, " + patient.getItsNumber()
-									+ " is already registered.",
-							Type.ERROR_MESSAGE);
-					notif.setStyleName("errorMsg");
-					notif.setPosition(Position.TOP_LEFT);
-					notif.show(Page.getCurrent());
+					String errorDescription = "The ITS number, " + patient.getItsNumber()
+							+ " is already registered.";
+					// Create an error notification if the user is already
+					// registered.
+					MedicalArziUtils.createAndShowNotification(null,
+							errorDescription,
+							Type.ERROR_MESSAGE, Position.TOP_LEFT,
+							"errorMsg", -1);
 				}
 
 			} catch (InvalidValueException e) {
@@ -432,13 +433,17 @@ public class PatientRegistrationView extends CustomComponent implements View,
 
 			} catch (CommitException ce) {
 				logger.error(ce);
-				Notification notif = new Notification(
-						null,
-						"Fields marked with asterisk (*) are required. Please enter the required values and fix the errors before proceeding further.",
-						Type.ERROR_MESSAGE);
-				notif.setStyleName("errorMsg");
-				notif.setPosition(Position.TOP_LEFT);
-				notif.show(Page.getCurrent());
+				
+				String errorDescription = "Fields marked with asterisk (*) are required. "
+						+ "Please enter the required values and fix the errors before proceeding further.";
+				
+				// Create an error notification if the required fields are not
+				// entered correctly.
+				MedicalArziUtils.createAndShowNotification(null,
+						errorDescription,
+						Type.ERROR_MESSAGE, Position.TOP_LEFT,
+						"errorMsg", -1);
+				
 			}
 		}
 

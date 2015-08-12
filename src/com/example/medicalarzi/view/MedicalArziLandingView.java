@@ -34,7 +34,6 @@ import com.vaadin.data.fieldgroup.PropertyId;
 import com.vaadin.data.util.converter.StringToLongConverter;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.server.Page;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.Position;
 import com.vaadin.spring.annotation.VaadinUIScope;
@@ -44,13 +43,13 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
@@ -590,6 +589,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 	@Override
 	public void buttonClick(ClickEvent event) {
 		if (event.getButton().equals(cancelBtn)) {
+			logger.debug("Cancel Button Clicked.");
 
 		} else if (event.getButton().equals(saveBtn)
 				|| event.getButton().equals(submitBtn)) {
@@ -626,7 +626,16 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 								.getConditionStartDate().getGregorianCalDate()));
 				
 				Status arziStatus = new Status();
-				arziStatus.setStatusId(new Long(1000));
+				// Set the status to "Draft' when Save Btn is clicked and
+				// 'Submitted' when Submit Btn is clicked.
+				if (event.getButton().equals(saveBtn)) {
+					arziStatus
+							.setStatusId(MedicalArziConstants.ARZI_DRAFT_STATUS);
+				} else {
+					arziStatus
+							.setStatusId(MedicalArziConstants.ARZI_SUBMITTED_STATUS);
+				}
+				
 				arzi.setCurrentStatus(arziStatus);
 				
 				logger.debug("Inserting a new arzi for patient with ITS number-> \""
@@ -634,16 +643,27 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 				
 				//Insert the new arzi for the patient
 				patientService.createNewArzi(arzi);
+				
+				//Create a user friendly notification on success.
+				String successMsg = "The arzi for \""
+						+ constructPtntFullName(ptntInfo)
+						+ "\" is successfully created";
+				MedicalArziUtils.createAndShowNotification(null, successMsg,
+						Type.HUMANIZED_MESSAGE, Position.TOP_LEFT,
+						"userFriendlyMsg", -1);
 
 			} catch (CommitException ce) {
 				logger.error(ce);
-				Notification notif = new Notification(
-						null,
-						"Fields marked with asterisk (*) are required. Please enter the required values and fix the errors before proceeding further.",
-						Type.ERROR_MESSAGE);
-				notif.setStyleName("errorMsg");
-				notif.setPosition(Position.TOP_LEFT);
-				notif.show(Page.getCurrent());
+				
+				String errorDescription = "Fields marked with asterisk (*) are required. "
+						+ "Please enter the required values and fix the errors before proceeding further.";
+				
+				// Create an error notification if the required fields are not
+				// entered correctly.
+				MedicalArziUtils.createAndShowNotification(null,
+						errorDescription,
+						Type.ERROR_MESSAGE, Position.TOP_LEFT,
+						"errorMsg", -1);
 			}
 		}
 	}
