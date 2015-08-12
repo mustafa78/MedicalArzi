@@ -53,8 +53,8 @@
 				BDY_PRT_ID,
 				COND_ID,
 				COND_STRT_DT_ID,
-				CREATE_TS,
 				CREATE_USR_ID,
+				CREATE_TS,
 				RQST_SMT_DT_ID,
 				CURR_STATUS_ID,
 				CURR_STATUS_DT_ID
@@ -65,8 +65,8 @@
 			#{bodyPart.bodyPartId,jdbcType=INTEGER},
 			#{condition.conditionId,jdbcType=INTEGER},
 			#{conditionStartDate.gregorianDateId,jdbcType=INTEGER},
+			#{itsNumber,jdbcType=INTEGER},
 			now(),
-			#{createdBy,jdbcType=VARCHAR},
 			#{requestSubmitDate.gregorianDateId,jdbcType=INTEGER},
 			#{currentStatus.statusId,jdbcType=INTEGER},
 			#{currentStatusDate.gregorianDateId,jdbcType=INTEGER}
