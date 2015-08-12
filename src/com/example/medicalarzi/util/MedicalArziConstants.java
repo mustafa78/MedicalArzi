@@ -28,6 +28,10 @@ public interface MedicalArziConstants {
 	final static public String MAP_DAWAT_TITLE_BHAI = "Bhai";
 	
 	final static public String MAP_DAWAT_TITLE_BEHEN = "Behen";
+	
+	final static public Long ARZI_DRAFT_STATUS = 1000L;
+	
+	final static public Long ARZI_SUBMITTED_STATUS = 1001L;
 
 	// For sending email.
 	final static public String EMAIL_HOST = "EmailHost";
@@ -52,5 +56,7 @@ public interface MedicalArziConstants {
 	final static public String CUSTOM_FORM_LEFTFORM_LAYOUT_ID = "customForm_leftFormLayout";
 	
 	final static public String CUSTOM_FORM_RIGHTFORM_LAYOUT_ID = "customForm_rightFormLayout";
+	
+	//
 
 }
