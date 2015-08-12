@@ -20,10 +20,14 @@ import com.vaadin.data.Container;
 import com.vaadin.data.Validator;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.validator.BeanValidator;
+import com.vaadin.server.Page;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.shared.Position;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.HasComponents;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 
 /**
  * @author Mkanchwa
@@ -134,6 +138,30 @@ public class MedicalArziUtils {
 		} finally {
 			VaadinSession.getCurrent().getLockInstance().unlock();
 		}
+	}
+	
+	/**
+	 * This method is responsible for creating a notification based on the
+	 * passed parameters. The notification might be a ERROR, WARNING or USER
+	 * FRIENDLY message. The position on the page is specified by the passed
+	 * position parameter and the notification delay is set to "-1" which means
+	 * that the message would not disappear until it is clicked.
+	 * 
+	 * @param caption
+	 * @param description
+	 * @param type
+	 * @param position
+	 * @param cssStyleName
+	 * @param delayMsec
+	 */
+	public static void createAndShowNotification(String caption,
+			String description, Type type, Position position,
+			String cssStyleName, int delayMsec) {
+		Notification notif = new Notification(caption, description, type, true);
+		notif.setDelayMsec(delayMsec);
+		notif.setStyleName(cssStyleName);
+		notif.setPosition(position);
+		notif.show(Page.getCurrent());
 	}
 
 }
