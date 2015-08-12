@@ -36,7 +36,8 @@
 			<id 	property="lookupId" 	column="ptntMiddleNmTitleId" />
 			<result property="lookupValue" 	column="ptntMiddleNmTitleName" />
 		</association>
-		<collection column="PTNT_ITS_NBR" property="roles" ofType="SecurityRole" javaType="java.util.ArrayList" select="com.example.medicalarzi.dao.SecurityMapper.selectSecurityRolesForUser" />
+		<collection column="PTNT_ITS_NBR" property="roles" ofType="SecurityRole" javaType="java.util.ArrayList" 
+			select="com.example.medicalarzi.dao.SecurityMapper.selectSecurityRolesForUser" />
   	</resultMap>
 
   	<sql id="ptntColumnList">
@@ -83,7 +84,9 @@
 				LAST_NM,
 				DOB,
 				EMAIL_ADDR1,
-				HASH_PSWD
+				HASH_PSWD,
+				CREATE_USR_ID,
+				CREATE_TS
 			) values (
 			#{itsNumber,jdbcType=INTEGER},
 			#{ptntTitle.lookupId,jdbcType=INTEGER},
@@ -93,7 +96,9 @@
 			#{lastName,jdbcType=VARCHAR},
 			#{dob,jdbcType=DATE},
 			#{emailAddress,jdbcType=VARCHAR},
-			encode(#{password,jdbcType=VARCHAR}, #{passString,jdbcType=VARCHAR}) ) ]]>
+			encode(#{password,jdbcType=VARCHAR}, #{passString,jdbcType=VARCHAR}),
+			#{itsNumber,jdbcType=INTEGER},
+			now()) ]]>
 	</insert>
 	
 	<!-- Update -->
@@ -119,8 +124,10 @@
       			st_cd = #{state,jdbcType=VARCHAR},
       		</if>
       		<if test="zip != null">
-      			zip_cd = #{zip,jdbcType=VARCHAR}
+      			zip_cd = #{zip,jdbcType=VARCHAR},
       		</if>
+      		LST_UPDT_USR_ID = #{itsNumber,jdbcType=VARCHAR},
+      		LST_UPDT_TS = now()
       		 where PTNT_ITS_NBR = #{itsNumber,jdbcType=INTEGER}
 	    </set>
     </update>
