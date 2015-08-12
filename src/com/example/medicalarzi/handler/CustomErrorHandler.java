@@ -7,6 +7,7 @@ import java.sql.SQLException;
 
 import org.apache.ibatis.exceptions.PersistenceException;
 
+import com.example.medicalarzi.util.MedicalArziUtils;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.converter.Converter;
 import com.vaadin.server.AbstractErrorMessage.ContentMode;
@@ -14,11 +15,9 @@ import com.vaadin.server.DefaultErrorHandler;
 import com.vaadin.server.ErrorEvent;
 import com.vaadin.server.ErrorHandler;
 import com.vaadin.server.ErrorMessage;
-import com.vaadin.server.Page;
 import com.vaadin.server.UserError;
 import com.vaadin.shared.Position;
 import com.vaadin.ui.AbstractComponent;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 
 /**
@@ -49,16 +48,19 @@ public class CustomErrorHandler implements ErrorHandler {
 		// Finds the original source of the error/exception
 		AbstractComponent component = DefaultErrorHandler
 				.findAbstractComponent(event);
+		
 		if (component != null) {
 			ErrorMessage errorMessage = getErrorMessageForException(event
 					.getThrowable());
 			if (errorMessage != null) {
 				component.setComponentError(errorMessage);
-				Notification notif = new Notification(null, errorMessage.getFormattedHtmlMessage(),
-						Type.ERROR_MESSAGE, true);
-				notif.setPosition(Position.TOP_LEFT);
-				notif.setStyleName("errorMsg");
-				notif.show(Page.getCurrent());
+				
+				//Create a error notification
+				MedicalArziUtils.createAndShowNotification(null,
+						errorMessage.getFormattedHtmlMessage(),
+						Type.ERROR_MESSAGE, Position.TOP_LEFT,
+						"errorMsg", -1);
+
 				return;
 			}
 		}
