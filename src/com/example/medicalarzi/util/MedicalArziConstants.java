@@ -32,6 +32,10 @@ public interface MedicalArziConstants {
 	final static public Long ARZI_DRAFT_STATUS = 1000L;
 	
 	final static public Long ARZI_SUBMITTED_STATUS = 1001L;
+	
+	final static public Integer MAP_GENDER_MALE_ID = 1005;
+	
+	final static public Integer MAP_GENDER_FEMALE_ID = 1006;
 
 	// For sending email.
 	final static public String EMAIL_HOST = "EmailHost";
@@ -57,6 +61,7 @@ public interface MedicalArziConstants {
 	
 	final static public String CUSTOM_FORM_RIGHTFORM_LAYOUT_ID = "customForm_rightFormLayout";
 	
-	//
+	//Hint texts, descriptions or any static texts
+	final static public String PASSWORD_HINT_TEXT = "Password must be at least 8 characters long and contain at least 1 number.";
 
 }
