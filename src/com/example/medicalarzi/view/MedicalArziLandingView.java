@@ -14,12 +14,12 @@ import com.example.medicalarzi.component.ArziDateField;
 import com.example.medicalarzi.component.ArziFooterComponent;
 import com.example.medicalarzi.component.ArziHeaderComponent;
 import com.example.medicalarzi.component.CustomFormComponent;
+import com.example.medicalarzi.converter.StringToLookupConverter;
 import com.example.medicalarzi.model.Arzi;
 import com.example.medicalarzi.model.ArziType;
 import com.example.medicalarzi.model.BodyPart;
 import com.example.medicalarzi.model.Condition;
 import com.example.medicalarzi.model.GregHijDate;
-import com.example.medicalarzi.model.Lookup;
 import com.example.medicalarzi.model.Patient;
 import com.example.medicalarzi.model.Procedure;
 import com.example.medicalarzi.model.Status;
@@ -50,7 +50,6 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
-import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TextField;
@@ -117,12 +116,12 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 
 	@PropertyId("middleName")
 	private TextField middleName;
+	
+	@PropertyId("gender")
+	private TextField gender;
 
 	@PropertyId("lastName")
 	private TextField lastName;
-
-	@PropertyId("gender")
-	private OptionGroup gender;
 
 	@PropertyId("dob")
 	private ArziDateField dob;
@@ -197,10 +196,10 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 	public ArziDateField getDob() {
 		return dob;
 	}
-
-	public OptionGroup getGender() {
+	
+	public TextField getGender() {
 		return gender;
-	}	
+	}
 
 	/**
 	 * The constructor should first build the main layout, set the composition
@@ -221,7 +220,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		init();
 		
 		getItsNumber().setValue(String.valueOf(patient.getItsNumber()));
-		getGender().select(patient.getGender());
+		getGender().setValue(patient.getGender().getDescription());
 		
 		setFieldsReadOnly(true);
 
@@ -405,15 +404,11 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		middleName = new TextField("Middle Name:");
 		middleName.setWidth("300px");
 		leftFormLayout.addComponent(middleName);
-
-		gender = new OptionGroup("Gender:");
-		gender.setContainerDataSource(MedicalArziUtils
-				.getContainer(Lookup.class));
-		gender.addItems(lookupService
-				.getByLookupType(MedicalArziConstants.MAP_GENDER));
-		gender.setItemCaptionMode(ItemCaptionMode.PROPERTY);
-		gender.setItemCaptionPropertyId("description");
-		gender.setStyleName("horizontal");
+		
+		// gender
+		gender = new TextField("Gender:");
+		gender.setWidth("300px");
+		gender.setConverter(new StringToLookupConverter());
 		leftFormLayout.addComponent(gender);
 
 		// addressLn1
@@ -679,6 +674,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 	private String constructPtntFullName(Patient ptnt) {
 		StringBuffer fullName = new StringBuffer();
 		
+		//Patient Title
 		if (ptnt.getPtntTitle() != null
 				&& !(StringUtils.equalsIgnoreCase(ptnt
 						.getPtntTitle().getLookupValue(),
@@ -691,8 +687,10 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 			fullName.append(" ");
 		}
 		
+		//Their first name
 		fullName.append(ptnt.getFirstName());
 		
+		//Their middle name title
 		if (ptnt.getPtntMiddleNmTitle() != null
 				&& !(StringUtils.equalsIgnoreCase(ptnt
 						.getPtntMiddleNmTitle().getLookupValue(),
@@ -701,16 +699,20 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 								ptnt.getPtntMiddleNmTitle()
 										.getLookupValue(),
 								MedicalArziConstants.MAP_DAWAT_TITLE_BEHEN))) {
+			fullName.append(" ");
 			fullName.append(ptnt.getPtntMiddleNmTitle()
 					.getLookupValue());
-			fullName.append(" ");
 			
-		} else {
+		} 
+		
+		//Their middle name
+		if(StringUtils.isNotEmpty(ptnt.getMiddleName())) {
 			fullName.append(" ");
 			fullName.append(ptnt.getMiddleName());
 			fullName.append(" ");
 		}
 		
+		//Their last name
 		fullName.append(ptnt.getLastName());
 		
 		return fullName.toString();
@@ -724,7 +726,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		getFirstName().setReadOnly(true);
 		getMiddleName().setReadOnly(true);
 		getLastName().setReadOnly(true);
-		//getGender().setReadOnly(true);
+		getGender().setReadOnly(true);
 	}
 
 }
