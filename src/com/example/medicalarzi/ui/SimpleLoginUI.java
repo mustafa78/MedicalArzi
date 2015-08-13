@@ -27,6 +27,7 @@ import com.vaadin.spring.navigator.SpringViewProvider;
 import com.vaadin.ui.UI;
 
 /**
+ * 
  * @author mkanchwa
  *
  */
@@ -137,6 +138,12 @@ public class SimpleLoginUI extends UI {
 		UI.getCurrent().setErrorHandler(new CustomErrorHandler());
 
 		// ... or on session level
+		// When a new client connects, it creates a new user session,
+		// represented by an instance of VaadinSession.
+		// VaadinSession also provides access to the lower-level session
+		// objects, HttpSession and PortletSession, through a WrappedSession.
+		// Deployment configurations could also be accessed through
+		// VaadinSession.
 		VaadinSession.getCurrent().setErrorHandler(new CustomErrorHandler());
 	}
 
