@@ -112,9 +112,20 @@ public interface LookupMapper {
 	public List<ArziType> selectAllArziTypes();
 	
 	/**
+	 * This method is responsible for selecting the custom Hijri date based on
+	 * the gregorian calendar date.
 	 * 
 	 * @param calDate
 	 * @return
 	 */
 	public GregHijDate selectGregHijBasedOnCalDt(Date calDate);
+	
+	/**
+	 * This method is responsible for selecting the custom Hijri date based on
+	 * the id
+	 * 
+	 * @param dateId
+	 * @return
+	 */
+	public GregHijDate selectGregHijDateById(@Param("dateId") Long dateId);
 }

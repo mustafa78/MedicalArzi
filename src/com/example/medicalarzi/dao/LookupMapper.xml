@@ -182,6 +182,13 @@
 	    from D_DATE 
 	    where CAL_DT = #{calDate, jdbcType=DATE}
   	</select>
+  	
+  	<select id="selectGregHijDateById" resultMap="GregHijDateResultMap" parameterType="Long">
+	    select
+	    <include refid="Date_Column_List" />
+	    from D_DATE 
+	    where DT_ID = #{dateId, jdbcType=DATE}
+  	</select>
 
   	<!-- Insert Statements -->
   	<insert id="insertLookup" parameterType="Lookup">
