@@ -27,6 +27,7 @@
 	    <association property="gender" column="genderInd" javaType="Lookup">
 			<id 	property="lookupId" 	column="genderInd" />
 			<result property="lookupValue" 	column="genderVal" />
+			<result property="description" 	column="genderDescription" />
 		</association>
 	    <association property="ptntTitle" column="ptntTitleId" javaType="Lookup">
 			<id 	property="lookupId" 	column="ptntTitleId" />
@@ -67,7 +68,8 @@
   		LST_UPDT_TS,
   		(SELECT LKUP_VAL FROM D_LOOKUPS WHERE LKUP_ID = TTL_ID) AS "ptntTitleName",
   		(SELECT LKUP_VAL FROM D_LOOKUPS WHERE LKUP_ID = MDL_NM_TTL_ID) AS "ptntMiddleNmTitleName",
-  		(SELECT LKUP_VAL FROM D_LOOKUPS WHERE LKUP_ID = GNDR_IND_ID) AS "genderVal"
+  		(SELECT LKUP_VAL FROM D_LOOKUPS WHERE LKUP_ID = GNDR_IND_ID) AS "genderVal",
+  		(SELECT LKUP_DESC FROM D_LOOKUPS WHERE LKUP_ID = GNDR_IND_ID) AS "genderDescription"
   	</sql>
 
 	<!-- All the tables name and column names should be in CAPS or else it would not work in MySQL -->
@@ -82,6 +84,7 @@
 				MDL_NM_TTL_ID,
 				MDL_NM,
 				LAST_NM,
+				GNDR_IND_ID,
 				DOB,
 				EMAIL_ADDR1,
 				HASH_PSWD,
@@ -94,6 +97,7 @@
 			#{ptntMiddleNmTitle.lookupId,jdbcType=INTEGER},
 			#{middleName,jdbcType=VARCHAR},
 			#{lastName,jdbcType=VARCHAR},
+			#{gender.lookupId,jdbcType=INTEGER},
 			#{dob,jdbcType=DATE},
 			#{emailAddress,jdbcType=VARCHAR},
 			encode(#{password,jdbcType=VARCHAR}, #{passString,jdbcType=VARCHAR}),
