@@ -21,6 +21,7 @@ import com.vaadin.data.Validator;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.validator.BeanValidator;
 import com.vaadin.server.Page;
+import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.Position;
 import com.vaadin.ui.Component;
@@ -163,5 +164,70 @@ public class MedicalArziUtils {
 		notif.setPosition(position);
 		notif.show(Page.getCurrent());
 	}
+	
+	/**
+	 * This method is responsible for setting the attributes in the current
+	 * request.
+	 * 
+	 * @param key
+	 * @param value
+	 */
+	public static void setRequestAttribute(String key, Object value) {
+		VaadinService.getCurrentRequest().setAttribute(key, value);
+	}
 
+	
+	/**
+	 * This method is responsible for constructing the patients full name based
+	 * on his first name, last name, title and his middle name and middle name
+	 * title
+	 * 
+	 * @param ptnt
+	 * @return
+	 */
+	public static String constructPtntFullName(Patient ptnt) {
+		StringBuffer fullName = new StringBuffer();
+		
+		if (ptnt != null) {
+			// Patient Title
+			if (ptnt.getPtntTitle() != null
+					&& !(StringUtils.equalsIgnoreCase(ptnt.getPtntTitle()
+							.getLookupValue(),
+							MedicalArziConstants.MAP_DAWAT_TITLE_BHAI) || StringUtils
+							.equalsIgnoreCase(ptnt.getPtntTitle()
+									.getLookupValue(),
+									MedicalArziConstants.MAP_DAWAT_TITLE_BEHEN))) {
+				fullName.append(ptnt.getPtntTitle().getLookupValue());
+				fullName.append(" ");
+			}
+
+			// Their first name
+			fullName.append(ptnt.getFirstName());
+
+			// Their middle name title
+			if (ptnt.getPtntMiddleNmTitle() != null
+					&& !(StringUtils.equalsIgnoreCase(ptnt
+							.getPtntMiddleNmTitle().getLookupValue(),
+							MedicalArziConstants.MAP_DAWAT_TITLE_BHAI) || StringUtils
+							.equalsIgnoreCase(ptnt.getPtntMiddleNmTitle()
+									.getLookupValue(),
+									MedicalArziConstants.MAP_DAWAT_TITLE_BEHEN))) {
+				fullName.append(" ");
+				fullName.append(ptnt.getPtntMiddleNmTitle().getLookupValue());
+
+			}
+
+			// Their middle name
+			if (StringUtils.isNotEmpty(ptnt.getMiddleName())) {
+				fullName.append(" ");
+				fullName.append(ptnt.getMiddleName());
+				fullName.append(" ");
+			}
+
+			// Their last name
+			fullName.append(ptnt.getLastName());
+		}
+		
+		return fullName.toString();
+	}	
 }
