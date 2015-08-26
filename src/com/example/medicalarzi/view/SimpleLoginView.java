@@ -20,6 +20,7 @@ import com.vaadin.data.validator.RegexpValidator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.server.VaadinService;
 import com.vaadin.shared.Position;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.spring.annotation.VaadinUIScope;
@@ -119,13 +120,24 @@ public class SimpleLoginView extends CustomComponent implements View,
 		}
 
 		if (event.getOldView() instanceof PatientRegistrationView) {
-			if ((Boolean) getSession().getAttribute("isRegistrationSuccess")) {
+			if ((Boolean) getSession().getAttribute(
+					MedicalArziConstants.SESS_ATTR_IS_REGISTRATION_SUCCESSFUL)) {
 				//Create a user friendly notification
 				MedicalArziUtils.createAndShowNotification(null,
 						"User registration is successfull",
 						Type.HUMANIZED_MESSAGE, Position.TOP_LEFT,
 						"userFriendlyMsg", -1);
 
+			}
+		}
+		else if(event.getOldView() instanceof ForgotPasswordView) {
+			if (VaadinService.getCurrentRequest().getAttribute(
+					MedicalArziConstants.REQ_ATTR_PASSWD_EMAILED) != null) {
+				//Create a user friendly notification
+				MedicalArziUtils.createAndShowNotification(null,
+						"The password has been sent to the registered email address. Please check your email to login.",
+						Type.HUMANIZED_MESSAGE, Position.TOP_LEFT,
+								"userFriendlyMsg", -1);
 			}
 		}
 	}
