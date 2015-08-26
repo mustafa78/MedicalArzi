@@ -233,6 +233,11 @@ public class ForgotPasswordView extends CustomComponent implements View,
 
 			// Email the password
 			emailPasswordToPatient(password);
+			
+			MedicalArziUtils.setRequestAttribute(
+					MedicalArziConstants.REQ_ATTR_PASSWD_EMAILED, true);
+			
+			getUI().getNavigator().navigateTo(SimpleLoginView.NAME);
 
 		}
 
@@ -264,18 +269,29 @@ public class ForgotPasswordView extends CustomComponent implements View,
 		String body = properties
 				.getProperty(MedicalArziConstants.FORGOT_PSWD_EMAIL_BODY);
 
+		//Fetch the patient information based on the ITS number.
+		Patient ptInfo = patientService.getPatientInfo(Long.valueOf(itsNumber
+				.getValue()));
+
 		String formattedSubject = MessageFormat.format(subject,
 				itsNumber.getValue());
 
-		String formattedBody = MessageFormat.format(body, password);
+		String formattedBody = MessageFormat.format(body, new Object[] {
+				MedicalArziUtils.constructPtntFullName(ptInfo), password });
 
 		String[] toList = { emailAddress.getValue() };
 
 		// email password
 		MAPMail mail = new MAPMail();
+		
+		logger.debug("Sending password reset email to email address --> "
+				+ emailAddress.getValue());
 
 		mail.sendMail(toList, from, replyTo, host, formattedBody,
 				formattedSubject, "Medical Arzi Admin");
+
+		logger.debug("Email successfully sent to email address --> "
+				+ emailAddress.getValue());
 	}
 
 	@Override
