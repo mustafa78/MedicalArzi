@@ -5,6 +5,8 @@ package com.example.medicalarzi.dao;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.example.medicalarzi.model.Arzi;
 
 /**
@@ -16,7 +18,6 @@ public interface ArziMapper {
 	/**
 	 * This method is responsible for insert a new arzi for a patient.
 	 * 
-	 * @param newArzi
 	 */
 	public void insertPatientsNewArzi(Arzi newArzi);
 
@@ -27,6 +28,16 @@ public interface ArziMapper {
 	 * @param itsNumber
 	 * @return java.util.List
 	 */
-	public List<Arzi> selectPatientsAllArzis(Long itsNumber);
+	public List<Arzi> selectPatientsAllArzis(@Param("itsNumber") Long itsNumber);
+	
+	/**
+	 * This method is responsible for returning the requested saved arzi for the
+	 * patient based on their ITS number.
+	 * 
+	 * @param itsNumber
+	 * @param arziId
+	 * @return com.example.medicalarzi.model.Arzi
+	 */
+	public Arzi selectArziForPatient(@Param("itsNumber") Long itsNumber, @Param("arziId") Long arziId);
 
 }

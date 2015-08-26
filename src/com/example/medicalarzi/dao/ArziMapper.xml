@@ -4,14 +4,19 @@
 	<!-- Result Map -->
 	<resultMap id="ArziHdrResultMap" type="ArziHeader" >
 	    <id column="ARZI_ID" property="arziId" jdbcType="INTEGER" />
-	    <result column="ITS_NBR" property="itsNumber" jdbcType="INTEGER" />
-	    <result column="CREATE_USR_ID" property="createdBy" jdbcType="VARCHAR" />
-	    <result column="CREATE_TS" property="createdDate" jdbcType="TIMESTAMP" />
-	    <result column="LST_UPDT_USR_ID" property="updatedBy" jdbcType="VARCHAR" />
-	    <result column="LST_UPDT_TS" property="updatedDate" jdbcType="TIMESTAMP" />
+	    <result column="ptntItsNbr" property="itsNumber" jdbcType="INTEGER" />
+	    <result column="hdrCreateUserId" property="createdBy" jdbcType="VARCHAR" />
+	    <result column="hdrCreateTS" property="createdDate" jdbcType="TIMESTAMP" />
+	    <result column="hdrLastUpdUserId" property="updatedBy" jdbcType="VARCHAR" />
+	    <result column="hdrLastUpdTS" property="updatedDate" jdbcType="TIMESTAMP" />
 	    <association property="arziType" column="arziTypeId" javaType="ArziType">
 			<id 	property="arziTypeId" 	column="arziTypeId" />
 			<result property="arzTypeName" 	column="arzTypeName" />
+		</association>
+		<association property="bodyPart" column="bodyPartId" javaType="Procedure">
+			<id 	property="bodyPartId" 	column="bodyPartId" />
+			<result property="bodyPartPrefixCd" 	column="bodyPartPrefixCd" />
+			<result property="bodyPartName" 	column="bodyPartName" />
 		</association>
 	    <association property="procedure" column="procedureId" javaType="Procedure">
 			<id 	property="procedureId" 	column="procedureId" />
@@ -23,25 +28,68 @@
 			<result property="conditionPrefixCd" 	column="conditionPrefixCd" />
 			<result property="conditionName" 	column="conditionName" />
 		</association>
-		<association property="currentStatusDate" column="currStatusDtId" javaType="GregHijDate">
-			<id 	property="gregorianDateId" 	column="currStatusDtId" />
-			<result	property="gregorianCalDate" column="CAL_DT"  jdbcType="TIMESTAMP" />
-			<result property="hijriCalDate" 	column="HIJRI_DT" jdbcType="VARCHAR" />
+		<association property="currentStatus" column="currentStatusId" javaType="Condition">
+			<id 	property="statusId" 	column="currentStatusId" />
+			<result property="statusDesc" 	column="currentStatusDesc" />
 		</association>
+		<association property="currentStatusDate" column="currStatusDtId" javaType="GregHijDate" 
+			select="com.example.medicalarzi.dao.LookupMapper.selectGregHijDateById" />
+		<association property="conditionStartDate" column="condStartDtId" javaType="GregHijDate" 
+			select="com.example.medicalarzi.dao.LookupMapper.selectGregHijDateById" />
   	</resultMap>
   	<resultMap id="ArziResultMap" type="Arzi" extends="ArziHdrResultMap">
-  		<result column="ITS_NBR" property="reviewerItsNumber" jdbcType="INTEGER" />
-  		<association property="reviewDate" column="reviewDateId" javaType="GregHijDate">
-  			<id 	property="gregorianDateId" 	column="reviewDateId" />
-			<result	property="gregorianCalDate" column="CAL_DT"  jdbcType="TIMESTAMP" />
-			<result property="hijriCalDate" 	column="HIJRI_DT" jdbcType="VARCHAR" />
-		</association>
-		<association property="statusChangeDate" column="statusChangeDateId" javaType="GregHijDate">
-			<id 	property="gregorianDateId" 	column="statusChangeDateId" />
-			<result	property="gregorianCalDate" column="CAL_DT"  jdbcType="TIMESTAMP" />
-			<result property="hijriCalDate" 	column="HIJRI_DT"  jdbcType="VARCHAR" />
-		</association>
+  		<result column="reviewerItsNbr" property="reviewerItsNumber" jdbcType="INTEGER" />
+  		<result column="dtlCreateUserId" property="createdBy" jdbcType="VARCHAR" />
+	    <result column="dtlCreateTS" property="createdDate" jdbcType="TIMESTAMP" />
+	    <result column="dtlLastUpdUserId" property="updatedBy" jdbcType="VARCHAR" />
+	    <result column="dtlLastUpdTS" property="updatedDate" jdbcType="TIMESTAMP" />
+	    <association property="reviewDate" column="reviewDtId" javaType="GregHijDate" 
+  			select="com.example.medicalarzi.dao.LookupMapper.selectGregHijDateById" />
+  		<association property="statusChangeDate" column="statusChangeDtId" javaType="GregHijDate" 
+  			select="com.example.medicalarzi.dao.LookupMapper.selectGregHijDateById" />
   	</resultMap>
+  	
+  	<sql id="arziColumnList">
+  		hdr.ITS_NBR as "ptntItsNbr"
+  		hdr.ARZI_ID as "arzi_id",
+  		hdr.PROC_ID as "procedureId",
+  		hdr.ARZI_TYP_ID as "arziTypeId",
+  		hdr.BDY_PRT_ID as "bodyPartId",
+  		hdr.COND_ID as "conditionId",
+  		hdr.COND_STRT_DT_ID as "condStartDtId",
+  		hdr.CURR_STATUS_ID as "currentStatusId",
+  		hdr.CURR_STATUS_DT_ID as "currStatusDtId",
+  		hdr.RQST_SMT_DT_ID as "requestSubmitDtId",
+  		hdr.CREATE_USR_ID as "hdrCreateUserId",
+  		hdr.CREATE_TS as "hdrCreateTS",
+  		hdr.LST_UPDT_USR_ID as "hdrLastUpdUserId",
+  		hdr.LST_UPDT_TS as "hdrLastUpdTS",
+  		dtl.RVWR_ITS_NBR as "reviewerItsNbr",
+  		dtl.STATUS_ID as "status_id",
+  		dtl.STATUS_CHG_DT_ID as "statusChangeDtId",
+  		dtl.RVW_DT_ID as "reviewDtId",
+  		dtl.CREATE_USR_ID as "dtlCreateUserId",
+  		dtl.CREATE_TS as "dtlCreateTS",
+  		dtl.LST_UPDT_USR_ID as "dtlLastUpdUserId",
+  		dtl.LST_UPDT_TS as "dtlLastUpdTS",
+  		(SELECT PROC_NM FROM D_PROC WHERE PROC_ID = hdr.PROC_ID) AS "procedureName",
+  		(SELECT PROC_PRFX_CD FROM D_PROC WHERE PROC_ID = hdr.PROC_ID) AS "procedurePrefixCd",
+  		(SELECT COND_NM FROM D_COND WHERE COND_ID = hdr.COND_ID) AS "conditionName",
+  		(SELECT COND_PRFX_CD FROM D_COND WHERE COND_ID = hdr.COND_ID) AS "conditionPrefixCd",
+  		(SELECT BDY_PRT_NM FROM D_BDY_PRT WHERE BDY_PRT_ID = hdr.BDY_PRT_ID) AS "bodyPartName",
+  		(SELECT BDY_PRT_PRFX_CD FROM D_BDY_PRT WHERE BDY_PRT_ID = hdr.BDY_PRT_ID) AS "bodyPartPrefixCd",
+  		(SELECT ARZI_TYP FROM D_ARZI_TYP WHERE ARZI_TYP_ID = hdr.ARZI_TYP_ID) AS "arzTypeName",
+  		(SELECT STATUS_DESC FROM D_STATUS WHERE CURR_STATUS_ID = hdr.CURR_STATUS_ID) AS "currentStatusDesc"
+  	</sql>
+  	
+  	<!-- Select an arzi for the patient -->
+  	<select id="selectArziForPatient" parameterType="Long" resultMap="ArziResultMap">
+		select
+			<include refid="arziColumnList" />
+		from F_ARZI_HDR hdr, F_ARZI_DTL dtl
+		where hdr.ARZI_ID = dtl.ARZI_ID
+		and hdr.ITS_NBR = #{itsNumber,jdbcType=INTEGER}
+	</select>
   	
 	<!-- Insert -->
 	<insert id="insertPatientsNewArzi" parameterType="Arzi">
