@@ -38,6 +38,18 @@ public interface ArziMapper {
 	 * @param arziId
 	 * @return com.example.medicalarzi.model.Arzi
 	 */
-	public Arzi selectArziForPatient(@Param("itsNumber") Long itsNumber, @Param("arziId") Long arziId);
+	public Arzi selectArziForPatient(@Param("itsNumber") Long itsNumber,
+			@Param("arziId") Long arziId);
+	
+	/**
+	 * This method is responsible for returning all the arzis for the patient
+	 * based on their ITS number
+	 * 
+	 * @param itsNumber
+	 * 
+	 * @return java.util.List<com.example.medicalarzi.model.Arzi>
+	 */
+	public List<Arzi> selectAllArzisForPatient(
+			@Param("itsNumber") Long itsNumber);
 
 }

@@ -11,9 +11,9 @@
 	    <result column="hdrLastUpdTS" property="updatedDate" jdbcType="TIMESTAMP" />
 	    <association property="arziType" column="arziTypeId" javaType="ArziType">
 			<id 	property="arziTypeId" 	column="arziTypeId" />
-			<result property="arzTypeName" 	column="arzTypeName" />
+			<result property="arziTypeName" 	column="arziTypeName" />
 		</association>
-		<association property="bodyPart" column="bodyPartId" javaType="Procedure">
+		<association property="bodyPart" column="bodyPartId" javaType="BodyPart">
 			<id 	property="bodyPartId" 	column="bodyPartId" />
 			<result property="bodyPartPrefixCd" 	column="bodyPartPrefixCd" />
 			<result property="bodyPartName" 	column="bodyPartName" />
@@ -28,7 +28,7 @@
 			<result property="conditionPrefixCd" 	column="conditionPrefixCd" />
 			<result property="conditionName" 	column="conditionName" />
 		</association>
-		<association property="currentStatus" column="currentStatusId" javaType="Condition">
+		<association property="currentStatus" column="currentStatusId" javaType="Status">
 			<id 	property="statusId" 	column="currentStatusId" />
 			<result property="statusDesc" 	column="currentStatusDesc" />
 		</association>
@@ -50,7 +50,7 @@
   	</resultMap>
   	
   	<sql id="arziColumnList">
-  		hdr.ITS_NBR as "ptntItsNbr"
+  		hdr.ITS_NBR as "ptntItsNbr",
   		hdr.ARZI_ID as "arzi_id",
   		hdr.PROC_ID as "procedureId",
   		hdr.ARZI_TYP_ID as "arziTypeId",
@@ -78,17 +78,33 @@
   		(SELECT COND_PRFX_CD FROM D_COND WHERE COND_ID = hdr.COND_ID) AS "conditionPrefixCd",
   		(SELECT BDY_PRT_NM FROM D_BDY_PRT WHERE BDY_PRT_ID = hdr.BDY_PRT_ID) AS "bodyPartName",
   		(SELECT BDY_PRT_PRFX_CD FROM D_BDY_PRT WHERE BDY_PRT_ID = hdr.BDY_PRT_ID) AS "bodyPartPrefixCd",
-  		(SELECT ARZI_TYP FROM D_ARZI_TYP WHERE ARZI_TYP_ID = hdr.ARZI_TYP_ID) AS "arzTypeName",
-  		(SELECT STATUS_DESC FROM D_STATUS WHERE CURR_STATUS_ID = hdr.CURR_STATUS_ID) AS "currentStatusDesc"
+  		(SELECT ARZI_TYP FROM D_ARZI_TYP WHERE ARZI_TYP_ID = hdr.ARZI_TYP_ID) AS "arziTypeName",
+  		(SELECT STATUS_DESC FROM D_STATUS WHERE STATUS_ID = hdr.CURR_STATUS_ID) AS "currentStatusDesc"
   	</sql>
   	
-  	<!-- Select an arzi for the patient -->
-  	<select id="selectArziForPatient" parameterType="Long" resultMap="ArziResultMap">
+  	<!-- Select all arzis for the patient based on the ITS number -->
+  	<select id="selectAllArzisForPatient" parameterType="Long" resultMap="ArziResultMap">
 		select
 			<include refid="arziColumnList" />
-		from F_ARZI_HDR hdr, F_ARZI_DTL dtl
-		where hdr.ARZI_ID = dtl.ARZI_ID
-		and hdr.ITS_NBR = #{itsNumber,jdbcType=INTEGER}
+		from 
+			F_ARZI_HDR hdr left join F_ARZI_DTL dtl
+		on 
+			hdr.ARZI_ID = dtl.ARZI_ID
+		where 
+			hdr.ITS_NBR = #{itsNumber,jdbcType=INTEGER}
+	</select>
+	
+	<!-- Select an arzi for the patient based on the ITS number and arzi id -->
+	<select id="selectArziForPatient" resultMap="ArziResultMap">
+		select
+			<include refid="arziColumnList" />
+		from 
+			F_ARZI_HDR hdr left join F_ARZI_DTL dtl
+		on 
+			hdr.ARZI_ID = dtl.ARZI_ID
+		where 
+			hdr.ARZI_ID = #{arziId,jdbcType=INTEGER} and 
+			hdr.ITS_NBR = #{itsNumber,jdbcType=INTEGER}
 	</select>
   	
 	<!-- Insert -->
