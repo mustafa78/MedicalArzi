@@ -3,6 +3,8 @@
  */
 package com.example.medicalarzi.service.impl;
 
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
 
@@ -99,7 +101,7 @@ public class PatientServiceImpl implements PatientService {
 
 	@Override
 	public Patient getPatientInfo(Long itsNumber) {
-		logger.debug("Fetching patient with ITS Number: " + itsNumber);
+		logger.debug("Fetching patient with ITS Number: ->" + itsNumber);
 
 		Patient ptntInfo = ptntMapper.retrievePatientInfo(itsNumber);
 
@@ -108,7 +110,7 @@ public class PatientServiceImpl implements PatientService {
 
 	@Override
 	public String emailForgotPassword(Long itsNumber, String passString) {
-		logger.debug("Fetching password for the patient with ITS Number: "
+		logger.debug("Fetching password for the patient with ITS Number: ->"
 				+ itsNumber);
 
 		String password = ptntMapper.retrievePassword(itsNumber, passString);
@@ -121,7 +123,7 @@ public class PatientServiceImpl implements PatientService {
 
 	@Override
 	public void updatePatientInfo(Patient ptnt) {
-		logger.debug("Updating the information for patient with ITS Number: "
+		logger.debug("Updating the information for patient with ITS Number: -> "
 				+ ptnt.getItsNumber());
 
 		ptntMapper.updatePatientSelective(ptnt);
@@ -132,13 +134,33 @@ public class PatientServiceImpl implements PatientService {
 
 	@Override
 	public void createNewArzi(Arzi newArzi) {
-		logger.debug("Registering the patient with ITS number: "
+		logger.debug("Registering the patient with ITS number: -> "
 				+ newArzi.getItsNumber());
 
 		arziMapper.insertPatientsNewArzi(newArzi);
 
 		logger.debug("Arzi for patient with ITS number -> "
 				+ newArzi.getItsNumber() + " successfully registered");
+	}
+
+	@Override
+	public List<Arzi> retrieveAllArzisForPatient(Long itsNumber) {
+		logger.debug("Retreiving all the arzis submitted by the patient with ITS number: -> "
+				+ itsNumber);
+
+		List<Arzi> arziList = arziMapper.selectAllArzisForPatient(itsNumber);
+
+		return arziList;
+	}
+
+	@Override
+	public Arzi retrieveArziForPatient(Long itsNumber, Long arziId) {
+		logger.debug("Retreiving arzi with \"" + arziId + "\" "
+				+ "submitted by the patient with ITS number: -> " + itsNumber);
+
+		Arzi arzi = arziMapper.selectArziForPatient(itsNumber, arziId);
+
+		return arzi;
 	}
 
 }

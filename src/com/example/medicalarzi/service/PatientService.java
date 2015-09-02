@@ -3,6 +3,8 @@
  */
 package com.example.medicalarzi.service;
 
+import java.util.List;
+
 import com.example.medicalarzi.model.Arzi;
 import com.example.medicalarzi.model.Patient;
 
@@ -15,7 +17,7 @@ public interface PatientService {
 	/**
 	 * This method is responsible for registering the new patient.
 	 *
-	 * @param ptnt
+	 * @param com.example.medicalarzi.model.Patient
 	 */
 	public void registerPatient(Patient ptnt);
 
@@ -60,14 +62,15 @@ public interface PatientService {
 	 *
 	 * @param itsNumber
 	 * @param passString
-	 * @return
+	 * 
+	 * @return java.lang.String
 	 */
 	public String emailForgotPassword(Long itsNumber, String passString);
 	
 	/**
 	 * This method is responsible for updating the patient information.
 	 * 
-	 * @param ptnt
+	 * @param com.example.medicalarzi.model.Patient
 	 */
 	public void updatePatientInfo(Patient ptnt);
 	
@@ -75,8 +78,29 @@ public interface PatientService {
 	 * This method is responsible for creating a new arzi for the patient based
 	 * on the patient's ITS number.
 	 * 
-	 * @param newArzi
+	 * @param com.example.medicalarzi.model.Arzi
 	 */
 	public void createNewArzi(Arzi newArzi);
+	
+	/**
+	 * This method is responsible for retrieving all the saved/submitted arzis
+	 * for a patient based on the patient's ITS number.
+	 * 
+	 * @param itsNumber
+	 * 
+	 * @return java.util.List<com.example.medicalarzi.model.Arzi>
+	 */
+	public List<Arzi> retrieveAllArzisForPatient(Long itsNumber);
+	
+	/**
+	 * This method is responsible for retrieving a specific arzi for a patient
+	 * based on the patient's ITS number and the arzi Id.
+	 * 
+	 * @param itsNumber
+	 * @param arziId
+	 * 
+	 * @return com.example.medicalarzi.model.Arzi
+	 */
+	public Arzi retrieveArziForPatient(Long itsNumber, Long arziId);
 
 }
