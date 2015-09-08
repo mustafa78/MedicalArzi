@@ -43,6 +43,7 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.PopupDateField;
@@ -108,6 +109,9 @@ public class PatientRegistrationView extends CustomComponent implements View,
 
 	@PropertyId("emailAddress")
 	private TextField emailAddress;
+	
+	@PropertyId("gender")
+	private OptionGroup gender;
 
 	private ArziHeaderComponent header;
 
@@ -282,6 +286,19 @@ public class PatientRegistrationView extends CustomComponent implements View,
 		lastName.addBlurListener(new InstallPatientValidatorBlurListener(
 				lastName, "lastName"));
 		viewLayout.addComponent(lastName);
+		
+		// gender
+		gender = new OptionGroup("Gender:");
+		gender.setContainerDataSource(MedicalArziUtils
+				.getContainer(Lookup.class));
+		gender.addItems(lookupService
+				.getByLookupType(MedicalArziConstants.MAP_GENDER));
+		gender.setItemCaptionMode(ItemCaptionMode.PROPERTY);
+		gender.setItemCaptionPropertyId("description");
+		gender.setRequired(true);
+		gender.setStyleName("horizontal");
+		gender.addBlurListener(new InstallPatientValidatorBlurListener(gender, "gender"));
+		viewLayout.addComponent(gender);
 
 		// dob
 		dob = new ArziDateField("Date of Birth:") ;
@@ -289,7 +306,7 @@ public class PatientRegistrationView extends CustomComponent implements View,
 		dob.addBlurListener(new InstallPatientValidatorBlurListener(dob, "dob"));
 		viewLayout.addComponent(dob);
 
-		emailAddress = new TextField("Email Address");
+		emailAddress = new TextField("Email Address:");
 		emailAddress.setNullRepresentation("");
 		emailAddress.setImmediate(true);
 		emailAddress.setRequired(true);
@@ -299,8 +316,9 @@ public class PatientRegistrationView extends CustomComponent implements View,
 		viewLayout.addComponent(emailAddress);
 
 		// newPsswdFld
-		newPassword = new PasswordField("New Password");
+		newPassword = new PasswordField("New Password:");
 		newPassword.setNullRepresentation("");
+		newPassword.setDescription(MedicalArziConstants.PASSWORD_HINT_TEXT);
 		newPassword.setImmediate(true);
 		newPassword.setRequired(true);
 		newPassword.setWidth("300px");
@@ -308,8 +326,9 @@ public class PatientRegistrationView extends CustomComponent implements View,
 		viewLayout.addComponent(newPassword);
 
 		// confirmPsswdFld
-		confirmPassword = new PasswordField("Confirm Password");
+		confirmPassword = new PasswordField("Confirm Password:");
 		confirmPassword.setNullRepresentation("");
+		confirmPassword.setDescription(MedicalArziConstants.PASSWORD_HINT_TEXT);
 		confirmPassword.setRequired(true);
 		confirmPassword.setWidth("300px");
 		confirmPassword.addValidator(new Validator() {
@@ -410,8 +429,10 @@ public class PatientRegistrationView extends CustomComponent implements View,
 							+ patient.getItsNumber()
 							+ " is successfully registered.");
 
-					MedicalArziUtils.setSessionAttribute(
-							"isRegistrationSuccess", true);
+					MedicalArziUtils
+							.setSessionAttribute(
+									MedicalArziConstants.SESS_ATTR_IS_REGISTRATION_SUCCESSFUL,
+									true);
 
 					getUI().getNavigator().navigateTo(SimpleLoginView.NAME);
 
