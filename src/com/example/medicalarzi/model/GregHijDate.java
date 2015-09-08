@@ -6,6 +6,9 @@ package com.example.medicalarzi.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
 /**
  * @author mkanchwa
  *
@@ -203,6 +206,17 @@ public class GregHijDate implements Serializable {
 
 	public void setUpdatedDate(Date updatedDate) {
 		this.updatedDate = updatedDate;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return (new ReflectionToStringBuilder(this,
+				RecursiveToStringStyle.MULTI_LINE_STYLE)).toString();
 	}
 
 }

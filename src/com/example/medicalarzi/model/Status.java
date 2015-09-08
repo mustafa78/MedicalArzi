@@ -6,6 +6,9 @@ package com.example.medicalarzi.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
 /**
  * @author mkanchwa
  *
@@ -84,4 +87,9 @@ public class Status implements Serializable {
 		this.updatedDate = updatedDate;
 	}
 
+	@Override
+	public String toString() {
+		return (new ReflectionToStringBuilder(this,
+				RecursiveToStringStyle.MULTI_LINE_STYLE)).toString();
+	}
 }

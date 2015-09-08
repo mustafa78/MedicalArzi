@@ -6,6 +6,9 @@ package com.example.medicalarzi.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
 /**
  * @author mkanchwa
  *
@@ -104,4 +107,9 @@ public class Condition implements Serializable {
 		this.activeInd = activeInd;
 	}
 
+	@Override
+	public String toString() {
+		return (new ReflectionToStringBuilder(this,
+				RecursiveToStringStyle.MULTI_LINE_STYLE)).toString();
+	}
 }
