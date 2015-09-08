@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.example.medicalarzi.model.Arzi;
 import com.example.medicalarzi.model.ArziType;
 import com.example.medicalarzi.model.BodyPart;
 import com.example.medicalarzi.model.Condition;
@@ -115,6 +116,9 @@ public class MedicalArziUtils {
 		else if (objClass == ArziType.class)
 			container = new BeanItemContainer<ArziType>(
 					(Class<? super ArziType>) objClass);
+		else if (objClass == Arzi.class)
+			container = new BeanItemContainer<Arzi>(
+					(Class<? super Arzi>) objClass);
 
 		return container;
 	}
