@@ -2,9 +2,9 @@ package com.example.medicalarzi.view;
 
 import java.text.NumberFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +31,7 @@ import com.vaadin.annotations.Theme;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.fieldgroup.PropertyId;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.converter.StringToLongConverter;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -46,6 +47,10 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.Grid;
+import com.vaadin.ui.Grid.HeaderCell;
+import com.vaadin.ui.Grid.HeaderRow;
+import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
@@ -54,6 +59,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.renderers.DateRenderer;
 import com.vaadin.ui.themes.Reindeer;
 
 /**
@@ -81,10 +87,10 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 	// Header
 	private ArziHeaderComponent header;
 
-	private VerticalLayout viewLayout;
-
 	private TabSheet tabSheet;
-
+	
+	private VerticalLayout viewLayout;
+	
 	// Patient Personal Info
 	private Panel ptntInfoSection;
 
@@ -94,6 +100,11 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 	private Panel ptntMedicalInfoSection;
 
 	private CustomFormComponent ptntMedicalInfoForm;
+	
+	// Inbox
+	private VerticalLayout inboxViewLayout;
+	
+	private Grid arziGrid;
 
 	// Buttons layout
 	private HorizontalLayout buttonsLayout;
@@ -224,7 +235,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		
 		setFieldsReadOnly(true);
 
-		String patientName = constructPtntFullName(patient);
+		String patientName = MedicalArziUtils.constructPtntFullName(patient);
 
 		logger.debug("Patient \"" + patientName
 				+ " has logged in successfully.");
@@ -329,8 +340,107 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		buildViewlayout();
 		tabSheet.addTab(viewLayout, "New Arzi", new ThemeResource(
 				"icons/newArzi.png"));
-		tabSheet.addTab(new Label("Inbox"), "Inbox", new ThemeResource(
+		// gridLayout
+		buildInboxViewLayout();
+		tabSheet.addTab(inboxViewLayout, "Inbox", new ThemeResource(
 				"icons/inbox.png"));
+	}
+	
+	/**
+	 * This method will build the grid layout which will list all the arzis
+	 * which are saved/submitted.
+	 * 
+	 */
+	@SuppressWarnings("unchecked")
+	private void buildInboxViewLayout() {
+		// inboxViewLayout
+		inboxViewLayout = new VerticalLayout();
+		inboxViewLayout.setImmediate(true);
+		inboxViewLayout.setMargin(true);
+		inboxViewLayout.setSpacing(true);
+		
+		Label inboxDescription = new Label();
+		inboxDescription.setValue("My Arzis:");
+		inboxDescription.setStyleName("v-captiontext");
+		inboxViewLayout.addComponent(inboxDescription);
+		inboxViewLayout.setExpandRatio(inboxDescription, 0.1f);
+		
+		arziGrid = new Grid();
+		arziGrid.setSizeFull();
+		arziGrid.setSelectionMode(SelectionMode.SINGLE);
+
+		// Initialize the container
+		BeanItemContainer<Arzi> arziContainer = (BeanItemContainer<Arzi>) MedicalArziUtils
+				.getContainer(Arzi.class);
+
+		// Retrieve all the arzis for the patient based on the ITS number
+		List<Arzi> arziList = patientService.retrieveAllArzisForPatient(patient
+				.getItsNumber());
+
+		arziContainer.addAll(arziList);
+
+		// Add nested properties to the header
+		arziContainer.addNestedContainerBean("procedure");
+		arziContainer.addNestedContainerBean("condition");
+		arziContainer.addNestedContainerBean("conditionStartDate");
+		arziContainer.addNestedContainerBean("arziType");
+		arziContainer.addNestedContainerBean("bodyPart");
+		arziContainer.addNestedContainerBean("currentStatus");
+
+		// Add the container to the datasource
+		arziGrid.setContainerDataSource(arziContainer);
+		
+		arziGrid.setColumns("itsNumber", "arziId", "currentStatus.statusDesc",
+				"condition.conditionName",
+				"conditionStartDate.gregorianCalDate",
+				"procedure.procedureName", "bodyPart.bodyPartName");
+		
+		//Sets the converter on the ITS number to remove the grouping used.
+		arziGrid.getColumn("itsNumber").setConverter(
+				new StringToLongConverter() {
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					protected NumberFormat getFormat(Locale locale) {
+						NumberFormat format = super.getFormat(locale);
+						//This eliminates the "," after grouping of 3 digits.
+						format.setGroupingUsed(false); 
+						return format;
+					};
+				});
+		
+		//Set the header captions for each column
+		arziGrid.getColumn("currentStatus.statusDesc").setHeaderCaption("Arzi Status");
+		arziGrid.getColumn("condition.conditionName").setHeaderCaption("Condition");
+		arziGrid.getColumn("procedure.procedureName").setHeaderCaption("Procedure");
+		arziGrid.getColumn("bodyPart.bodyPartName").setHeaderCaption("Body Part");
+		arziGrid.getColumn("conditionStartDate.gregorianCalDate")
+				.setHeaderCaption("Condition Start Date");
+		
+		//Set the renderers
+		arziGrid.getColumn("conditionStartDate.gregorianCalDate").setRenderer(
+				new DateRenderer("%1$tB %1$te, %1$tY", Locale.ENGLISH));
+		
+		// This call prepends the header row to the existing grid
+		HeaderRow ptntMedicalInfoHeader = arziGrid.prependHeaderRow();
+		// Get hold of the columnID, mind you in my case this is a nestedID
+		HeaderCell conditionName = ptntMedicalInfoHeader
+				.getCell("condition.conditionName");
+		HeaderCell conditionStartDt = ptntMedicalInfoHeader
+				.getCell("conditionStartDate.gregorianCalDate");
+		HeaderCell procedureName = ptntMedicalInfoHeader
+				.getCell("procedure.procedureName");
+		HeaderCell bodyPartName = ptntMedicalInfoHeader
+				.getCell("bodyPart.bodyPartName");
+
+		// Now join all of these cells to form a logical block
+		HeaderCell ptntMedicalInfoHeaderCell = ptntMedicalInfoHeader.join(
+				conditionName, conditionStartDt, procedureName, bodyPartName);
+
+		ptntMedicalInfoHeaderCell.setText("Medical Information");
+		
+		//Add the Vertical Split Panel to the Vertical Layout
+		inboxViewLayout.addComponent(arziGrid);
 	}
 
 	/**
@@ -498,6 +608,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		arziType.setInputPrompt("Please select the arzi type.");
 		arziType.setItemCaptionMode(ItemCaptionMode.PROPERTY);
 		arziType.setItemCaptionPropertyId("arziTypeName");
+		arziType.setRequired(true);
 		leftFormLayout.addComponent(arziType);
 
 		// bodyPart
@@ -508,11 +619,13 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		bodyPart.setInputPrompt("Please select the affected body part.");
 		bodyPart.setItemCaptionMode(ItemCaptionMode.PROPERTY);
 		bodyPart.setItemCaptionPropertyId("bodyPartName");
+		bodyPart.setRequired(true);
 		leftFormLayout.addComponent(bodyPart);
 		
 		conditionStartDate = new ArziDateField("Condition Start Date:");
 		conditionStartDate.setImmediate(true);
 		conditionStartDate.setDescription("Please enter the date in the dd/MM/yyy format.");
+		conditionStartDate.setRequired(true);
 		leftFormLayout.addComponent(conditionStartDate);
 
 		/**
@@ -530,6 +643,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		condition.setInputPrompt("Please select your medical condition.");
 		condition.setItemCaptionMode(ItemCaptionMode.PROPERTY);
 		condition.setItemCaptionPropertyId("conditionName");
+		condition.setRequired(true);
 		rightFormLayout.addComponent(condition);
 
 		// procedure
@@ -540,6 +654,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		procedure.setInputPrompt("Please select the medical procedure.");
 		procedure.setItemCaptionMode(ItemCaptionMode.PROPERTY);
 		procedure.setItemCaptionPropertyId("procedureName");
+		procedure.setRequired(true);
 		rightFormLayout.addComponent(procedure);
 	}
 
@@ -641,7 +756,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 				
 				//Create a user friendly notification on success.
 				String successMsg = "The arzi for \""
-						+ constructPtntFullName(ptntInfo)
+						+ MedicalArziUtils.constructPtntFullName(ptntInfo)
 						+ "\" is successfully created";
 				MedicalArziUtils.createAndShowNotification(null, successMsg,
 						Type.HUMANIZED_MESSAGE, Position.TOP_LEFT,
@@ -661,61 +776,6 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 						"errorMsg", -1);
 			}
 		}
-	}
-	
-	/**
-	 * This method is responsible for constructing the patients full name based
-	 * on his first name, last name, title and his middle name and middle name
-	 * title
-	 * 
-	 * @param ptnt
-	 * @return
-	 */
-	private String constructPtntFullName(Patient ptnt) {
-		StringBuffer fullName = new StringBuffer();
-		
-		//Patient Title
-		if (ptnt.getPtntTitle() != null
-				&& !(StringUtils.equalsIgnoreCase(ptnt
-						.getPtntTitle().getLookupValue(),
-						MedicalArziConstants.MAP_DAWAT_TITLE_BHAI) || StringUtils
-						.equalsIgnoreCase(
-								ptnt.getPtntTitle()
-										.getLookupValue(),
-								MedicalArziConstants.MAP_DAWAT_TITLE_BEHEN))) {
-			fullName.append(ptnt.getPtntTitle().getLookupValue());
-			fullName.append(" ");
-		}
-		
-		//Their first name
-		fullName.append(ptnt.getFirstName());
-		
-		//Their middle name title
-		if (ptnt.getPtntMiddleNmTitle() != null
-				&& !(StringUtils.equalsIgnoreCase(ptnt
-						.getPtntMiddleNmTitle().getLookupValue(),
-						MedicalArziConstants.MAP_DAWAT_TITLE_BHAI) || StringUtils
-						.equalsIgnoreCase(
-								ptnt.getPtntMiddleNmTitle()
-										.getLookupValue(),
-								MedicalArziConstants.MAP_DAWAT_TITLE_BEHEN))) {
-			fullName.append(" ");
-			fullName.append(ptnt.getPtntMiddleNmTitle()
-					.getLookupValue());
-			
-		} 
-		
-		//Their middle name
-		if(StringUtils.isNotEmpty(ptnt.getMiddleName())) {
-			fullName.append(" ");
-			fullName.append(ptnt.getMiddleName());
-			fullName.append(" ");
-		}
-		
-		//Their last name
-		fullName.append(ptnt.getLastName());
-		
-		return fullName.toString();
 	}
 	
 	/**
