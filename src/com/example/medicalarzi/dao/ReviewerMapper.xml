@@ -7,7 +7,6 @@
 	    <result column="MDL_NM" property="middleName" jdbcType="VARCHAR" />
 	    <result column="LAST_NM" property="lastName" jdbcType="VARCHAR" />
 	    <result column="DOB" property="dob" jdbcType="DATE" />
-	    <result column="GNDR_IND" property="genderInd" jdbcType="VARCHAR" />
 	    <result column="HASH_PSWD" property="updatedBy" jdbcType="VARCHAR" />
 	    <result column="HOME_PHN" property="phoneNum" jdbcType="VARCHAR" />
 	    <result column="CELL_PHN" property="cellNum" jdbcType="VARCHAR" />
@@ -26,11 +25,11 @@
 	    <result column="LST_UPDT_USR_ID" property="updatedBy" jdbcType="VARCHAR" />
 	    <result column="LST_UPDT_TS" property="updatedDate" jdbcType="TIMESTAMP" />
 	    <association property="drTitle" column="ptntTitleId" javaType="Lookup">
-			<id 	property="id" 			column="ptntTitleId" />
+			<id 	property="lookupId" column="ptntTitleId" />
 			<result property="lookupValue" column="ptntTitleName" />
 		</association>
 		<association property="drMiddleNmTitle" column="ptntMiddleNmTitleId" javaType="Lookup">
-			<id 	property="id" 			column="ptntMiddleNmTitleId" />
+			<id 	property="lookupId" column="ptntMiddleNmTitleId" />
 			<result property="lookupValue" column="ptntMiddleNmTitleName" />
 		</association>
   	</resultMap>
@@ -43,7 +42,7 @@
   		MDL_NM,
   		LAST_NM,
   		DOB,
-  		GNDR_IND,
+  		GNDR_IND_ID,
   		HOME_PHN,
   		CELL_PHN,
   		FAX,
