@@ -14,7 +14,10 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
 	<context-param>
 	    <param-name>javax.faces.INTERPRET_EMPTY_STRING_SUBMITTED_VALUES_AS_NULL</param-name>
 	    <param-value>true</param-value>
-	</context-param>    
+	</context-param>
+	<session-config>
+      <session-timeout>120</session-timeout>    <!-- 120 minutes-->
+    </session-config>    
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
