@@ -17,6 +17,10 @@ public interface MedicalArziConstants {
 	final static public String SESS_ATTR_PTNT_ITS_NUM = "patientITSNumber";
 	
 	final static public String SESS_ATTR_PTNT_INFO = "patientInfo";
+	
+	final static public String SESS_ATTR_IS_REGISTRATION_SUCCESSFUL = "isRegistrationSuccess";
+	
+	final static public String REQ_ATTR_PASSWD_EMAILED = "passwordEmailedSuccessfully";
 
 	final static public String MAP_PROPERTIES = "com.example.medicalarzi.resources.MAPConf";
 	
