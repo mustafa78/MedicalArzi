@@ -212,6 +212,7 @@ public class SimpleLoginView extends CustomComponent implements View,
 		itsNumber = new TextField("ITS Number:");
 		itsNumber.setWidth("300px");
 		itsNumber.setRequired(true);
+		itsNumber.setMaxLength(8);
 		itsNumber.setInputPrompt("Please enter your ITS number");
 		itsNumber.addValidator(new RegexpValidator("\\d*",
 				"You must enter a number"));
