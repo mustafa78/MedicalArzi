@@ -69,7 +69,6 @@ $v-error-indicator-color: #ed473b;
 	}
 	
 
-
 	// Insert your own theme rules here
   	.banner {
 		//background-image: url("img/banner-bkgnd-1.png") !important;
@@ -77,12 +76,12 @@ $v-error-indicator-color: #ed473b;
 		background: -o-linear-gradient(bottom right, #1F323D, #93ADBE); /* For Opera 11.1 to 12.0 */
 		background: -moz-linear-gradient(bottom right, #1F323D, #93ADBE); /* For Firefox 3.6 to 15 */
 		background: linear-gradient(to right, #1F323D, #93ADBE); /* Standard syntax */
+		background: -ms-linear-gradient(to right, #1F323D, #93ADBE);
 	}
 
 	.banner-title {
   		font-family: Algerian;
 		font-size: 60px;
-		//font-weight: bold;
 		color: #E1E2EC;
 		line-height: 1;
   	}
@@ -156,15 +155,15 @@ $v-error-indicator-color: #ed473b;
 	.userFriendlyMsg {
 		width: 100%;
 		margin-top: 108px !important;
-		font-size: 14px;
+		font-size: 12px;
 		background-color: green;
 	}	
 
 	.errorMsg {
 		width: 100%;
 		margin-top: 108px !important;
-		font-size: 14px;
-		background: red;
+		font-size: 12px;
+		background-color: #ca3030;
 	}
 	
 	.errorLabel {
@@ -193,7 +192,8 @@ $v-error-indicator-color: #ed473b;
 	}
 	
 	.v-panel-content-arziContent {
-		overflow: hidden;
+		overflow-y: auto;
+		overflow-x: hidden;
 		background-color: #B6C9D3;
 	}
 	
