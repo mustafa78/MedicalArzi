@@ -17,6 +17,7 @@ import com.example.medicalarzi.util.MedicalArziConstants;
 import com.example.medicalarzi.util.MedicalArziUtils;
 import com.vaadin.annotations.Theme;
 import com.vaadin.data.validator.RegexpValidator;
+import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.ThemeResource;
@@ -228,6 +229,8 @@ public class SimpleLoginView extends CustomComponent implements View,
 		loginButton = new Button(new ThemeResource("img/login-button.png"));
 		loginButton.setStyleName(Reindeer.BUTTON_LINK + " ptntLoginBtn");
 		loginButton.addClickListener(this);
+		//Set the login button as the default button. Causes a click event for the button to be fired.
+		loginButton.setClickShortcut(KeyCode.ENTER);
 
 		buttonsLayout = buildButtonsLayout();
 
