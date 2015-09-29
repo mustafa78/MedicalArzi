@@ -48,7 +48,6 @@ public class StringToLookupConverter implements Converter<String, Lookup> {
 			lookup = new Lookup (MedicalArziConstants.MAP_GENDER_FEMALE_ID, value);
 			lookup.setDescription("Female");
 		}
-		lookup.setDescription(value);
 		return lookup;
 	}
 
