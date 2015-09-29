@@ -71,7 +71,7 @@ public class Patient implements Serializable {
 
 	private String zip;
 
-	private String jamaatName;
+	private Jamaat jamaat;
 
 	private Boolean activeInd;
 
@@ -361,12 +361,12 @@ public class Patient implements Serializable {
 		this.additionalComments = additionalComments;
 	}
 
-	public String getJamaatName() {
-		return jamaatName;
+	public Jamaat getJamaat() {
+		return jamaat;
 	}
 
-	public void setJamaatName(String jamaatName) {
-		this.jamaatName = jamaatName;
+	public void setJamaat(Jamaat jamaat) {
+		this.jamaat = jamaat;
 	}
 
 	public Boolean getActiveInd() {
