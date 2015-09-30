@@ -135,5 +135,31 @@
 			#{currentStatus.statusId,jdbcType=INTEGER},
 			#{currentStatusDate.gregorianDateId,jdbcType=INTEGER}
 			 ) ]]>
-	</insert>  	
+	</insert> 
+	
+	<!-- Update --> 
+	<update id="updateArziHdrSelective" parameterType="Arzi">
+    	update F_ARZI_HDR
+	    <set>
+	      	<if test="arziType != null">
+        		ARZI_TYP_ID = #{arziType.arziTypeId,jdbcType=INTEGER},
+      		</if>
+      		<if test="bodyPart != null">
+      			BDY_PRT_ID = #{bodyPart.bodyPartId,jdbcType=INTEGER},
+      		</if>
+      		<if test="condition != null">
+      			COND_ID = #{condition.conditionId,jdbcType=INTEGER},
+      		</if>
+      		<if test="conditionStartDate != null">
+      			COND_STRT_DT_ID = (select DT_ID from D_DATE where CAL_DT = #{conditionStartDate.gregorianCalDate,jdbcType=DATE}),
+      		</if>
+      		<if test="procedure != null">
+      			PROC_ID = #{procedure.procedureId,jdbcType=INTEGER},
+      		</if>
+      		LST_UPDT_USR_ID = #{itsNumber,jdbcType=VARCHAR},
+      		LST_UPDT_TS = now()
+      		 where ITS_NBR = #{itsNumber,jdbcType=INTEGER} and 
+      		 	   ARZI_ID = #{arziId,jdbcType=INTEGER}
+	    </set>
+    </update>
 </mapper>

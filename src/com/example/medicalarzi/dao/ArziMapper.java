@@ -18,6 +18,7 @@ public interface ArziMapper {
 	/**
 	 * This method is responsible for insert a new arzi for a patient.
 	 * 
+	 * @param newArzi
 	 */
 	public void insertPatientsNewArzi(Arzi newArzi);
 
@@ -51,5 +52,13 @@ public interface ArziMapper {
 	 */
 	public List<Arzi> selectAllArzisForPatient(
 			@Param("itsNumber") Long itsNumber);
+	
+	/**
+	 * This method is responsible for updating the saved arzis (in draft mode)
+	 * by a patient before it is submitted.
+	 * 
+	 * @param editedArzi
+	 */
+	public void updateArziHdrSelective(Arzi editedArzi);
 
 }
