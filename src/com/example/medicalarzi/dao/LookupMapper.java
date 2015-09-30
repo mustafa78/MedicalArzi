@@ -9,6 +9,7 @@ import com.example.medicalarzi.model.ArziType;
 import com.example.medicalarzi.model.BodyPart;
 import com.example.medicalarzi.model.Condition;
 import com.example.medicalarzi.model.GregHijDate;
+import com.example.medicalarzi.model.Jamaat;
 import com.example.medicalarzi.model.Lookup;
 import com.example.medicalarzi.model.Procedure;
 
@@ -116,7 +117,8 @@ public interface LookupMapper {
 	 * the gregorian calendar date.
 	 * 
 	 * @param calDate
-	 * @return
+	 * 
+	 * @return com.example.medicalarzi.model.GregHijDate
 	 */
 	public GregHijDate selectGregHijBasedOnCalDt(Date calDate);
 	
@@ -125,7 +127,24 @@ public interface LookupMapper {
 	 * the id
 	 * 
 	 * @param dateId
-	 * @return
+	 * 
+	 * @return com.example.medicalarzi.model.GregHijDate
 	 */
 	public GregHijDate selectGregHijDateById(@Param("dateId") Long dateId);
+	
+	/**
+	 * 
+	 * @return com.example.medicalarzi.model.Jamaat
+	 */
+	public List<Jamaat> selectAllJamaats();
+	
+	/**
+	 * This method is responsible for selecting a particular jamaat based on the
+	 * id
+	 * 
+	 * @param jamaatId
+	 * 
+	 * @return com.example.medicalarzi.model.Jamaat
+	 */
+	public Jamaat selectJamaatById(@Param("jamaatId") Long jamaatId);
 }

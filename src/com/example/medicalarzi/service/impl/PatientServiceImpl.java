@@ -163,4 +163,17 @@ public class PatientServiceImpl implements PatientService {
 		return arzi;
 	}
 
+	@Override
+	public void updateAnExistingArziInDraftMode(Arzi editedArzi) {
+		logger.debug("Updating arzi with \"" + editedArzi.getArziId() + "\" "
+				+ "by the patient with ITS number: -> "
+				+ editedArzi.getItsNumber());
+
+		arziMapper.updateArziHdrSelective(editedArzi);
+
+		logger.debug("Arzi with \"" + editedArzi.getArziId()
+				+ "\" successfully updated");
+
+	}
+
 }

@@ -102,5 +102,14 @@ public interface PatientService {
 	 * @return com.example.medicalarzi.model.Arzi
 	 */
 	public Arzi retrieveArziForPatient(Long itsNumber, Long arziId);
+	
+	/**
+	 * This method is responsible for updating an existing arzi in the draft
+	 * mode before it is submitted. The patient can make the updates before
+	 * submitting if the information was not correct before it was saved.
+	 * 
+	 * @param editedArzi
+	 */
+	public void updateAnExistingArziInDraftMode(Arzi editedArzi);
 
 }

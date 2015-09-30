@@ -14,6 +14,7 @@ import com.example.medicalarzi.model.ArziType;
 import com.example.medicalarzi.model.BodyPart;
 import com.example.medicalarzi.model.Condition;
 import com.example.medicalarzi.model.GregHijDate;
+import com.example.medicalarzi.model.Jamaat;
 import com.example.medicalarzi.model.Lookup;
 import com.example.medicalarzi.model.Procedure;
 import com.example.medicalarzi.service.LookupService;
@@ -123,6 +124,12 @@ public class LookupServiceImpl implements LookupService {
 	@Override
 	public GregHijDate getRequestedGregorianHijriCalendar(Date calendarDate) {
 		 return lookupMapper.selectGregHijBasedOnCalDt(calendarDate);
+	}
+
+	@Override
+	public List<Jamaat> getListOfAllJamaats() {
+		List<Jamaat> listOfJamaats =  lookupMapper.selectAllJamaats();
+		return listOfJamaats;
 	}
 
 }

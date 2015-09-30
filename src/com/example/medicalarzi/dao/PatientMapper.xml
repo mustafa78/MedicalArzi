@@ -18,7 +18,6 @@
 	    <result column="ST_CD" property="state" jdbcType="VARCHAR" />
 	    <result column="CNTY_ID" property="updatedDate" jdbcType="INTEGER" />
 	    <result column="ZIP_CD" property="zip" jdbcType="VARCHAR" />
-	    <result column="JAMAAT_NM" property="jamaatName" jdbcType="VARCHAR" />
 	    <result column="ACTV_IND" property="activeInd" jdbcType="VARCHAR" javaType="BOOLEAN" />
 	    <result column="CREATE_USR_ID" property="createdBy" jdbcType="VARCHAR" />
 	    <result column="CREATE_TS" property="createdDate" jdbcType="TIMESTAMP" />
@@ -37,10 +36,12 @@
 			<id 	property="lookupId" 	column="ptntMiddleNmTitleId" />
 			<result property="lookupValue" 	column="ptntMiddleNmTitleName" />
 		</association>
+		<association property="jamaat" column="jamaatId" javaType="Jamaat" 
+			select="com.example.medicalarzi.dao.LookupMapper.selectJamaatById" />
 		<collection column="PTNT_ITS_NBR" property="roles" ofType="SecurityRole" javaType="java.util.ArrayList" 
 			select="com.example.medicalarzi.dao.SecurityMapper.selectSecurityRolesForUser" />
   	</resultMap>
-
+  	
   	<sql id="ptntColumnList">
   		PTNT_ITS_NBR,
   		TTL_ID AS "ptntTitleId",
@@ -60,7 +61,7 @@
   		ST_CD,
   		CNTY_ID,
   		ZIP_CD,
-  		JAMAAT_NM,
+  		JAMAAT_ID AS "jamaatId",
   		ACTV_IND,
   		CREATE_USR_ID,
   		CREATE_TS,
@@ -73,7 +74,6 @@
   	</sql>
 
 	<!-- All the tables name and column names should be in CAPS or else it would not work in MySQL -->
-	
   	<!-- Insert -->
 	<insert id="insertPatientRecord" parameterType="Patient">
 		<![CDATA[
@@ -130,6 +130,9 @@
       		<if test="zip != null">
       			zip_cd = #{zip,jdbcType=VARCHAR},
       		</if>
+      		<if test="jamaat != null">
+      			jamaat_id = #{jamaat.jamaatId,jdbcType=VARCHAR},
+      		</if>
       		LST_UPDT_USR_ID = #{itsNumber,jdbcType=VARCHAR},
       		LST_UPDT_TS = now()
       		 where PTNT_ITS_NBR = #{itsNumber,jdbcType=INTEGER}
@@ -163,5 +166,5 @@
 		from D_PTNT
 		where PTNT_ITS_NBR = #{itsNumber,jdbcType=INTEGER}
 	</select>
-
+	
 </mapper>

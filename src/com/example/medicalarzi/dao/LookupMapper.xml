@@ -72,6 +72,16 @@
 	    <result column="CREATE_USR_ID" property="createdBy" jdbcType="VARCHAR" />
 	    <result column="LST_UPDT_USR_ID" property="updatedBy" jdbcType="VARCHAR" />
   	</resultMap>
+  	<resultMap type="Jamaat" id="JamaatResultMap">
+  		<id column="JAMAAT_ID" property="jamaatId" jdbcType="INTEGER" />
+  		<result column="JAMAAT_NM" property="jamaatName" jdbcType="VARCHAR" />
+  		<result column="REGION" property="region" jdbcType="VARCHAR" />
+  		<result column="COUNTRY" property="country" jdbcType="VARCHAR" />
+  		<result column="CREATE_USR_ID" property="createdBy" jdbcType="VARCHAR" />
+	    <result column="CREATE_TS" property="createdDate" jdbcType="TIMESTAMP" />
+	    <result column="LST_UPDT_USR_ID" property="updatedBy" jdbcType="VARCHAR" />
+	    <result column="LST_UPDT_TS" property="updatedDate" jdbcType="TIMESTAMP" />
+  	</resultMap>
 
 	<!-- SQL fragments -->
   	<sql id="Base_Column_List" >
@@ -98,6 +108,10 @@
     	DT_ID, CAL_DT, CAL_YR, CAL_MNTH_NBR, CAL_MNTH_NM, HIJRI_DATE_ID, HIJRI_DT, HIJRI_YR, HIJRI_MNTH_NBR, HIJRI_MNTH_NM, MIQAAT_MNTH_DY
     	CREATE_TS, LST_UPDT_TS, CREATE_USR_ID, LST_UPDT_USR_ID
   	</sql>
+  	<sql id="Jamaat_Column_List">
+		JAMAAT_ID, JAMAAT_NM, REGION, COUNTRY,
+		CREATE_USR_ID, CREATE_TS, LST_UPDT_USR_ID, LST_UPDT_TS
+	</sql>
 
   	<!-- Select Statements -->
   	<!--Get Distinct Lookup Types. -->
@@ -188,6 +202,21 @@
 	    <include refid="Date_Column_List" />
 	    from D_DATE 
 	    where DT_ID = #{dateId, jdbcType=DATE}
+  	</select>
+  	
+  	<!-- Select jamaat by id -->
+  	<select id="selectJamaatById" resultMap="JamaatResultMap" parameterType="Long">
+		select
+			<include refid="Jamaat_Column_List" />
+		from D_JAMAAT
+		where JAMAAT_ID = #{jamaatId,jdbcType=INTEGER}	
+	</select>
+	
+	<!-- Select all jamaats -->
+	<select id="selectAllJamaats" resultMap="JamaatResultMap">
+	    select
+	    <include refid="Jamaat_Column_List" />
+	    from D_JAMAAT
   	</select>
 
   	<!-- Insert Statements -->

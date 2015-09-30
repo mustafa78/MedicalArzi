@@ -112,4 +112,28 @@ public class Jamaat implements Serializable {
 				RecursiveToStringStyle.MULTI_LINE_STYLE)).toString();
 	}
 
+	@Override
+	public int hashCode() {
+        return jamaatId.intValue();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof Jamaat)) {
+			return false;
+		}
+		Jamaat other = (Jamaat) obj;
+		if (jamaatId == null) {
+			if (other.jamaatId != null) {
+				return false;
+			}
+		} else if (!jamaatId.equals(other.jamaatId)) {
+			return false;
+		}
+		return true;
+	}
+
 }
