@@ -1,8 +1,5 @@
 package com.example.medicalarzi.view;
 
-import java.text.NumberFormat;
-import java.util.Locale;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +22,6 @@ import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.fieldgroup.PropertyId;
-import com.vaadin.data.util.converter.StringToLongConverter;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.ThemeResource;
@@ -43,8 +39,8 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.PopupDateField;
 import com.vaadin.ui.TextField;
@@ -224,16 +220,7 @@ public class PatientRegistrationView extends CustomComponent implements View,
 		itsNumber.setImmediate(true);
 		itsNumber.setRequired(true);
 		itsNumber.setMaxLength(8);
-		itsNumber.setConverter(new StringToLongConverter() {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			protected NumberFormat getFormat(Locale locale) {
-				NumberFormat format = super.getFormat(locale);
-				format.setGroupingUsed(false);
-				return format;
-			};
-		});
+		itsNumber.setConverter(MedicalArziUtils.itsNumberConverter());
 		viewLayout.addComponent(itsNumber);
 		itsNumber.addBlurListener(new InstallPatientValidatorBlurListener(
 				itsNumber, "itsNumber"));
