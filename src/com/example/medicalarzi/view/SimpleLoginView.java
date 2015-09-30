@@ -127,7 +127,8 @@ public class SimpleLoginView extends CustomComponent implements View,
 				MedicalArziUtils.createAndShowNotification(null,
 						"User registration is successfull",
 						Type.HUMANIZED_MESSAGE, Position.TOP_LEFT,
-						"userFriendlyMsg", -1);
+						"userFriendlyMsg",
+						MedicalArziConstants.USER_FRIENDLY_MSG_DELAY_MSEC);
 
 			}
 		}
@@ -135,10 +136,14 @@ public class SimpleLoginView extends CustomComponent implements View,
 			if (VaadinService.getCurrentRequest().getAttribute(
 					MedicalArziConstants.REQ_ATTR_PASSWD_EMAILED) != null) {
 				//Create a user friendly notification
-				MedicalArziUtils.createAndShowNotification(null,
-						"The password has been sent to the registered email address. Please check your email to login.",
-						Type.HUMANIZED_MESSAGE, Position.TOP_LEFT,
-								"userFriendlyMsg", -1);
+				MedicalArziUtils
+						.createAndShowNotification(
+								null,
+								"The password has been sent to the registered email address. Please check your email to login.",
+								Type.HUMANIZED_MESSAGE,
+								Position.TOP_LEFT,
+								"userFriendlyMsg",
+								MedicalArziConstants.USER_FRIENDLY_MSG_DELAY_MSEC);
 			}
 		}
 	}
