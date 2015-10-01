@@ -3,8 +3,10 @@
  */
 package com.example.medicalarzi.util;
 
+import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -14,12 +16,15 @@ import com.example.medicalarzi.model.Arzi;
 import com.example.medicalarzi.model.ArziType;
 import com.example.medicalarzi.model.BodyPart;
 import com.example.medicalarzi.model.Condition;
+import com.example.medicalarzi.model.Jamaat;
 import com.example.medicalarzi.model.Lookup;
 import com.example.medicalarzi.model.Patient;
 import com.example.medicalarzi.model.Procedure;
 import com.vaadin.data.Container;
 import com.vaadin.data.Validator;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.data.util.converter.Converter;
+import com.vaadin.data.util.converter.StringToLongConverter;
 import com.vaadin.data.validator.BeanValidator;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinService;
@@ -119,6 +124,9 @@ public class MedicalArziUtils {
 		else if (objClass == Arzi.class)
 			container = new BeanItemContainer<Arzi>(
 					(Class<? super Arzi>) objClass);
+		else if (objClass == Jamaat.class)
+			container = new BeanItemContainer<Jamaat>(
+					(Class<? super Jamaat>) objClass);
 
 		return container;
 	}
@@ -227,6 +235,9 @@ public class MedicalArziUtils {
 				fullName.append(ptnt.getMiddleName());
 				fullName.append(" ");
 			}
+			else {
+				fullName.append(" ");
+			}
 
 			// Their last name
 			fullName.append(ptnt.getLastName());
@@ -234,4 +245,28 @@ public class MedicalArziUtils {
 		
 		return fullName.toString();
 	}	
+	
+	/**
+	 * This method is responsible for converting from java.lang.String to
+	 * java.lang.Long and back and it removes the grouping of the values with a
+	 * comma for example 12345678 is represented by default as 123,456,78 but we
+	 * do not want this grouping for the ITS number for the patient, so we have
+	 * to override the format and set the grouping to false.
+	 * 
+	 * @return com.vaadin.data.util.Converter<String, Long>
+	 */
+	public static Converter<String, Long> itsNumberConverter() {
+		return new StringToLongConverter() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected NumberFormat getFormat(Locale locale) {
+				NumberFormat format = super.getFormat(locale);
+				// This eliminates the "," after grouping of 3 digits.
+				format.setGroupingUsed(false);
+				return format;
+			};
+		};
+		
+	}
 }
