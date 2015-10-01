@@ -25,7 +25,8 @@ public class ArziDateField extends PopupDateField {
 	 * 
 	 */
 	public ArziDateField() {
-		// TODO Auto-generated constructor stub
+		super();
+		setDateFormat("dd/MM/yyyy");
 	}
 
 	/**
