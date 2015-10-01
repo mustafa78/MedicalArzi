@@ -10,6 +10,7 @@ import com.example.medicalarzi.model.ArziType;
 import com.example.medicalarzi.model.BodyPart;
 import com.example.medicalarzi.model.Condition;
 import com.example.medicalarzi.model.GregHijDate;
+import com.example.medicalarzi.model.Jamaat;
 import com.example.medicalarzi.model.Lookup;
 import com.example.medicalarzi.model.Procedure;
 
@@ -102,5 +103,12 @@ public interface LookupService {
 	 * @return GregHijDate
 	 */
 	public GregHijDate getRequestedGregorianHijriCalendar(Date calendarDate);
+	
+	/**
+	 * This method is responsible for getting all the possible jamaats.
+	 * 
+	 * @return java.util.List
+	 */
+	public List<Jamaat> getListOfAllJamaats();
 
 }
