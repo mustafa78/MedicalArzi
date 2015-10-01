@@ -12,8 +12,7 @@ public interface MedicalArziConstants {
 	// Keys
 	final static public String MAP_ENCODE_PASSWORD_KEY = "MUFADDAL_MOULA_53";
 	
-	final static public String SESS_ATTR_PTNT_FULL_NAME = "fullPatientName";
-	
+	//Session and Request Param Keys
 	final static public String SESS_ATTR_PTNT_ITS_NUM = "patientITSNumber";
 	
 	final static public String SESS_ATTR_PTNT_INFO = "patientInfo";
@@ -65,7 +64,17 @@ public interface MedicalArziConstants {
 	
 	final static public String CUSTOM_FORM_RIGHTFORM_LAYOUT_ID = "customForm_rightFormLayout";
 	
+	final static public String NEW_ARI_TAB_COMPONENT_ID = "newArziTabComponent";
+	
+	final static public String INBOX_TAB_COMPONENT_ID = "inboxTabCompoent";
+	
+	final static public String NEW_ARZI_TAB_CAPTION = "New Arzi";
+	
+	final static public String INBOX_TAB_CAPTION = "Inbox";
+	
 	//Hint texts, descriptions or any static texts
 	final static public String PASSWORD_HINT_TEXT = "Password must be at least 8 characters long and contain at least 1 number.";
+	
+	final static public Integer USER_FRIENDLY_MSG_DELAY_MSEC =  4000;
 
 }
