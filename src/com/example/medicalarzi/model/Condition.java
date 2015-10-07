@@ -112,4 +112,28 @@ public class Condition implements Serializable {
 		return (new ReflectionToStringBuilder(this,
 				RecursiveToStringStyle.MULTI_LINE_STYLE)).toString();
 	}
+	
+	@Override
+	public int hashCode() {
+        return conditionId.intValue();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof Condition)) {
+			return false;
+		}
+		Condition other = (Condition) obj;
+		if (conditionId == null) {
+			if (other.conditionId != null) {
+				return false;
+			}
+		} else if (!conditionId.equals(other.conditionId)) {
+			return false;
+		}
+		return true;
+	}	
 }
