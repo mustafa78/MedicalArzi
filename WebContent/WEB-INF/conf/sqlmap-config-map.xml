@@ -24,6 +24,7 @@
 		<typeAlias alias="Status" type="com.example.medicalarzi.model.Status" />
 		<typeAlias alias="Lookup" type="com.example.medicalarzi.model.Lookup" />
 		<typeAlias alias="GregHijDate" type="com.example.medicalarzi.model.GregHijDate" />
+		<typeAlias alias="Jamaat" type="com.example.medicalarzi.model.Jamaat" />
 	</typeAliases>
 
 	<typeHandlers>
