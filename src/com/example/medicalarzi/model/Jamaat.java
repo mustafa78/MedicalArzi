@@ -23,6 +23,8 @@ public class Jamaat implements Serializable {
 	private Long jamaatId;
 
 	private String jamaatName;
+	
+	private String jamiyatName;
 
 	private String region;
 
@@ -106,6 +108,14 @@ public class Jamaat implements Serializable {
 		this.updatedDate = updatedDate;
 	}
 
+	public String getJamiyatName() {
+		return jamiyatName;
+	}
+
+	public void setJamiyatName(String jamiyatName) {
+		this.jamiyatName = jamiyatName;
+	}
+	
 	@Override
 	public String toString() {
 		return (new ReflectionToStringBuilder(this,
