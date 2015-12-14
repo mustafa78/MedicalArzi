@@ -2,6 +2,7 @@ package com.example.medicalarzi.view;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -20,6 +21,7 @@ import com.example.medicalarzi.converter.StringToBodyPartConverter;
 import com.example.medicalarzi.converter.StringToConditionConverter;
 import com.example.medicalarzi.converter.StringToLookupConverter;
 import com.example.medicalarzi.converter.StringToProcedureConverter;
+import com.example.medicalarzi.handler.MedicalArziCommitHandler;
 import com.example.medicalarzi.model.Arzi;
 import com.example.medicalarzi.model.ArziType;
 import com.example.medicalarzi.model.BodyPart;
@@ -35,13 +37,11 @@ import com.example.medicalarzi.util.MedicalArziConstants;
 import com.example.medicalarzi.util.MedicalArziUtils;
 import com.vaadin.annotations.Theme;
 import com.vaadin.data.Container;
-import com.vaadin.data.Item;
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
-import com.vaadin.data.fieldgroup.FieldGroup.CommitEvent;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
-import com.vaadin.data.fieldgroup.FieldGroup.CommitHandler;
 import com.vaadin.data.fieldgroup.PropertyId;
-import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.converter.Converter;
 import com.vaadin.event.SelectionEvent;
@@ -87,7 +87,7 @@ import com.vaadin.ui.themes.Reindeer;
 @VaadinUIScope
 @SpringView(name = MedicalArziLandingView.NAME)
 public class MedicalArziLandingView extends CustomComponent implements View,
-		ClickListener, SelectedTabChangeListener, SelectionListener {
+		ClickListener, SelectedTabChangeListener, SelectionListener, ValueChangeListener {
 
 	/**
 	 * 
@@ -122,6 +122,9 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 	private VerticalLayout inboxViewLayout;
 
 	private Grid arziGrid;
+	
+	// Search
+	private VerticalLayout searchViewLayout;
 
 	// Buttons layout
 	private HorizontalLayout buttonsLayout;
@@ -187,6 +190,9 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 
 	@PropertyId("conditionStartDate.gregorianCalDate")
 	private ArziDateField conditionStartDate;
+	
+	@PropertyId("otherCondition")
+	private TextField otherCondition;
 
 	// private TextArea description;
 
@@ -234,8 +240,14 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 	public ComboBox getJamaat() {
 		return jamaat;
 	}
+	
+	public ComboBox getCondition() {
+		return condition;
+	}
 
-
+	public TextField getOtherCondition() {
+		return otherCondition;
+	}
 
 	/**
 	 * The constructor should first build the main layout, set the composition
@@ -246,6 +258,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		logger.debug("Inside the Medical Arzi Landing View.");
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void enter(ViewChangeEvent event) {
 		// Get the patient's full name from the session
@@ -263,6 +276,17 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		// select that item.
 		getJamaat().select(getJamaat().getItem(patient.getJamaat()));
 		
+		//Select the default condition as Other
+		List<Condition> listOfConditions = (List<Condition>) getCondition().getItemIds();
+		for (Iterator<Condition> iterator = listOfConditions.iterator(); iterator.hasNext();) {
+			Condition condition = (Condition) iterator.next();
+			if(condition.getConditionName().equals("Other")) {
+				getCondition().select(condition);
+				break;
+			}
+		}
+		//getCondition().select(getCondition().getItemIds().iterator().next());
+		
 		setFieldsReadOnly(true);
 
 		String patientName = MedicalArziUtils.constructPtntFullName(patient);
@@ -270,6 +294,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		logger.debug("Patient \"" + patientName
 				+ " has logged in successfully.");
 
+		//Set the full name of the logged in patient/user
 		Label loggedInName = (Label) MedicalArziUtils.findById(header,
 				MedicalArziConstants.HEADER_LOGGED_IN_PTNT_NAME);
 
@@ -373,11 +398,35 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		buildViewlayout();
 		tabSheet.addTab(viewLayout, MedicalArziConstants.NEW_ARZI_TAB_CAPTION,
 				new ThemeResource("icons/newArzi.png"));
+		
 		// gridLayout
 		buildInboxViewLayout();
 		tabSheet.addTab(inboxViewLayout,
 				MedicalArziConstants.INBOX_TAB_CAPTION, new ThemeResource(
 						"icons/inbox.png"));
+		
+		//Search
+		buildSearchViewLayout();
+		tabSheet.addTab(searchViewLayout,
+				MedicalArziConstants.SEARCH_TAB_CAPTION, new ThemeResource(
+						"icons/search.png"));
+	}
+	
+	/**
+	 * 
+	 */
+	private void buildSearchViewLayout() {
+		// searchViewLayout
+		searchViewLayout = new VerticalLayout();
+		searchViewLayout.setId(MedicalArziConstants.SEARCH_TAB_COMPONENT_ID);
+		searchViewLayout.setMargin(true);
+		searchViewLayout.setSpacing(true);	
+		
+		Label searchDescription = new Label();
+		searchDescription.setValue("Search:");
+		searchDescription.setStyleName("v-captiontext");
+		searchViewLayout.addComponent(searchDescription);
+		searchViewLayout.setExpandRatio(searchDescription, 0.1f);
 	}
 
 	/**
@@ -441,8 +490,9 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		arziGrid.setContainerDataSource(arziContainer);
 		
 		arziGrid.setColumns("itsNumber", "currentStatus.statusDesc",
-				"arziType", "condition", "conditionStartDate.gregorianCalDate",
-				"procedure", "bodyPart", "arziId");
+				"arziType", "condition", "otherCondition",
+				"conditionStartDate.gregorianCalDate", "procedure", "bodyPart",
+				"arziId");
 		
 		arziGrid.removeColumn("arziId");
 		arziGrid.setColumnReorderingAllowed(true);
@@ -472,7 +522,10 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 								"Condition is required!",
 								lookupService.getListOfAllMedicalConditions(),
 								"conditionName", condContainer, null));
-				
+		
+		//Add the valueChange listner to the Condition combobox
+		//arziGrid.getColumn("condition").getEditorField().addValueChangeListener(this);
+		
 		Container arziTypeContainer = MedicalArziUtils
 				.getContainer(ArziType.class);
 		StringToArziTypeConverter arziTypeConv = new StringToArziTypeConverter(
@@ -514,6 +567,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		// Get hold of the columnID, mind you in my case this is a nestedID
 		HeaderCell arziType = ptntMedicalInfoHeader.getCell("arziType");
 		HeaderCell condition = ptntMedicalInfoHeader.getCell("condition");
+		HeaderCell otherCondition = ptntMedicalInfoHeader.getCell("otherCondition");
 		HeaderCell conditionStartDt = ptntMedicalInfoHeader
 				.getCell("conditionStartDate.gregorianCalDate");
 		HeaderCell procedure = ptntMedicalInfoHeader.getCell("procedure");
@@ -521,41 +575,20 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 
 		// Now join all of these cells to form a logical block
 		HeaderCell ptntMedicalInfoHeaderCell = ptntMedicalInfoHeader.join(
-				arziType, condition, conditionStartDt, procedure, bodyPart);
+				arziType, condition, otherCondition, conditionStartDt,
+				procedure, bodyPart);
 
 		ptntMedicalInfoHeaderCell.setText("Medical Information");
 
 		arziGrid.addSelectionListener(this);
 		
-		arziGrid.getEditorFieldGroup().addCommitHandler(new CommitHandler() {
+		// Adding the commit handler to the field group
+		MedicalArziCommitHandler maCommitHdlr = new MedicalArziCommitHandler();
+		
+		maCommitHdlr.setPatientService(patientService);
+		
+		arziGrid.getEditorFieldGroup().addCommitHandler(maCommitHdlr);
 
-			private static final long serialVersionUID = -1205941526336673973L;
-
-			@Override
-			public void preCommit(CommitEvent commitEvent) throws CommitException {
-				
-			}
-			
-			@Override
-			public void postCommit(CommitEvent commitEvent) throws CommitException {
-				
-				Item editedItem = commitEvent.getFieldBinder().getItemDataSource();
-				
-				if(editedItem instanceof BeanItem<?>) {
-					BeanItem<?> editedBeanItem = (BeanItem<?>)editedItem;
-					
-					Arzi editedArzi = (Arzi)editedBeanItem.getBean();
-					
-					logger.debug("Updated arzi information: " + editedArzi);
-					
-					patientService.updateAnExistingArziInDraftMode(editedArzi);
-				}
-				
-				Notification.show("Arzi updated successfully!!!");
-			}
-		});
-
-		// Add the Vertical Split Panel to the Vertical Layout
 		inboxViewLayout.addComponent(arziGrid);
 	}
 
@@ -672,6 +705,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 
 		// middleName
 		middleName = new TextField("Middle Name:");
+		middleName.setNullRepresentation("");
 		middleName.setWidth("300px");
 		leftFormLayout.addComponent(middleName);
 
@@ -816,6 +850,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 				MedicalArziConstants.CUSTOM_FORM_RIGHTFORM_LAYOUT_ID);
 
 		condition = new ComboBox("Medical Condition:");
+		condition.setImmediate(true);
 		condition.setContainerDataSource(MedicalArziUtils
 				.getContainer(Condition.class));
 		condition.addItems(lookupService.getListOfAllMedicalConditions());
@@ -823,6 +858,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		condition.setItemCaptionMode(ItemCaptionMode.PROPERTY);
 		condition.setItemCaptionPropertyId("conditionName");
 		condition.setRequired(true);
+		condition.addValueChangeListener(this);
 		rightFormLayout.addComponent(condition);
 
 		// procedure
@@ -835,6 +871,12 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		procedure.setItemCaptionPropertyId("procedureName");
 		procedure.setRequired(true);
 		rightFormLayout.addComponent(procedure);
+		
+		otherCondition = new TextField("Other Condition:");
+		otherCondition.setDescription("Please enter your condition..");
+		otherCondition.setWidth("300px");
+		otherCondition.setNullRepresentation("");
+		rightFormLayout.addComponent(otherCondition);
 	}
 
 	private void buildButtonsLayout() {
@@ -944,7 +986,8 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 
 				MedicalArziUtils.createAndShowNotification(null, successMsg,
 						Type.HUMANIZED_MESSAGE, Position.TOP_LEFT,
-						"userFriendlyMsg", -1);
+						"userFriendlyMsg",
+						MedicalArziConstants.USER_FRIENDLY_MSG_DELAY_MSEC);
 
 			} catch (CommitException ce) {
 				logger.error(ce);
@@ -956,8 +999,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 				// entered correctly.
 				MedicalArziUtils.createAndShowNotification(null,
 						errorDescription, Type.ERROR_MESSAGE,
-						Position.TOP_LEFT, "errorMsg",
-						MedicalArziConstants.USER_FRIENDLY_MSG_DELAY_MSEC);
+						Position.TOP_LEFT, "errorMsg", -1);
 			}
 		}
 	}
@@ -1020,16 +1062,48 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		Arzi selectedArzi = (Arzi) arziGrid.getSelectedRow();
 
 		if (selectedArzi != null) {
+			// The row should not be editable if the arzi is in the 'Submitted' status
 			if (selectedArzi.getCurrentStatus().getStatusId().intValue() == MedicalArziConstants.ARZI_SUBMITTED_STATUS
 					.intValue()) {
 				arziGrid.setEditorEnabled(false);
 			} else {
 				arziGrid.setEditorEnabled(true);
 			}
+			
+			//The other condition field should be editable if the 'Other' is selected as the condition.
+			/*if (selectedArzi.getCondition().getConditionId().intValue() == MedicalArziConstants.MAP_OTHER_CONDITION_ID
+					.intValue()) {
+				arziGrid.getColumn("otherCondition").setEditable(true);
+			} else {
+				arziGrid.getColumn("otherCondition").setEditable(false);
+			}*/
 		}
 
 		logger.debug("The patient with ITS number:-> " + patient.getItsNumber()
 				+ " selected arzi : " + selectedArzi + " for editing");
+	}
+
+	@Override
+	public void valueChange(ValueChangeEvent event) {
+		if (event.getProperty().getValue() instanceof Condition) {
+			Condition selectedCondition = (Condition) event.getProperty()
+					.getValue();
+			if (selectedCondition.getConditionId().intValue() == MedicalArziConstants.MAP_OTHER_CONDITION_ID
+					.intValue()) {
+				getOtherCondition().setVisible(true);
+
+				getOtherCondition().setRequired(true);
+				
+				// TODO: find out how we can make the field editable/non
+				// editable when the editor is active. Currently, it throws the
+				// IllegalStateException
+			} else {
+				getOtherCondition().setVisible(false);
+
+				getOtherCondition().setRequired(false);
+			}
+		}
+
 	}
 
 }
