@@ -5,6 +5,7 @@
 	<resultMap id="ArziHdrResultMap" type="ArziHeader" >
 	    <id column="ARZI_ID" property="arziId" jdbcType="INTEGER" />
 	    <result column="ptntItsNbr" property="itsNumber" jdbcType="INTEGER" />
+	    <result column="otherCond" property="otherCondition" jdbcType="VARCHAR" />
 	    <result column="hdrCreateUserId" property="createdBy" jdbcType="VARCHAR" />
 	    <result column="hdrCreateTS" property="createdDate" jdbcType="TIMESTAMP" />
 	    <result column="hdrLastUpdUserId" property="updatedBy" jdbcType="VARCHAR" />
@@ -56,6 +57,7 @@
   		hdr.ARZI_TYP_ID as "arziTypeId",
   		hdr.BDY_PRT_ID as "bodyPartId",
   		hdr.COND_ID as "conditionId",
+  		hdr.OTHR_COND as "otherCond",
   		hdr.COND_STRT_DT_ID as "condStartDtId",
   		hdr.CURR_STATUS_ID as "currentStatusId",
   		hdr.CURR_STATUS_DT_ID as "currStatusDtId",
@@ -116,6 +118,7 @@
 				ARZI_TYP_ID,
 				BDY_PRT_ID,
 				COND_ID,
+				OTHR_COND,
 				COND_STRT_DT_ID,
 				CREATE_USR_ID,
 				CREATE_TS,
@@ -128,6 +131,7 @@
 			#{arziType.arziTypeId,jdbcType=INTEGER},
 			#{bodyPart.bodyPartId,jdbcType=INTEGER},
 			#{condition.conditionId,jdbcType=INTEGER},
+			#{otherCondition,jdbcType=VARCHAR},
 			#{conditionStartDate.gregorianDateId,jdbcType=INTEGER},
 			#{itsNumber,jdbcType=INTEGER},
 			now(),
@@ -149,6 +153,9 @@
       		</if>
       		<if test="condition != null">
       			COND_ID = #{condition.conditionId,jdbcType=INTEGER},
+      		</if>
+      		<if test="otherCondition != null">
+      			OTHR_COND = #{otherCondition,jdbcType=VARCHAR},
       		</if>
       		<if test="conditionStartDate != null">
       			COND_STRT_DT_ID = (select DT_ID from D_DATE where CAL_DT = #{conditionStartDate.gregorianCalDate,jdbcType=DATE}),
