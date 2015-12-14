@@ -39,6 +39,8 @@ public interface MedicalArziConstants {
 	final static public Integer MAP_GENDER_MALE_ID = 1005;
 	
 	final static public Integer MAP_GENDER_FEMALE_ID = 1006;
+	
+	final static public Integer MAP_OTHER_CONDITION_ID = 3016;
 
 	// For sending email.
 	final static public String EMAIL_HOST = "EmailHost";
@@ -68,9 +70,13 @@ public interface MedicalArziConstants {
 	
 	final static public String INBOX_TAB_COMPONENT_ID = "inboxTabCompoent";
 	
+	final static public String SEARCH_TAB_COMPONENT_ID = "searchTabCompoent";
+	
 	final static public String NEW_ARZI_TAB_CAPTION = "New Arzi";
 	
 	final static public String INBOX_TAB_CAPTION = "Inbox";
+	
+	final static public String SEARCH_TAB_CAPTION = "Search";
 	
 	//Hint texts, descriptions or any static texts
 	final static public String PASSWORD_HINT_TEXT = "Password must be at least 8 characters long and contain at least 1 number.";
