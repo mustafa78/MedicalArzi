@@ -6,6 +6,8 @@ package com.example.medicalarzi.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
@@ -22,6 +24,7 @@ public class ArziHeader implements Serializable {
 
 	private Long arziId;
 
+	@NotNull(message = "Please enter the ITS number.")
 	private Long itsNumber;
 
 	private Procedure procedure;
@@ -33,6 +36,8 @@ public class ArziHeader implements Serializable {
 	private BodyPart bodyPart;
 
 	private Status currentStatus;
+	
+	private String otherCondition;
 
 	// These properties are initialized because when we are binding the
 	// properties to the UI widgets, the nested properties throw exceptions if
@@ -170,10 +175,18 @@ public class ArziHeader implements Serializable {
 		this.conditionStartDate = conditionStartDate;
 	}
 
+	public String getOtherCondition() {
+		return otherCondition;
+	}
+
+	public void setOtherCondition(String otherCondition) {
+		this.otherCondition = otherCondition;
+	}
+	
 	@Override
 	public String toString() {
 		return (new ReflectionToStringBuilder(this,
 				RecursiveToStringStyle.MULTI_LINE_STYLE)).toString();
-	}
+	}	
 
 }
