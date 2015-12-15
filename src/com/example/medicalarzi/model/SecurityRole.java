@@ -89,4 +89,30 @@ public class SecurityRole implements Serializable {
 		this.updatedDate = updatedDate;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((secRoleId == null) ? 0 : secRoleId.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SecurityRole other = (SecurityRole) obj;
+		if (secRoleId == null) {
+			if (other.secRoleId != null)
+				return false;
+		} else if (!secRoleId.equals(other.secRoleId))
+			return false;
+		return true;
+	}
+
 }
