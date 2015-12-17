@@ -30,10 +30,13 @@ import com.vaadin.server.Page;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.Position;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.HasComponents;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.TextField;
+import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.Notification.Type;
 
 /**
@@ -269,4 +272,47 @@ public class MedicalArziUtils {
 		};
 		
 	}
+	
+	/**
+	 * This method returns the combobox with the possible values extracted from
+	 * the passed container and displaying the passed property from an item
+	 * 
+	 * @param caption
+	 * @param inputPrompt
+	 * @param requiredErrorMsg
+	 * @param items
+	 * @param propertyId
+	 * @param container
+	 * @return
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static Field<?> getComboBox(String caption, String inputPrompt,
+			String requiredErrorMsg, Collection<?> items, Object propertyId,
+			Container container, Converter converter) {
+		ComboBox comboBox = new ComboBox(caption);
+		// comboBox.setNullSelectionAllowed(true);
+		comboBox.setInputPrompt(inputPrompt);
+		comboBox.setContainerDataSource(container);
+		comboBox.addItems(items);
+		comboBox.setItemCaptionMode(ItemCaptionMode.PROPERTY);
+		comboBox.setItemCaptionPropertyId(propertyId);
+		if(converter != null) {
+			comboBox.setConverter(converter);
+		}
+		comboBox.setRequired(true);
+		comboBox.setRequiredError(requiredErrorMsg);
+		return comboBox;
+	}
+	
+	/**
+	 * 
+	 * @param flag
+	 * @return
+	 */
+	public static Field<?> getTextFieldEditor(Boolean flag) {
+	    TextField textField = new TextField();
+	    textField.setNullRepresentation("");
+	    textField.setEnabled(flag);
+	    return textField;
+	}	
 }
