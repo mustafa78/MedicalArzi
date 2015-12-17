@@ -32,5 +32,16 @@ public interface SecurityMapper {
 	 */
 	public List<SecurityRole> selectSecurityRolesForUser(
 			@Param("ptntItsNumber") Long ptntItsNumber);
+	
+	
+	/**
+	 * This method is responsible for getting the security role based on the
+	 * security role id.
+	 * 
+	 * @param secRoleId
+	 * @return
+	 */
+	public SecurityRole selectSecurityRoleById(
+			@Param("secRoleId") Long secRoleId);
 
 }

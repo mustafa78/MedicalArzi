@@ -12,17 +12,17 @@
   	</resultMap>
 
   	<sql id="Base_Column_List" >
-    	SEC_ROL_ID, SEC_ROL_NM, MODULE_NAME
+    	SEC_ROL_ID, SEC_ROL_NM, MODULE_NM
   	</sql>
 
-  	<select id="selectAllRoles" resultMap="BaseResultMap"  >
+  	<select id="selectAllRoles" resultMap="BaseResultMap">
 	    select
 	    <include refid="Base_Column_List" />
 	    from D_SEC_ROLE
 	    order by SEC_ROL_NM
   	</select>
 
-	<select id="selectSecurityRolesForUser" resultType="SecurityRole" parameterType="long" >
+	<select id="selectSecurityRolesForUser" resultType="SecurityRole" parameterType="long">
 		select distinct
 	    	sr.sec_rol_id as secRoleId, sr.sec_rol_nm as secRoleName
 	  	from
@@ -31,7 +31,14 @@
 	    	sr.sec_rol_id = psr.ptnt_sec_rol_id
 	 			and
 	 		psr.ptnt_its_nbr = #{ptntItsNumber}
-   </select>
+   	</select>
+   
+	<select id="selectSecurityRoleById" resultMap="BaseResultMap">
+   		select
+	    <include refid="Base_Column_List" />
+	    from D_SEC_ROL
+	    where SEC_ROL_ID = #{secRoleId}
+   	</select>
 
 
 </mapper>
