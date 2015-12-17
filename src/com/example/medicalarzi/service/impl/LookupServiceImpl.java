@@ -10,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
 
 import com.example.medicalarzi.dao.LookupMapper;
+import com.example.medicalarzi.dao.SecurityMapper;
 import com.example.medicalarzi.model.ArziType;
 import com.example.medicalarzi.model.BodyPart;
 import com.example.medicalarzi.model.Condition;
@@ -17,6 +18,7 @@ import com.example.medicalarzi.model.GregHijDate;
 import com.example.medicalarzi.model.Jamaat;
 import com.example.medicalarzi.model.Lookup;
 import com.example.medicalarzi.model.Procedure;
+import com.example.medicalarzi.model.SecurityRole;
 import com.example.medicalarzi.service.LookupService;
 
 /**
@@ -30,7 +32,8 @@ public class LookupServiceImpl implements LookupService {
 
 	private LookupMapper lookupMapper;
 
-
+	private SecurityMapper securityMapper;
+	
 	/**
 	 * @return the lookupMapper
 	 */
@@ -46,6 +49,20 @@ public class LookupServiceImpl implements LookupService {
 	}
 
 	/**
+	 * @return the securityMapper
+	 */
+	public SecurityMapper getSecurityMapper() {
+		return securityMapper;
+	}
+
+	/**
+	 * @param securityMapper the securityMapper to set
+	 */
+	public void setSecurityMapper(SecurityMapper securityMapper) {
+		this.securityMapper = securityMapper;
+	}
+
+	/**
 	 *
 	 */
 	public LookupServiceImpl() {
@@ -57,8 +74,7 @@ public class LookupServiceImpl implements LookupService {
 	 */
 	@Override
 	public List<Lookup> getListOfLookupTypes() {
-		// TODO Auto-generated method stub
-		return null;
+		return lookupMapper.selectDistinctLookupTypes();
 	}
 
 	/* (non-Javadoc)
@@ -66,8 +82,7 @@ public class LookupServiceImpl implements LookupService {
 	 */
 	@Override
 	public Lookup getByLookupId(Long lookupId) {
-		// TODO Auto-generated method stub
-		return null;
+		return lookupMapper.selectByLookupId(lookupId);
 	}
 
 	/* (non-Javadoc)
@@ -84,8 +99,7 @@ public class LookupServiceImpl implements LookupService {
 	 */
 	@Override
 	public List<Lookup> getByLookupTypeValueSort(String lookupType) {
-		// TODO Auto-generated method stub
-		return null;
+		return lookupMapper.selectByLookupTypeValueSort(lookupType);
 	}
 
 	/* (non-Javadoc)
@@ -93,8 +107,7 @@ public class LookupServiceImpl implements LookupService {
 	 */
 	@Override
 	public void updateLookup(Lookup lookup) {
-		// TODO Auto-generated method stub
-
+		lookupMapper.updateLookup(lookup);
 	}
 
 	@Override
@@ -130,6 +143,11 @@ public class LookupServiceImpl implements LookupService {
 	public List<Jamaat> getListOfAllJamaats() {
 		List<Jamaat> listOfJamaats =  lookupMapper.selectAllJamaats();
 		return listOfJamaats;
+	}
+
+	@Override
+	public SecurityRole getSecurityRoleById(Long securityRole) {
+		return securityMapper.selectSecurityRoleById(securityRole);
 	}
 
 }

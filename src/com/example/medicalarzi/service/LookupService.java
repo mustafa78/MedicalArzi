@@ -13,6 +13,7 @@ import com.example.medicalarzi.model.GregHijDate;
 import com.example.medicalarzi.model.Jamaat;
 import com.example.medicalarzi.model.Lookup;
 import com.example.medicalarzi.model.Procedure;
+import com.example.medicalarzi.model.SecurityRole;
 
 /**
  * @author mkanchwa
@@ -110,5 +111,14 @@ public interface LookupService {
 	 * @return java.util.List
 	 */
 	public List<Jamaat> getListOfAllJamaats();
+	
+	/**
+	 * This method is responsible for getting a security role based on the
+	 * security role id.
+	 * 
+	 * @param securityRole
+	 * @return
+	 */
+	public SecurityRole getSecurityRoleById(Long securityRole);
 
 }
