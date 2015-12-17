@@ -47,6 +47,11 @@
 			value="com.example.medicalarzi.dao.ArziMapper" />
 		<property name="sqlSessionFactory" ref="sqlSession.map" />
 	</bean>
+	<bean id="securityMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface"
+			value="com.example.medicalarzi.dao.SecurityMapper" />
+		<property name="sqlSessionFactory" ref="sqlSession.map" />
+	</bean>
 
 	<!-- Services -->
 	<bean id="service.PatientServiceImpl" class="com.example.medicalarzi.service.impl.PatientServiceImpl" scope="singleton">
@@ -60,6 +65,7 @@
    	</bean>
    	<bean id="service.LookupServiceImpl" class="com.example.medicalarzi.service.impl.LookupServiceImpl" scope="singleton">
    		<property name="lookupMapper" ref="lookupMapper"/>
+   		<property name="securityMapper" ref="securityMapper"/>
    	</bean>
 	<bean id="service.LookupService" class="org.springframework.aop.framework.ProxyFactoryBean" scope="singleton">
       	<property name="target">
