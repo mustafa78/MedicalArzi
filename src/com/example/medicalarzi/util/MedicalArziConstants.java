@@ -83,4 +83,6 @@ public interface MedicalArziConstants {
 	
 	final static public Integer USER_FRIENDLY_MSG_DELAY_MSEC =  4000;
 
+	final static public Long SEC_ROLE_ID_ADMIN = 1004L;
+
 }
