@@ -13,7 +13,7 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
  * @author mkanchwa
  *
  */
-public class Procedure implements Serializable{
+public class Procedure implements Serializable {
 
 	private Long procedureId;
 
@@ -106,11 +106,35 @@ public class Procedure implements Serializable{
 	public void setActiveInd(Boolean activeInd) {
 		this.activeInd = activeInd;
 	}
-	
+
 	@Override
 	public String toString() {
 		return (new ReflectionToStringBuilder(this,
 				RecursiveToStringStyle.MULTI_LINE_STYLE)).toString();
+	}
+
+	@Override
+	public int hashCode() {
+		return procedureId.intValue();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof Procedure)) {
+			return false;
+		}
+		Procedure other = (Procedure) obj;
+		if (procedureId == null) {
+			if (other.procedureId != null) {
+				return false;
+			}
+		} else if (!procedureId.equals(other.procedureId)) {
+			return false;
+		}
+		return true;
 	}
 
 }

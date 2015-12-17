@@ -112,4 +112,29 @@ public class BodyPart implements Serializable {
 		return (new ReflectionToStringBuilder(this,
 				RecursiveToStringStyle.MULTI_LINE_STYLE)).toString();
 	}
+	
+	@Override
+	public int hashCode() {
+        return bodyPartId.intValue();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof BodyPart)) {
+			return false;
+		}
+		BodyPart other = (BodyPart) obj;
+		if (bodyPartId == null) {
+			if (other.bodyPartId != null) {
+				return false;
+			}
+		} else if (!bodyPartId.equals(other.bodyPartId)) {
+			return false;
+		}
+		return true;
+	}	
+	
 }

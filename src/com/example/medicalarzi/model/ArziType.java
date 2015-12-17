@@ -19,11 +19,11 @@ public class ArziType implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -1742880714078171023L;
-	
+
 	private Long arziTypeId;
-	
+
 	private String arziTypeName;
-	
+
 	private String createdBy;
 
 	private Date createdDate;
@@ -86,11 +86,35 @@ public class ArziType implements Serializable {
 	public void setUpdatedDate(Date updatedDate) {
 		this.updatedDate = updatedDate;
 	}
-	
+
 	@Override
 	public String toString() {
 		return (new ReflectionToStringBuilder(this,
 				RecursiveToStringStyle.MULTI_LINE_STYLE)).toString();
-	}	
+	}
+
+	@Override
+	public int hashCode() {
+		return arziTypeId.intValue();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof ArziType)) {
+			return false;
+		}
+		ArziType other = (ArziType) obj;
+		if (arziTypeId == null) {
+			if (other.arziTypeId != null) {
+				return false;
+			}
+		} else if (!arziTypeId.equals(other.arziTypeId)) {
+			return false;
+		}
+		return true;
+	}
 
 }
