@@ -6,8 +6,8 @@ package com.example.medicalarzi.view;
 import com.vaadin.annotations.Theme;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.spring.annotation.VaadinUIScope;
-import com.vaadin.spring.navigator.annotation.SpringView;
+import com.vaadin.spring.annotation.SpringView;
+import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CssLayout;
@@ -19,7 +19,7 @@ import com.vaadin.ui.Label;
  *
  */
 @Theme("medicalarzi")
-@VaadinUIScope
+@UIScope
 @SpringView(name = SimpleLoginMainView.NAME)
 public class SimpleLoginMainView extends CustomComponent implements View {
 

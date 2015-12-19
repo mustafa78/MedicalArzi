@@ -9,8 +9,8 @@ import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.PropertyId;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.spring.annotation.VaadinUIScope;
-import com.vaadin.spring.navigator.annotation.SpringView;
+import com.vaadin.spring.annotation.SpringView;
+import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.AbsoluteLayout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -30,7 +30,7 @@ import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 
 @Theme("medicalarzi")
-@VaadinUIScope
+@UIScope
 @SpringView(name = ArziView.NAME)
 public class ArziView extends CustomComponent implements View {
 

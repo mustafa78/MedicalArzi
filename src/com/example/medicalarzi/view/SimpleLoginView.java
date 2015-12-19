@@ -24,8 +24,8 @@ import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.shared.Position;
 import com.vaadin.shared.ui.MarginInfo;
-import com.vaadin.spring.annotation.VaadinUIScope;
-import com.vaadin.spring.navigator.annotation.SpringView;
+import com.vaadin.spring.annotation.SpringView;
+import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -46,7 +46,7 @@ import com.vaadin.ui.themes.Reindeer;
  *
  */
 @Theme("medicalarzi")
-@VaadinUIScope
+@UIScope
 @SpringView(name = SimpleLoginView.NAME)
 public class SimpleLoginView extends CustomComponent implements View,
 		ClickListener {

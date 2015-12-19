@@ -7,8 +7,8 @@ import com.example.medicalarzi.component.UserList;
 import com.vaadin.annotations.Theme;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.spring.annotation.VaadinUIScope;
-import com.vaadin.spring.navigator.annotation.SpringView;
+import com.vaadin.spring.annotation.SpringView;
+import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Label;
@@ -22,7 +22,7 @@ import com.vaadin.ui.VerticalLayout;
  *
  */
 @Theme("medicalarzi")
-@VaadinUIScope
+@UIScope
 @SpringView(name = MyFormView.NAME)
 public class MyFormView extends CustomComponent implements View {
 

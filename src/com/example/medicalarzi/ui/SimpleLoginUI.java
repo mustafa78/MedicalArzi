@@ -22,7 +22,7 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.spring.annotation.EnableVaadin;
 import com.vaadin.spring.annotation.SpringUI;
-import com.vaadin.spring.annotation.VaadinUIScope;
+import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.spring.navigator.SpringViewProvider;
 import com.vaadin.ui.UI;
 
@@ -33,7 +33,7 @@ import com.vaadin.ui.UI;
  */
 @Title("Medical Arzi Project")
 @Theme("medicalarzi")
-@VaadinUIScope
+@UIScope
 @EnableVaadin
 @SpringUI
 public class SimpleLoginUI extends UI {
