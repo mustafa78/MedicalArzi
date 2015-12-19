@@ -7,8 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.example.medicalarzi.model.Arzi;
-import com.example.medicalarzi.service.LookupService;
-import com.example.medicalarzi.service.PatientService;
+import com.example.medicalarzi.service.ServiceLocator;
 import com.vaadin.data.Item;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitEvent;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
@@ -30,10 +29,6 @@ public class MedicalArziCommitHandler implements CommitHandler {
 	public static Logger logger = LogManager
 			.getLogger(MedicalArziCommitHandler.class);
 
-	private PatientService patientService;
-
-	private LookupService lookupService;
-
 	/**
 	 * 
 	 */
@@ -41,22 +36,6 @@ public class MedicalArziCommitHandler implements CommitHandler {
 		super();
 	}
 
-	/* Getters and Setters */
-	public PatientService getPatientService() {
-		return patientService;
-	}
-
-	public void setPatientService(PatientService patientService) {
-		this.patientService = patientService;
-	}
-
-	public LookupService getLookupService() {
-		return lookupService;
-	}
-
-	public void setLookupService(LookupService lookupService) {
-		this.lookupService = lookupService;
-	}
 
 	@Override
 	public void preCommit(CommitEvent commitEvent) throws CommitException {
@@ -75,7 +54,8 @@ public class MedicalArziCommitHandler implements CommitHandler {
 			
 			logger.debug("Updated arzi information: " + editedArzi);
 			
-			getPatientService().updateAnExistingArziInDraftMode(editedArzi);
+			ServiceLocator.getInstance().getPatientService()
+					.updateAnExistingArziInDraftMode(editedArzi);
 			
 			Notification.show("Arzi updated successfully!!!");
 		}
