@@ -27,8 +27,8 @@ import com.vaadin.data.util.converter.StringToLongConverter;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.spring.annotation.VaadinUIScope;
-import com.vaadin.spring.navigator.annotation.SpringView;
+import com.vaadin.spring.annotation.SpringView;
+import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -43,7 +43,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
 
 @Theme("medicalarzi")
-@VaadinUIScope
+@UIScope
 @SpringView(name = ForgotPasswordView.NAME)
 public class ForgotPasswordView extends CustomComponent implements View,
 		ClickListener, ValueChangeListener {
