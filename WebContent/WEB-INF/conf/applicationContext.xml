@@ -72,4 +72,13 @@
       		<ref bean="service.LookupServiceImpl"/>
       	</property>
    	</bean>
+   	<bean id="service.ReviewerServiceImpl" class="com.example.medicalarzi.service.impl.ReviewerServiceImpl" scope="singleton">
+   		<property name="lookupMapper" ref="lookupMapper"/>
+ 		<property name="arziMapper" ref="arziMapper"/>
+   	</bean>
+	<bean id="service.ReviewerService" class="org.springframework.aop.framework.ProxyFactoryBean" scope="singleton">
+      	<property name="target">
+      		<ref bean="service.ReviewerServiceImpl"/>
+      	</property>
+   	</bean>
 </beans>
