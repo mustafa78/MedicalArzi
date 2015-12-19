@@ -23,7 +23,7 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
     </listener>
     <servlet>
         <servlet-name>MedicalarziServlet</servlet-name>
-        <servlet-class>com.vaadin.spring.servlet.SpringAwareVaadinServlet</servlet-class>
+        <servlet-class>com.vaadin.spring.server.SpringVaadinServlet</servlet-class>
         <init-param>
             <description>Vaadin UI class to use</description>
             <param-name>UI</param-name>
