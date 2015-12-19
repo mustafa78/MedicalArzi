@@ -42,7 +42,7 @@
 			rev="&vaadin.version;" conf="widgetset-compile->default" />
 
 		<!-- vaadin-spring -->
-		<dependency org="com.vaadin" name="vaadin-spring" rev="0.0.1-SNAPSHOT"/>
+		<dependency org="com.vaadin" name="vaadin-spring" rev="1.0.0"/>
 
 		<dependency org="com.vaadin.external.atmosphere" name="atmosphere-runtime" rev="2.2.4.vaadin2"/>
 
