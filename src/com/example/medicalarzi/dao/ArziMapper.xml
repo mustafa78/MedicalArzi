@@ -38,6 +38,7 @@
 		<association property="conditionStartDate" column="condStartDtId" javaType="GregHijDate" 
 			select="com.example.medicalarzi.dao.LookupMapper.selectGregHijDateById" />
   	</resultMap>
+  	
   	<resultMap id="ArziResultMap" type="Arzi" extends="ArziHdrResultMap">
   		<result column="reviewerItsNbr" property="reviewerItsNumber" jdbcType="INTEGER" />
   		<result column="dtlCreateUserId" property="createdBy" jdbcType="VARCHAR" />
@@ -50,6 +51,14 @@
   			select="com.example.medicalarzi.dao.LookupMapper.selectGregHijDateById" />
   	</resultMap>
   	
+  	<resultMap id="ArziSearchResultMap" type="ArziSearchResult">
+  		<association property="patient" column="ptntItsNbr" javaType="Patient" 
+			select="com.example.medicalarzi.dao.PatientMapper.retrievePatientInfo" />
+		<association property="arzi" column="arziId" javaType="Arzi" 
+			select="selectArziById" />
+  	</resultMap>
+  	
+  	<!-- SQL fragments -->
   	<sql id="arziColumnList">
   		hdr.ITS_NBR as "ptntItsNbr",
   		hdr.ARZI_ID as "arzi_id",
@@ -84,6 +93,37 @@
   		(SELECT STATUS_DESC FROM D_STATUS WHERE STATUS_ID = hdr.CURR_STATUS_ID) AS "currentStatusDesc"
   	</sql>
   	
+  	<!-- where clause fragment for the arzi search -->
+  	<sql id="arziSearchWhere">
+  		<where>
+  			AND 1=1
+  			<if test="itsNumber != null and itsNumber != ''">
+				AND ptnt.ITS_NBR '#{itsNumber,jdbcType=INTEGER}'
+			</if>
+			<if test="firstName != null and firstName != ''">
+				AND ptnt.firstName like '#{firstName,jdbcType=VARCHAR}'
+			</if>
+			<if test="lastName != null and lastName != ''">
+				AND ptnt.lastName like '#{lastName,jdbcType=VARCHAR}'
+			</if>
+			<if test="jamaat != null and jamaat.jamaatId != null">
+				AND hdr.jamaat = #{hdr.jamaat.jamaatId,jdbcType=INTEGER}
+			</if>
+			<if test="arziType != null and arziType.arziTypeId != null">
+				AND hdr.arziType = #{hdr.arziType.id,jdbcType=INTEGER}
+			</if>
+			<if test="bodyPart != null and bodyPart.bodyPartId != null">
+				AND hdr.bodyPart = #{hdr.bodyPart.bodyPartId,jdbcType=INTEGER}
+			</if>
+			<if test="condition != null and condition.conditionId != null">
+				AND hdr.condition = #{hdr.condition.conditionId,jdbcType=INTEGER}
+			</if>
+			<if test="procedure != null and procedure.procedureId != null">
+				AND hdr.procedure = #{hdr.procedure.procedureId,jdbcType=INTEGER}
+			</if>		
+  		</where>
+  	</sql>
+  	
   	<!-- Select all arzis for the patient based on the ITS number -->
   	<select id="selectAllArzisForPatient" parameterType="Long" resultMap="ArziResultMap">
 		select
@@ -107,6 +147,32 @@
 		where 
 			hdr.ARZI_ID = #{arziId,jdbcType=INTEGER} and 
 			hdr.ITS_NBR = #{itsNumber,jdbcType=INTEGER}
+	</select>
+	
+	<!-- Select an arzi based on the given arzi id (unique for each arzi) -->
+	<select id="selectArziById" parameterType="Long" resultMap="ArziResultMap">
+		select
+			<include refid="arziColumnList" />
+		from 
+			F_ARZI_HDR hdr left join F_ARZI_DTL dtl
+		on 
+			hdr.ARZI_ID = dtl.ARZI_ID
+		where 
+			hdr.ARZI_ID = #{arziId,jdbcType=INTEGER}
+	</select>
+	
+	<select id="selectArzisBySearchCriteria" resultMap="ArziResultMap" parameterType="ArziSearchCriteria">
+		select
+			ptnt.ITS_NBR as "ptntItsNbr",
+			hdr.ARZI_ID as "arziId"
+		from 
+			F_ARZI_HDR hdr
+				join 
+			 		D_PTNT ptnt on ptnt.PTNT_ITS_NBR = hdr.ITS_NBR	
+				left join 
+			 		F_ARZI_DTL dtl on hdr.ARZI_ID = dtl.ARZI_ID
+		<include refid="arziSearchWhere" />
+		order by ptnt.LAST_NAME, ptnt.FIRST_NAME, hdr.ARZI_ID
 	</select>
   	
 	<!-- Insert -->
