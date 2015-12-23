@@ -40,6 +40,10 @@
 		<!-- Compiler for custom widget sets. Should not be deployed -->
 		<dependency org="com.vaadin" name="vaadin-client-compiler"
 			rev="&vaadin.version;" conf="widgetset-compile->default" />
+		
+		<!-- Vaadin Addons -->	
+		<dependency org="org.vaadin.addons" name="vaadin-grid-util" 
+  	 		rev="1.0.8" />			
 
 		<!-- vaadin-spring -->
 		<dependency org="com.vaadin" name="vaadin-spring" rev="1.0.0"/>
