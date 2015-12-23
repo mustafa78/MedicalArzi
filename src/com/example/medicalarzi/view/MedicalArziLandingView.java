@@ -1,6 +1,5 @@
 package com.example.medicalarzi.view;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -16,6 +15,7 @@ import com.example.medicalarzi.component.ArziDateField;
 import com.example.medicalarzi.component.ArziFooterComponent;
 import com.example.medicalarzi.component.ArziHeaderComponent;
 import com.example.medicalarzi.component.CustomFormComponent;
+import com.example.medicalarzi.component.DoctorSearch;
 import com.example.medicalarzi.converter.StringToArziTypeConverter;
 import com.example.medicalarzi.converter.StringToBodyPartConverter;
 import com.example.medicalarzi.converter.StringToConditionConverter;
@@ -30,6 +30,7 @@ import com.example.medicalarzi.model.GregHijDate;
 import com.example.medicalarzi.model.Jamaat;
 import com.example.medicalarzi.model.Patient;
 import com.example.medicalarzi.model.Procedure;
+import com.example.medicalarzi.model.SecurityRole;
 import com.example.medicalarzi.model.Status;
 import com.example.medicalarzi.service.LookupService;
 import com.example.medicalarzi.service.PatientService;
@@ -43,15 +44,14 @@ import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.fieldgroup.PropertyId;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.data.util.converter.Converter;
 import com.vaadin.event.SelectionEvent;
 import com.vaadin.event.SelectionEvent.SelectionListener;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.Position;
-import com.vaadin.spring.annotation.VaadinUIScope;
-import com.vaadin.spring.navigator.annotation.SpringView;
+import com.vaadin.spring.annotation.SpringView;
+import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -59,7 +59,6 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.Field;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.HeaderCell;
@@ -84,7 +83,7 @@ import com.vaadin.ui.themes.Reindeer;
  *
  */
 @Theme("medicalarzi")
-@VaadinUIScope
+@UIScope
 @SpringView(name = MedicalArziLandingView.NAME)
 public class MedicalArziLandingView extends CustomComponent implements View,
 		ClickListener, SelectedTabChangeListener, SelectionListener, ValueChangeListener {
@@ -125,6 +124,8 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 	
 	// Search
 	private VerticalLayout searchViewLayout;
+	
+	private DoctorSearch searchComponent;
 
 	// Buttons layout
 	private HorizontalLayout buttonsLayout;
@@ -203,7 +204,12 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 	
 	private Patient patient;
 
-	// Service stubs
+	/**
+	 * Service stubs - Could use the @Autowire for the service stubs or get it
+	 * from the ServiceLocator. @SpringView autowires the spring service beans,
+	 * use the ServiceLocator when trying to use the beans from outside the
+	 * @SpringView.
+	 **/
 	@Autowired
 	@Qualifier("service.PatientService")
 	private PatientService patientService;
@@ -405,11 +411,15 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 				MedicalArziConstants.INBOX_TAB_CAPTION, new ThemeResource(
 						"icons/inbox.png"));
 		
-		//Search
-		buildSearchViewLayout();
-		tabSheet.addTab(searchViewLayout,
-				MedicalArziConstants.SEARCH_TAB_CAPTION, new ThemeResource(
-						"icons/search.png"));
+		//Search tab - only available to admins
+		SecurityRole adminRole = lookupService
+				.getSecurityRoleById(MedicalArziConstants.SEC_ROLE_ID_ADMIN);
+		if (patient.getRoles().contains(adminRole)) {
+			buildSearchViewLayout();
+			tabSheet.addTab(searchViewLayout,
+					MedicalArziConstants.SEARCH_TAB_CAPTION, new ThemeResource(
+							"icons/search.png"));
+		}
 	}
 	
 	/**
@@ -422,11 +432,8 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		searchViewLayout.setMargin(true);
 		searchViewLayout.setSpacing(true);	
 		
-		Label searchDescription = new Label();
-		searchDescription.setValue("Search:");
-		searchDescription.setStyleName("v-captiontext");
-		searchViewLayout.addComponent(searchDescription);
-		searchViewLayout.setExpandRatio(searchDescription, 0.1f);
+		searchComponent = new DoctorSearch();
+		searchViewLayout.addComponent(searchComponent);
 	}
 
 	/**
@@ -451,7 +458,10 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 	}
 
 	/**
-	 * 
+	 * This method builds the arzi grid on the Inbox tab with the list of arzis
+	 * for the logged in user. The user is also able to edit his/her arzi if it
+	 * is not yet submitted and sitting in the Draft mode. Once an arzi is
+	 * submitted, the user will not be able to edit that arzi.
 	 */
 	@SuppressWarnings("unchecked")
 	private void buildArziGrid() {
@@ -468,7 +478,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		// Initialize the container
 		BeanItemContainer<Arzi> arziContainer = (BeanItemContainer<Arzi>) MedicalArziUtils
 				.getContainer(Arzi.class);
-
+		
 		// Retrieve all the arzis for the patient based on the ITS number
 		List<Arzi> arziList = patientService.retrieveAllArzisForPatient(patient
 				.getItsNumber());
@@ -488,13 +498,27 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		
 		// Add the container to the datasource
 		arziGrid.setContainerDataSource(arziContainer);
-		
+
 		arziGrid.setColumns("itsNumber", "currentStatus.statusDesc",
 				"arziType", "condition", "otherCondition",
-				"conditionStartDate.gregorianCalDate", "procedure", "bodyPart",
-				"arziId");
+				"conditionStartDate.gregorianCalDate", "procedure", "bodyPart");
 		
-		arziGrid.removeColumn("arziId");
+		/*arziGrid.getColumn("edit")
+				.setWidth(35)
+				.setHeaderCaption("Tools")
+				.setRenderer(
+						new ButtonRenderer(
+								new ClickableRenderer.RendererClickListener() {
+									private static final long serialVersionUID = 8902672690745778342L;
+
+									@Override
+									public void click(RendererClickEvent e) {
+										Notification.show("Editing item "
+												+ e.getItemId());
+									}
+								}));*/
+		
+		// Column reorderin allowed
 		arziGrid.setColumnReorderingAllowed(true);
 		
 		// Sets the converter on the ITS number to remove the grouping used.
@@ -511,6 +535,10 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 				.setRenderer(
 						new DateRenderer("%1$tB %1$td, %1$tY", Locale.ENGLISH));
 		
+		//Setting the other condition values in the textfield editor on the grid for editing.
+		arziGrid.getColumn("otherCondition").setEditorField(
+				MedicalArziUtils.getTextFieldEditor(true));
+		
 		Container condContainer = MedicalArziUtils
 				.getContainer(Condition.class);
 		StringToConditionConverter condConv = new StringToConditionConverter(
@@ -518,14 +546,15 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		arziGrid.getColumn("condition")
 				.setConverter(condConv)
 				.setEditorField(
-						getComboBox("", "Please select a condition...",
+						MedicalArziUtils.getComboBox("",
+								"Please select a condition...",
 								"Condition is required!",
 								lookupService.getListOfAllMedicalConditions(),
 								"conditionName", condContainer, null));
-		
-		//Add the valueChange listner to the Condition combobox
+		//Add the valueChange listener to the Condition combobox
 		//arziGrid.getColumn("condition").getEditorField().addValueChangeListener(this);
 		
+		//Setting the arziType values in the combobox editor on the grid for editing.
 		Container arziTypeContainer = MedicalArziUtils
 				.getContainer(ArziType.class);
 		StringToArziTypeConverter arziTypeConv = new StringToArziTypeConverter(
@@ -533,8 +562,8 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		arziGrid.getColumn("arziType")
 				.setConverter(arziTypeConv)
 				.setEditorField(
-						getComboBox("", "Please select a type...",
-								"Type is required!",
+						MedicalArziUtils.getComboBox("",
+								"Please select a type...", "Type is required!",
 								lookupService.getListOfAllArziTypes(),
 								"arziTypeName", arziTypeContainer, null));
 		
@@ -545,7 +574,8 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		arziGrid.getColumn("procedure")
 				.setConverter(procConv)
 				.setEditorField(
-						getComboBox("", "Please select a procedure...",
+						MedicalArziUtils.getComboBox("",
+								"Please select a procedure...",
 								"Procedure is required!",
 								lookupService.getListOfAllMedicalProcedures(),
 								"procedureName", procContainer, null));
@@ -557,7 +587,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		arziGrid.getColumn("bodyPart")
 				.setConverter(bdyPrtConv)
 				.setEditorField(
-						getComboBox("", "Please select a body part...",
+						MedicalArziUtils.getComboBox("", "Please select a body part...",
 								"Body Part is required!",
 								lookupService.getListOfAllBodyParts(),
 								"bodyPartName", bdyPrtContainer, null));
@@ -579,13 +609,13 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 				procedure, bodyPart);
 
 		ptntMedicalInfoHeaderCell.setText("Medical Information");
+		
 
+		//Add the event listner on the grid on selecting a row.
 		arziGrid.addSelectionListener(this);
 		
 		// Adding the commit handler to the field group
 		MedicalArziCommitHandler maCommitHdlr = new MedicalArziCommitHandler();
-		
-		maCommitHdlr.setPatientService(patientService);
 		
 		arziGrid.getEditorFieldGroup().addCommitHandler(maCommitHdlr);
 
@@ -606,36 +636,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		return arziGridFieldsBinder;
 	}
 
-	/**
-	 * This method returns the combox with the possible values extracted from
-	 * the passed container and displaying the passed property from an item
-	 * 
-	 * @param caption
-	 * @param inputPrompt
-	 * @param requiredErrorMsg
-	 * @param items
-	 * @param propertyId
-	 * @param container
-	 * @return
-	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private Field<?> getComboBox(String caption, String inputPrompt,
-			String requiredErrorMsg, Collection<?> items, Object propertyId,
-			Container container, Converter converter) {
-		ComboBox comboBox = new ComboBox(caption);
-		// comboBox.setNullSelectionAllowed(true);
-		comboBox.setInputPrompt(inputPrompt);
-		comboBox.setContainerDataSource(container);
-		comboBox.addItems(items);
-		comboBox.setItemCaptionMode(ItemCaptionMode.PROPERTY);
-		comboBox.setItemCaptionPropertyId(propertyId);
-		if(converter != null) {
-			comboBox.setConverter(converter);
-		}
-		comboBox.setRequired(true);
-		comboBox.setRequiredError(requiredErrorMsg);
-		return comboBox;
-	}
+
 
 	/**
 	 * This method will build the CustomForm and add all the fields for a new
@@ -980,7 +981,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 						+ MedicalArziUtils.constructPtntFullName(ptntInfo)
 						+ "\" is successfully created";
 
-				// Once the new arzi is submitted which the selection to the
+				// Once the new arzi is submitted switch the selection to the
 				// Inbox tab with the user friendly success message.
 				tabSheet.setSelectedTab(inboxViewLayout);
 
