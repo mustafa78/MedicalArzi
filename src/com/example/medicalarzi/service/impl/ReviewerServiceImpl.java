@@ -3,11 +3,15 @@
  */
 package com.example.medicalarzi.service.impl;
 
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
 
 import com.example.medicalarzi.dao.ArziMapper;
 import com.example.medicalarzi.dao.LookupMapper;
+import com.example.medicalarzi.model.ArziSearchCriteria;
+import com.example.medicalarzi.model.ArziSearchResult;
 import com.example.medicalarzi.service.ReviewerService;
 
 /**
@@ -44,6 +48,13 @@ public class ReviewerServiceImpl implements ReviewerService {
 
 	public void setLookupMapper(LookupMapper lookupMapper) {
 		this.lookupMapper = lookupMapper;
+	}
+
+	@Override
+	public List<ArziSearchResult> searchArzisByCriteria(
+			ArziSearchCriteria criteria) {
+		List<ArziSearchResult> searchResults = arziMapper.selectArzisBySearchCriteria(criteria);
+		return searchResults;
 	}
 
 	
