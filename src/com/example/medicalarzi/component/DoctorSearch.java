@@ -3,40 +3,32 @@ package com.example.medicalarzi.component;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.example.medicalarzi.model.Arzi;
+import com.example.medicalarzi.model.ArziSearchResult;
 import com.example.medicalarzi.model.ArziType;
 import com.example.medicalarzi.model.BodyPart;
 import com.example.medicalarzi.model.Condition;
 import com.example.medicalarzi.model.Jamaat;
 import com.example.medicalarzi.model.Procedure;
+import com.example.medicalarzi.service.ReviewerService;
 import com.example.medicalarzi.service.ServiceLocator;
 import com.example.medicalarzi.util.MedicalArziConstants;
 import com.example.medicalarzi.util.MedicalArziUtils;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.server.Sizeable;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
-import com.vaadin.ui.themes.Reindeer;
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Grid;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.VerticalSplitPanel;
 
 public class DoctorSearch extends CustomComponent {
 
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = -2608386102633068228L;
 	
-	public static Logger logger = LogManager.getLogger(DoctorSearch.class);
+	private static Logger logger = LogManager.getLogger(DoctorSearch.class);
 	
-	private VerticalLayout mainLayout;
-
 	private VerticalSplitPanel splitPanel;
 
 	private Grid arziGrid;
@@ -44,18 +36,12 @@ public class DoctorSearch extends CustomComponent {
 	private VerticalLayout topLayout;
 
 	private Button search;
+	
+	
+	private CustomFormComponent searchCriteria;
+	
 
-	private HorizontalLayout criteriaLayout;
-	
-	private VerticalLayout leftLayout;
-	
-	private FormLayout leftFormLayout;
-	
-	private VerticalLayout rightLayout;
-
-	private FormLayout rightFormLayout;
-
-	
+	// Search criteria fields
 	private ComboBox arziType;
 	
 	private ComboBox bodyPart;
@@ -66,8 +52,6 @@ public class DoctorSearch extends CustomComponent {
 
 	private ComboBox jamaat;
 	
-	private BeanItemContainer<Arzi> myArziContainer = createMyArziDummyDatasource();
-	
 
 	/**
 	 * The constructor should first build the main layout, set the
@@ -75,39 +59,26 @@ public class DoctorSearch extends CustomComponent {
 	 *
 	 */
 	public DoctorSearch() {
-		//Build the mainLoayout
-		buildMainLayout();
-		
-		//initArziList();
-		
-		setCompositionRoot(mainLayout);
-	}
-
-	private void buildMainLayout() {
-		// top-level component properties
-		setSizeFull();
-
-		// common part: create layout
-		mainLayout = new VerticalLayout();
-		mainLayout.setImmediate(false);
-		mainLayout.setSizeFull();
-
-		// splitPanel
+		//Build the split panel
 		buildSplitPanel();
-		mainLayout.addComponent(splitPanel);
+		
+		//The root component. Must be set
+		setCompositionRoot(splitPanel);
 	}
 
 	private void buildSplitPanel() {
+		// top-level component properties
+		setSizeFull();
+		
 		// common part: create layout
 		splitPanel = new VerticalSplitPanel();
 		splitPanel.setImmediate(false);
 		splitPanel.setLocked(true);
-		splitPanel.setHeight("600px");
+		splitPanel.setHeight("400px");
 		splitPanel.setWidth("100%");		
 
 		// topLayout
 		buildTopLayout();
-		topLayout.setSizeFull();
 		splitPanel.addComponent(topLayout);
 		
 		// arziTable
@@ -120,60 +91,62 @@ public class DoctorSearch extends CustomComponent {
 	private void buildTopLayout() {
 		// common part: create layout
 		topLayout = new VerticalLayout();
-		topLayout.setSizeFull();
 		topLayout.setImmediate(false);
 		topLayout.setMargin(false);
 
 		// criteriaLayout
-		buildCriteriaLayout();
-		criteriaLayout.setSizeFull();
-		topLayout.addComponent(criteriaLayout);
+		buildSearchCriteria();
+		topLayout.addComponent(searchCriteria);
 
 		// search
 		search = new Button("Search");
 		search.setImmediate(true);
-		search.setStyleName(Reindeer.BUTTON_LINK);
-
 		topLayout.addComponent(search);
-		topLayout.setComponentAlignment(search, Alignment.MIDDLE_RIGHT);
 	}
 
-	private void buildCriteriaLayout() {
-		// common part: create layout
-		criteriaLayout = new HorizontalLayout();
-		criteriaLayout.setImmediate(false);
-		criteriaLayout.setSizeFull();
-		criteriaLayout.setMargin(false);
-		
-		// leftLayout
-		leftLayout = buildLeftLayout();
-		criteriaLayout.addComponent(leftLayout);
-		criteriaLayout.setExpandRatio(leftLayout, 1.0f);
-		
-		// rightLayout
-		rightLayout = buildRightLayout();
-		criteriaLayout.addComponent(rightLayout);
-		criteriaLayout.setExpandRatio(rightLayout, 1.0f);
+	private void buildSearchCriteria() {
+		// Search criteria customForm
+		searchCriteria = new CustomFormComponent();
+		searchCriteria.setImmediate(false);
+		searchCriteria.setSizeFull();
+		searchCriteria.setStyleName("customForm");
+
+		/**
+		 * Add the fields to the left FormLayout.
+		 * 
+		 */
+		FormLayout leftFormLayout = (FormLayout) MedicalArziUtils.findById(
+				searchCriteria,
+				MedicalArziConstants.CUSTOM_FORM_LEFTFORM_LAYOUT_ID);
 
 		// region
 		loadJamaats();
-		leftLayout.addComponent(jamaat);
-		
-		// bodyPart
-		loadArziTypes();
-		rightLayout.addComponent(arziType);
+		leftFormLayout.addComponent(jamaat);
 
 		// bodyPart
 		loadBodyParts();
-		leftLayout.addComponent(bodyPart);
+		leftFormLayout.addComponent(bodyPart);
+
+		// procedure
+		loadProcedures();
+		leftFormLayout.addComponent(procedure);
+
+		/**
+		 * Add the fields to the right FormLayout.
+		 * 
+		 */
+		FormLayout rightFormLayout = (FormLayout) MedicalArziUtils.findById(
+				searchCriteria,
+				MedicalArziConstants.CUSTOM_FORM_RIGHTFORM_LAYOUT_ID);
+
+		// bodyPart
+		loadArziTypes();
+		rightFormLayout.addComponent(arziType);
 
 		// condition
 		loadConditions();
-		rightLayout.addComponent(condition);
+		rightFormLayout.addComponent(condition);
 
-		// procedure
-		loadProcedures();;
-		leftLayout.addComponent(procedure);
 	}
 	
 	private void loadJamaats() {
@@ -247,8 +220,14 @@ public class DoctorSearch extends CustomComponent {
 		arziGrid.setColumnHeaders(new String[]{"ID", "CATEGORY", "REGION", "COUNTRY", "STATUS"});*/
 	}
 
-	private static BeanItemContainer<Arzi> createMyArziDummyDatasource() {
-		BeanItemContainer<Arzi> bc = new BeanItemContainer<Arzi>(Arzi.class);
+	private void buildResultsGrid() {
+		@SuppressWarnings("unchecked")
+		BeanItemContainer<ArziSearchResult> resultsContainer = (BeanItemContainer<ArziSearchResult>) MedicalArziUtils
+				.getContainer(ArziSearchResult.class);
+		
+		ReviewerService service = ServiceLocator.getInstance().getReviewerService();
+		
+		//service.searchArzisByCriteria(criteria);
 
 		 /*ArrayList<Arzi> arziList = new ArrayList<Arzi>();
 		 for (int i = 1; i < 50; i++) {
@@ -314,40 +293,6 @@ public class DoctorSearch extends CustomComponent {
 		 }
 
 		 bc.addAll(arziList);*/
-
-		return bc;
-	}	
-	
-	private VerticalLayout buildLeftLayout() {
-		// common part: create layout
-		leftLayout = new VerticalLayout();
-		leftLayout.setImmediate(false);
-		leftLayout.setWidth("100.0%");
-		leftLayout.setHeight("100.0%");
-		leftLayout.setMargin(false);
-		
-		// leftFormLayout
-		leftFormLayout = new FormLayout();
-		leftFormLayout.setId(MedicalArziConstants.CUSTOM_FORM_LEFTFORM_LAYOUT_ID);
-		leftLayout.addComponent(leftFormLayout);
-		
-		return leftLayout;
-	}
-
-	private VerticalLayout buildRightLayout() {
-		// common part: create layout
-		rightLayout = new VerticalLayout();
-		rightLayout.setImmediate(false);
-		rightLayout.setWidth("100.0%");
-		rightLayout.setHeight("100.0%");
-		rightLayout.setMargin(false);
-		
-		// rightFormLayout
-		rightFormLayout = new FormLayout();
-		rightFormLayout.setId(MedicalArziConstants.CUSTOM_FORM_RIGHTFORM_LAYOUT_ID);
-		rightLayout.addComponent(rightFormLayout);
-		
-		return rightLayout;
 	}	
 
 }
