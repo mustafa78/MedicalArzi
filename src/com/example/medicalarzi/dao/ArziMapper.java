@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Param;
 
 import com.example.medicalarzi.model.Arzi;
 import com.example.medicalarzi.model.ArziSearchCriteria;
+import com.example.medicalarzi.model.ArziSearchResult;
 
 /**
  * @author mkanchwa
@@ -67,9 +68,9 @@ public interface ArziMapper {
 	 * entered search criteria.
 	 * 
 	 * @param searchCriteria
-	 * @return com.example.medicalarzi.model.Arzi
+	 * @return java.util.List<com.example.medicalarzi.model.ArziSearchResult>
 	 */
-	public Arzi selectArzisBySearchCriteria(ArziSearchCriteria searchCriteria);
+	public List<ArziSearchResult> selectArzisBySearchCriteria(ArziSearchCriteria searchCriteria);
 	
 	/**
 	 * This method is responsible for selecting a particular arzi based on the
