@@ -24,12 +24,13 @@ public class ServiceLocator {
 	/** Singleton. */
     private static ServiceLocator me;
     
-	private final Map<String, Object> cache = new HashMap<String, Object>();
+	private final Map<String, Object> cache;
     
 	/**
-	 * 
+	 * Initialize the cache in the constructor.
 	 */
 	private ServiceLocator() {
+		cache = new HashMap<String, Object>();
 	}
 	
 	/**
@@ -83,7 +84,6 @@ public class ServiceLocator {
 	 * 
 	 * @return com.example.medicalarzi.service.PatientService
 	 * 
-	 * @throws Exception
 	 */
 	public PatientService getPatientService() {
 		return (PatientService) lookup("service.PatientService");
@@ -96,7 +96,6 @@ public class ServiceLocator {
 	 * 
 	 * @return com.example.medicalarzi.service.LookupService
 	 * 
-	 * @throws Exception
 	 */
 	public LookupService getLookupService() {
 		return (LookupService) lookup("service.LookupService");
@@ -108,7 +107,7 @@ public class ServiceLocator {
 	 * 
 	 * @return com.example.medicalarzi.service.ReviewerService
 	 */
-	public ReviewerService getDoctorService() {
+	public ReviewerService getReviewerService() {
 		return (ReviewerService) lookup("service.ReviewerService");
 	}
 }

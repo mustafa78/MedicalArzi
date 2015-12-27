@@ -13,6 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.example.medicalarzi.model.Arzi;
+import com.example.medicalarzi.model.ArziSearchResult;
 import com.example.medicalarzi.model.ArziType;
 import com.example.medicalarzi.model.BodyPart;
 import com.example.medicalarzi.model.Condition;
@@ -63,7 +64,7 @@ public class MedicalArziUtils {
 		Collection<Validator> validators = field.getValidators();
 
 		if (validators == null || validators.isEmpty()) {
-
+			//Creates a Vaadin validator utilizing the JSR-303 validation
 			field.addValidator(new BeanValidator(Patient.class, attribute));
 		}
 	}
@@ -74,10 +75,11 @@ public class MedicalArziUtils {
 	 *
 	 * @param root
 	 * @param id
-	 * @return
+	 * 
+	 * @return com.vaadin.ui.Component
 	 */
 	public static Component findById(HasComponents root, String id) {
-		logger.debug("findById called on " + root);
+		logger.debug("Finding the component: " + root);
 
 		Iterator<Component> iterate = root.iterator();
 
@@ -102,7 +104,8 @@ public class MedicalArziUtils {
 	 * given class and returns that container
 	 *
 	 * @param obj
-	 * @return
+	 * 
+	 * @return com.vaadin.data.Container
 	 */
 	@SuppressWarnings("unchecked")
 	public static Container getContainer(Class<?> objClass) {
@@ -130,6 +133,9 @@ public class MedicalArziUtils {
 		else if (objClass == Jamaat.class)
 			container = new BeanItemContainer<Jamaat>(
 					(Class<? super Jamaat>) objClass);
+		else if (objClass == ArziSearchResult.class)
+			container = new BeanItemContainer<ArziSearchResult>(
+					(Class<? super ArziSearchResult>) objClass);
 
 		return container;
 	}
@@ -283,7 +289,8 @@ public class MedicalArziUtils {
 	 * @param items
 	 * @param propertyId
 	 * @param container
-	 * @return
+	 * 
+	 * @return com.vaadin.ui.Field<?>
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static Field<?> getComboBox(String caption, String inputPrompt,
@@ -307,7 +314,8 @@ public class MedicalArziUtils {
 	/**
 	 * 
 	 * @param flag
-	 * @return
+	 * 
+	 * @return com.vaadin.ui.Field<?>
 	 */
 	public static Field<?> getTextFieldEditor(Boolean flag) {
 	    TextField textField = new TextField();

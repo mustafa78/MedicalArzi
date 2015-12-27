@@ -8,6 +8,8 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 import com.example.medicalarzi.model.Arzi;
+import com.example.medicalarzi.model.ArziSearchCriteria;
+import com.example.medicalarzi.model.ArziSearchResult;
 
 /**
  * @author mkanchwa
@@ -60,5 +62,23 @@ public interface ArziMapper {
 	 * @param editedArzi
 	 */
 	public void updateArziHdrSelective(Arzi editedArzi);
+	
+	/**
+	 * This method is responsible for selecting the arzis based on the user
+	 * entered search criteria.
+	 * 
+	 * @param searchCriteria
+	 * @return java.util.List<com.example.medicalarzi.model.ArziSearchResult>
+	 */
+	public List<ArziSearchResult> selectArzisBySearchCriteria(ArziSearchCriteria searchCriteria);
+	
+	/**
+	 * This method is responsible for selecting a particular arzi based on the
+	 * the arzi id.
+	 * 
+	 * @param arziId
+	 * @return
+	 */
+	public Arzi selectArziById(@Param("arziId") Long arziId);
 
 }
