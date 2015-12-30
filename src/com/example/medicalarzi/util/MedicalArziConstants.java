@@ -23,15 +23,20 @@ public interface MedicalArziConstants {
 
 	final static public String MAP_PROPERTIES = "com.example.medicalarzi.resources.MAPConf";
 	
-	//Lookup types & value constants
+	/**Lookup types & value constants**/
+	// Lookup Types
 	final static public String MAP_DAWAT_TITLE = "DAWAT TITLE";
+	
+	final static public String SEARCH_NUM_OF_DAYS = "NUM OF DAYS SEARCH";
 	
 	final static public String MAP_GENDER = "GENDER";
 	
+	// Lookup Vals
 	final static public String MAP_DAWAT_TITLE_BHAI = "Bhai";
 	
 	final static public String MAP_DAWAT_TITLE_BEHEN = "Behen";
 	
+	// Lookup Ids
 	final static public Long ARZI_DRAFT_STATUS = 1000L;
 	
 	final static public Long ARZI_SUBMITTED_STATUS = 1001L;
@@ -41,6 +46,17 @@ public interface MedicalArziConstants {
 	final static public Integer MAP_GENDER_FEMALE_ID = 1006;
 	
 	final static public Integer MAP_OTHER_CONDITION_ID = 3016;
+	
+	final static public Integer SEARCH_PERIOD_LAST_7_DAYS_ID = 1007;
+	
+	final static public Integer SEARCH_PERIOD_LAST_10_DAYS_ID = 1008;
+	
+	final static public Integer SEARCH_PERIOD_LAST_14_DAYS_ID = 1009;
+	
+	final static public Integer SEARCH_PERIOD_LAST_21_DAYS_ID = 1010;
+	
+	final static public Integer SEARCH_PERIOD_LAST_30_DAYS_ID = 1011;
+	
 
 	// For sending email.
 	final static public String EMAIL_HOST = "EmailHost";
