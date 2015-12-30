@@ -7,6 +7,10 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
         <param-name>productionMode</param-name>
         <param-value>false</param-value>
     </context-param>
+	<context-param>
+  		<param-name>heartbeatInterval</param-name>
+  		<param-value>300</param-value>
+	</context-param>    
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>/WEB-INF/conf/applicationContext.xml</param-value>
@@ -34,6 +38,16 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
             <param-name>legacyPropertyToString</param-name>
             <param-value>false</param-value>
         </init-param>
+        <init-param>
+    		<description>
+    			Enable Session Timeout. If the client close the browser then the session will expire after 30 minutes. 
+    			But if the client keeps the browser open for hours, then the session stay alive by default. 
+    			If you set the closeIdleSessions to true, then the session will expire after 'session-timeout' period
+    			even if the browser is still open (and no user activity of course)
+    		</description>
+    		<param-name>closeIdleSessions</param-name>
+    		<param-value>true</param-value>
+		</init-param>
     </servlet>
     <servlet-mapping>
         <servlet-name>MedicalarziServlet</servlet-name>
