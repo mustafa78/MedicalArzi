@@ -68,6 +68,11 @@ $v-error-indicator-color: #ed473b;
 		background: #B6C9D3;
 	}
 	
+	/*To remove the horizontal scrollbar on the search tab*/
+	.v-scrollable {
+		overflow: hidden;
+	}
+	
 
 	// Insert your own theme rules here
   	.banner {
