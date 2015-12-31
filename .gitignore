@@ -2,3 +2,4 @@
 /.settings/
 .project
 .tern-project
+/WebContent/VAADIN/themes/medicalarzi/styles.scss.cache
