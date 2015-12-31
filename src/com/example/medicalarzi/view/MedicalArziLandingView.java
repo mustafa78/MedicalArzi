@@ -55,6 +55,7 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
@@ -121,7 +122,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 	// Footer
 	private ArziFooterComponent footer;
 
-	// Personal information fields
+	// Personal information fields bound to the "Patient" model
 	@PropertyId("itsNumber")
 	private TextField itsNumber;
 
@@ -158,7 +159,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 	@PropertyId("jamaat")
 	private ComboBox jamaat;
 
-	// Medical information fields
+	// Medical information fields bound to the "Arzi" model
 	@PropertyId("arziType")
 	private ComboBox arziType;
 
@@ -177,7 +178,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 	@PropertyId("otherCondition")
 	private TextField otherCondition;
 
-	// private TextArea description;
+	private TextArea description;
 
 	// Binding Fields
 	private BeanFieldGroup<Patient> ptntFieldsBinder;
@@ -393,10 +394,15 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 				MedicalArziConstants.INBOX_TAB_CAPTION, new ThemeResource(
 						"icons/inbox.png"));
 		
-		//Search tab - only available to admins
+		//Search tab - only available to Admins & Doctors
 		SecurityRole adminRole = lookupService
 				.getSecurityRoleById(MedicalArziConstants.SEC_ROLE_ID_ADMIN);
-		if (patient.getRoles().contains(adminRole)) {
+		
+		SecurityRole doctorRole = lookupService
+				.getSecurityRoleById(MedicalArziConstants.SEC_ROLE_ID_DOCTOR);
+		
+		if (patient.getRoles().contains(adminRole)
+				|| patient.getRoles().contains(doctorRole)) {
 			searchComponent = new DoctorSearch();
 			tabSheet.addTab(searchComponent,
 					MedicalArziConstants.SEARCH_TAB_CAPTION, new ThemeResource(
@@ -748,8 +754,10 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 						+ MedicalArziUtils.constructPtntFullName(ptntInfo)
 						+ "\" is successfully created";
 
-				// Once the new arzi is submitted switch the selection to the
+				// Once the new arzi is submitted, reconstruct the inbox tab to
+				// get the latest data and then switch the selection to the
 				// Inbox tab with the user friendly success message.
+				inboxComponent = new InboxComponent();
 				tabSheet.setSelectedTab(inboxComponent);
 
 				MedicalArziUtils.createAndShowNotification(null, successMsg,
