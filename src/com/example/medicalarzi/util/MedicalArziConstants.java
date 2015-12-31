@@ -98,6 +98,10 @@ public interface MedicalArziConstants {
 	final static public String PASSWORD_HINT_TEXT = "Password must be at least 8 characters long and contain at least 1 number.";
 	
 	final static public Integer USER_FRIENDLY_MSG_DELAY_MSEC =  4000;
+	
+	final static public Long SEC_ROLE_ID_DOCTOR = 1001L;
+	
+	final static public Long SEC_ROLE_ID_QUEUE_MGR = 1002L;
 
 	final static public Long SEC_ROLE_ID_ADMIN = 1004L;
 

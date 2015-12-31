@@ -25,12 +25,16 @@ import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.fieldgroup.PropertyId;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.event.ShortcutAction.KeyCode;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.Position;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.Grid.HeaderCell;
+import com.vaadin.ui.Grid.HeaderRow;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.FormLayout;
@@ -40,6 +44,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.VerticalSplitPanel;
 import com.vaadin.ui.renderers.DateRenderer;
+import com.vaadin.ui.themes.Reindeer;
 
 public class DoctorSearch extends CustomComponent implements ClickListener {
 
@@ -82,7 +87,7 @@ public class DoctorSearch extends CustomComponent implements ClickListener {
 
 	@PropertyId("jamaat")
 	private ComboBox jamaat;
-	
+
 	@PropertyId("numberOfDays")
 	private ComboBox numOfDays;
 
@@ -141,7 +146,7 @@ public class DoctorSearch extends CustomComponent implements ClickListener {
 		splitPanel.setImmediate(false);
 		splitPanel.setLocked(true);
 		splitPanel.setSizeFull();
-		splitPanel.setSplitPosition(65, Unit.PERCENTAGE, true);
+		splitPanel.setSplitPosition(62, Unit.PERCENTAGE, true);
 
 		// topLayout
 		buildTopLayout();
@@ -164,8 +169,12 @@ public class DoctorSearch extends CustomComponent implements ClickListener {
 		topLayout.addComponent(searchCriteria);
 
 		// search
-		searchBtn = new Button("Search");
+		searchBtn = new Button(new ThemeResource("img/search.png"));
 		searchBtn.addClickListener(this);
+		searchBtn.setStyleName(Reindeer.BUTTON_LINK);
+		// Set the search button as the default button. Causes a click event for
+		// the button to be fired.
+		searchBtn.setClickShortcut(KeyCode.ENTER);
 		topLayout.addComponent(searchBtn);
 		topLayout.setComponentAlignment(searchBtn, Alignment.MIDDLE_CENTER);
 	}
@@ -204,7 +213,7 @@ public class DoctorSearch extends CustomComponent implements ClickListener {
 		// bodyPart
 		loadBodyParts();
 		leftFormLayout.addComponent(bodyPart);
-		
+
 		loadNumberOfDays();
 		leftFormLayout.addComponent(numOfDays);
 
@@ -297,7 +306,7 @@ public class DoctorSearch extends CustomComponent implements ClickListener {
 		procedure.setItemCaptionPropertyId("procedureName");
 		procedure.setRequired(false);
 	}
-	
+
 	private void loadNumberOfDays() {
 		numOfDays = new ComboBox("Search Period:");
 		numOfDays.setContainerDataSource(MedicalArziUtils
@@ -321,7 +330,7 @@ public class DoctorSearch extends CustomComponent implements ClickListener {
 
 		// Set the container as the grid datasource
 		resultsGrid.setContainerDataSource(resultsContainer);
-		
+
 		// Add nested properties to the header
 		resultsContainer.addNestedContainerBean("patient");
 		resultsContainer.addNestedContainerBean("arzi");
@@ -333,26 +342,22 @@ public class DoctorSearch extends CustomComponent implements ClickListener {
 		resultsContainer.addNestedContainerBean("arzi.arziType");
 		resultsContainer.addNestedContainerBean("arzi.bodyPart");
 		resultsContainer.addNestedContainerBean("arzi.condition");
-		resultsContainer
-				.addNestedContainerBean("arzi.conditionStartDate");
+		resultsContainer.addNestedContainerBean("arzi.conditionStartDate");
 		resultsContainer.addNestedContainerBean("arzi.procedure");
 
-		//Setting the grid columns
-		resultsGrid.setColumns("patient.itsNumber",
-				"patient.firstName", "patient.lastName",
-				"patient.jamaat.jamaatName",
-				"patient.jamaat.jamiyatName",
-				"arzi.currentStatus.statusDesc",
-				"arzi.arziType.arziTypeName",
-				"arzi.bodyPart.bodyPartName",
+		// Setting the grid columns
+		resultsGrid.setColumns("patient.itsNumber", "patient.firstName",
+				"patient.lastName", "patient.jamaat.jamaatName",
+				"patient.jamaat.jamiyatName", "arzi.currentStatus.statusDesc",
+				"arzi.arziType.arziTypeName", "arzi.bodyPart.bodyPartName",
 				"arzi.condition.conditionName", "arzi.otherCondition",
 				"arzi.conditionStartDate.gregorianCalDate",
 				"arzi.procedure.procedureName");
 
-		//Customize the grid columns
-		customizeResultsGridColumns();		
+		// Customize the grid columns
+		customizeResultsGridColumns();
 	}
-	
+
 	/**
 	 * This method is responsible for customizing all the grid columns like
 	 * setting the caption, setting the editor fields and grouping the similar
@@ -364,8 +369,9 @@ public class DoctorSearch extends CustomComponent implements ClickListener {
 		resultsGrid.getColumn("patient.itsNumber").setConverter(
 				MedicalArziUtils.itsNumberConverter());
 
+		// Set Header captions
 		resultsGrid.getColumn("arzi.currentStatus.statusDesc")
-				.setHeaderCaption("Arzi Status");
+				.setHeaderCaption("Status");
 
 		resultsGrid
 				.getColumn("arzi.conditionStartDate.gregorianCalDate")
@@ -373,7 +379,57 @@ public class DoctorSearch extends CustomComponent implements ClickListener {
 				.setRenderer(
 						new DateRenderer("%1$tB %1$td, %1$tY", Locale.ENGLISH));
 
-	}	
+		resultsGrid.getColumn("patient.jamaat.jamaatName").setHeaderCaption(
+				"Jamaat");
+
+		resultsGrid.getColumn("patient.jamaat.jamiyatName").setHeaderCaption(
+				"Jamiyat");
+
+		resultsGrid.getColumn("arzi.arziType.arziTypeName").setHeaderCaption(
+				"Type");
+
+		resultsGrid.getColumn("arzi.bodyPart.bodyPartName").setHeaderCaption(
+				"Body Part");
+
+		resultsGrid.getColumn("arzi.condition.conditionName").setHeaderCaption(
+				"Condition");
+
+		resultsGrid.getColumn("arzi.procedure.procedureName").setHeaderCaption(
+				"Procedure");
+
+		// This call prepends the header row to the existing grid
+		HeaderRow searchResultsHeader = resultsGrid.prependHeaderRow();
+
+		// Get hold of the columnID, mind you in my case this is a nestedID
+		// Join the arzi related cells
+		HeaderCell arziStatusCell = searchResultsHeader
+				.getCell("arzi.currentStatus.statusDesc");
+		HeaderCell arziTypeCell = searchResultsHeader
+				.getCell("arzi.arziType.arziTypeName");
+		searchResultsHeader.join(arziStatusCell, arziTypeCell).setText("Arzi");
+
+		// Join the Medical info cells
+		HeaderCell bodyPartCell = searchResultsHeader
+				.getCell("arzi.bodyPart.bodyPartName");
+		HeaderCell condCell = searchResultsHeader
+				.getCell("arzi.condition.conditionName");
+		HeaderCell procCell = searchResultsHeader
+				.getCell("arzi.procedure.procedureName");
+		HeaderCell otherCondCell = searchResultsHeader
+				.getCell("arzi.otherCondition");
+		HeaderCell condStartDtCell = searchResultsHeader
+				.getCell("arzi.conditionStartDate.gregorianCalDate");
+		searchResultsHeader.join(bodyPartCell, condCell, procCell, otherCondCell,
+				condStartDtCell).setText("Medical Information");
+		
+		// Join the Patient info cells
+		HeaderCell itsNumCell = searchResultsHeader.getCell("patient.itsNumber");
+		HeaderCell firstNameCell = searchResultsHeader.getCell("patient.firstName");
+		HeaderCell lastNameCell = searchResultsHeader.getCell("patient.lastName");
+		searchResultsHeader.join(itsNumCell, firstNameCell, lastNameCell).setText(
+				"Patient");	
+		
+	}
 
 	/**
 	 * Implement the button click listener. Called when the 'Search' button is
@@ -395,10 +451,11 @@ public class DoctorSearch extends CustomComponent implements ClickListener {
 
 				ReviewerService reviewerService = ServiceLocator.getInstance()
 						.getReviewerService();
-				
-				Lookup searchPeriod = (Lookup)numOfDays.getValue();
-				
-				//If the user entered the number of days to search as one of the search criteria
+
+				Lookup searchPeriod = (Lookup) numOfDays.getValue();
+
+				// If the user entered the number of days to search as one of
+				// the search criteria
 				if (searchPeriod != null) {
 
 					GregHijDate currentDate = ServiceLocator.getInstance()
@@ -437,11 +494,12 @@ public class DoctorSearch extends CustomComponent implements ClickListener {
 						.searchArzisByCriteria(userEnteredSearchCriteria);
 
 				/**
-				 * Update the Grid with fresh data. Two step process of replacing bean
-				 * items. (1) First remove all BeanItem objects with
-				 * Container::removeAllItems method. (2) Then add replacement BeanItem
-				 * objects with the BeanItemContainer::addAll method.
-				 */				
+				 * Update the Grid with fresh data. Two step process of
+				 * replacing bean items. (1) First remove all BeanItem objects
+				 * with Container::removeAllItems method. (2) Then add
+				 * replacement BeanItem objects with the
+				 * BeanItemContainer::addAll method.
+				 */
 				resultsContainer.removeAllItems();
 				// Add data to the container
 				resultsContainer.addAll(searchResultList);
