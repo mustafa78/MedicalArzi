@@ -86,6 +86,8 @@ public interface MedicalArziConstants {
 	
 	final static public String INBOX_TAB_COMPONENT_ID = "inboxTabComponent";
 	
+	final static public String INBOX_TAB_VIEW_LAYOUT_ID = "inboxTabViewLayout";
+	
 	final static public String SEARCH_TAB_COMPONENT_ID = "searchTabComponent";
 	
 	final static public String NEW_ARZI_TAB_CAPTION = "New Arzi";
