@@ -14,8 +14,8 @@ import com.example.medicalarzi.component.ArziDateField;
 import com.example.medicalarzi.component.ArziFooterComponent;
 import com.example.medicalarzi.component.ArziHeaderComponent;
 import com.example.medicalarzi.component.CustomFormComponent;
-import com.example.medicalarzi.component.DoctorSearch;
 import com.example.medicalarzi.component.InboxComponent;
+import com.example.medicalarzi.component.SearchComponent;
 import com.example.medicalarzi.converter.StringToLookupConverter;
 import com.example.medicalarzi.model.Arzi;
 import com.example.medicalarzi.model.ArziType;
@@ -55,12 +55,12 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.SelectedTabChangeEvent;
 import com.vaadin.ui.TabSheet.SelectedTabChangeListener;
+import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
@@ -108,7 +108,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 	private InboxComponent inboxComponent;
 	
 	// Search Component
-	private DoctorSearch searchComponent;
+	private SearchComponent searchComponent;
 
 	// Buttons layout
 	private HorizontalLayout buttonsLayout;
@@ -186,6 +186,8 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 	private BeanFieldGroup<Arzi> arziFieldsBinder;
 	
 	private Patient patient;
+	
+	private Boolean refreshInbox = false;
 
 	/**
 	 * Service stubs - Could use the @Autowire for the service stubs or get it
@@ -236,6 +238,14 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 
 	public TextField getOtherCondition() {
 		return otherCondition;
+	}
+
+	public Boolean isRefreshInbox() {
+		return refreshInbox;
+	}
+
+	public void setRefreshInbox(Boolean refreshInbox) {
+		this.refreshInbox = refreshInbox;
 	}
 
 	/**
@@ -390,6 +400,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		
 		// gridLayout
 		inboxComponent = new InboxComponent();
+		inboxComponent.setId(MedicalArziConstants.INBOX_TAB_COMPONENT_ID);
 		tabSheet.addTab(inboxComponent,
 				MedicalArziConstants.INBOX_TAB_CAPTION, new ThemeResource(
 						"icons/inbox.png"));
@@ -403,7 +414,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		
 		if (patient.getRoles().contains(adminRole)
 				|| patient.getRoles().contains(doctorRole)) {
-			searchComponent = new DoctorSearch();
+			searchComponent = new SearchComponent();
 			tabSheet.addTab(searchComponent,
 					MedicalArziConstants.SEARCH_TAB_CAPTION, new ThemeResource(
 							"icons/search.png"));
@@ -757,7 +768,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 				// Once the new arzi is submitted, reconstruct the inbox tab to
 				// get the latest data and then switch the selection to the
 				// Inbox tab with the user friendly success message.
-				inboxComponent = new InboxComponent();
+				setRefreshInbox(true);
 				tabSheet.setSelectedTab(inboxComponent);
 
 				MedicalArziUtils.createAndShowNotification(null, successMsg,
@@ -813,14 +824,20 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 			// If the selected tab is Inbox, refetch all the arzis for the user
 			// from the dbase.
 			if (inboxComponent != null
-					&& componentId.equals(inboxComponent.getId())) {
+					&& componentId.equals(inboxComponent.getId()) && isRefreshInbox()) {
 
 				logger.debug("The user has selected the Inbox tab. Reload the tab with the latest content.");
+				
+				// We don't have to refresh the inbox every time we switch tab.
+				// Inbox has to be refresh with the latest content only after
+				// the patient submits a new arzi.
+				setRefreshInbox(false);
 
-				// Fill the tab content when the tab is selected. Remove all the
-				// components from the selected tab and then replace the
+				// Fill the tab content when the tab is selected. Replace the
 				// selected tab with the new tab with the latest contents
-				tabSheet.replaceComponent(selectedTab, new InboxComponent());
+				inboxComponent = new InboxComponent();
+				inboxComponent.setId(MedicalArziConstants.INBOX_TAB_COMPONENT_ID);
+				tabSheet.replaceComponent(selectedTab, inboxComponent);
 
 			} else if (viewLayout != null
 					&& componentId.equals(viewLayout.getId())) {
