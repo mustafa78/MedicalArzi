@@ -163,6 +163,19 @@ public class MedicalArziUtils {
 	}
 	
 	/**
+	 * This method is responsible to access your session attributes through
+	 * class VaadinSession. It returns the object stored in the session for the
+	 * given key.
+	 * 
+	 * @param key
+	 * 
+	 * @return java.lang.Object
+	 */
+	public static Object getSessionAttribute(String key) {
+		return VaadinSession.getCurrent().getAttribute(key);
+	}
+	
+	/**
 	 * This method is responsible for creating a notification based on the
 	 * passed parameters. The notification might be a ERROR, WARNING or USER
 	 * FRIENDLY message. The position on the page is specified by the passed
@@ -197,6 +210,18 @@ public class MedicalArziUtils {
 		VaadinService.getCurrentRequest().setAttribute(key, value);
 	}
 
+	/**
+	 * This method is responsible to access your request attributes through
+	 * class VaadinService. It returns the object stored in the request for the
+	 * given key.
+	 * 
+	 * @param key
+	 * 
+	 * @return java.lang.Object
+	 */
+	public static Object getRequestAttribute(String key) {
+		return VaadinService.getCurrentRequest().getAttribute(key);
+	}
 	
 	/**
 	 * This method is responsible for constructing the patients full name based
@@ -204,7 +229,8 @@ public class MedicalArziUtils {
 	 * title
 	 * 
 	 * @param ptnt
-	 * @return
+	 * 
+	 * @return java.lang.String
 	 */
 	public static String constructPtntFullName(Patient ptnt) {
 		StringBuffer fullName = new StringBuffer();
