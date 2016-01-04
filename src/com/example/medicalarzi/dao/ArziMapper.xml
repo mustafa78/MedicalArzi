@@ -37,6 +37,8 @@
 			select="com.example.medicalarzi.dao.LookupMapper.selectGregHijDateById" />
 		<association property="conditionStartDate" column="condStartDtId" javaType="GregHijDate" 
 			select="com.example.medicalarzi.dao.LookupMapper.selectGregHijDateById" />
+		<association property="requestSubmitDate" column="requestSubmitDtId" javaType="GregHijDate" 
+			select="com.example.medicalarzi.dao.LookupMapper.selectGregHijDateById" />			
   	</resultMap>
   	
   	<resultMap id="ArziResultMap" type="Arzi" extends="ArziHdrResultMap">
@@ -93,7 +95,7 @@
   		(SELECT STATUS_DESC FROM D_STATUS WHERE STATUS_ID = hdr.CURR_STATUS_ID) AS "currentStatusDesc"
   	</sql>
   	
-  	<!-- where clause fragment for the arzi search which are not in draft status-->
+  	<!-- where clause fragment for the arzi search which are not in draft status. Part of it is in CDATA because of the ('>' & '<' )-->
   	<sql id="arziSearchWhere">
   		<where>
   			AND 1=1
