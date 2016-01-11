@@ -68,6 +68,7 @@ public interface ArziMapper {
 	 * entered search criteria.
 	 * 
 	 * @param searchCriteria
+	 * 
 	 * @return java.util.List<com.example.medicalarzi.model.ArziSearchResult>
 	 */
 	public List<ArziSearchResult> selectArzisBySearchCriteria(ArziSearchCriteria searchCriteria);
@@ -77,8 +78,25 @@ public interface ArziMapper {
 	 * the arzi id.
 	 * 
 	 * @param arziId
-	 * @return
+	 * 
+	 * @return com.example.medicalarzi.model.Arzi
 	 */
 	public Arzi selectArziById(@Param("arziId") Long arziId);
+	
+	/**
+	 * This method is responsible for deleting the Arzi record based on the arzi
+	 * id from the header table.
+	 * 
+	 * @param arziId
+	 */
+	public void deleteArziHeaderById(@Param("arziId") Long arziId);
+	
+	/**
+	 * This method is responsible for deleting the Arzi record based on the arzi
+	 * id from the detail table.
+	 * 
+	 * @param arziId
+	 */
+	public void deleteArziDetailById(@Param("arziId") Long arziId);
 
 }

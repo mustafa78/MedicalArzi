@@ -238,10 +238,21 @@
       		<if test="procedure != null">
       			PROC_ID = #{procedure.procedureId,jdbcType=INTEGER},
       		</if>
+      		<if test="currentStatus != null">
+      			CURR_STATUS_ID = #{currentStatus.statusId,jdbcType=INTEGER},
+      		</if>
       		LST_UPDT_USR_ID = #{itsNumber,jdbcType=VARCHAR},
       		LST_UPDT_TS = now()
-      		 where ITS_NBR = #{itsNumber,jdbcType=INTEGER} and 
-      		 	   ARZI_ID = #{arziId,jdbcType=INTEGER}
+      		 where ARZI_ID = #{arziId,jdbcType=INTEGER}
 	    </set>
     </update>
+    
+    <!-- Delete -->
+    <delete id="deleteArziHeaderById">
+    	delete from F_ARZI_HDR where ARZI_ID = #{arziId,jdbcType=INTEGER}
+    </delete>
+    
+    <delete id="deleteArziDetailById">
+    	delete from F_ARZI_DTL where ARZI_ID = #{arziId,jdbcType=INTEGER}
+    </delete>
 </mapper>
