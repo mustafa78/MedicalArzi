@@ -82,19 +82,23 @@ public interface MedicalArziConstants {
 	
 	final static public String CUSTOM_FORM_RIGHTFORM_LAYOUT_ID = "customForm_rightFormLayout";
 	
+	final static public String NEW_ARZI_TAB_CAPTION = "New Arzi";
+	
 	final static public String NEW_ARI_TAB_COMPONENT_ID = "newArziTabComponent";
+	
+	final static public String INBOX_TAB_CAPTION = "Inbox";
 	
 	final static public String INBOX_TAB_COMPONENT_ID = "inboxTabComponent";
 	
 	final static public String INBOX_TAB_VIEW_LAYOUT_ID = "inboxTabViewLayout";
 	
-	final static public String SEARCH_TAB_COMPONENT_ID = "searchTabComponent";
+	final static public String INBOX_TAB_DELETE_ARZI_BUTTON = "inboxTabDeleteArziBtn";
 	
-	final static public String NEW_ARZI_TAB_CAPTION = "New Arzi";
-	
-	final static public String INBOX_TAB_CAPTION = "Inbox";
+	final static public String INBOX_TAB_SUBMIT_ARZI_BUTTON = "inboxTabSubmitArziBtn";
 	
 	final static public String SEARCH_TAB_CAPTION = "Search";
+	
+	final static public String SEARCH_TAB_COMPONENT_ID = "searchTabComponent";
 	
 	//Hint texts, descriptions or any static texts
 	final static public String PASSWORD_HINT_TEXT = "Password must be at least 8 characters long and contain at least 1 number.";
