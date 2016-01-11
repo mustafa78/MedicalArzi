@@ -25,6 +25,8 @@ import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.fieldgroup.PropertyId;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.event.ItemClickEvent;
+import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.Position;
@@ -34,11 +36,15 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.Grid.DetailsGenerator;
 import com.vaadin.ui.Grid.HeaderCell;
 import com.vaadin.ui.Grid.HeaderRow;
+import com.vaadin.ui.Grid.RowReference;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
@@ -46,7 +52,8 @@ import com.vaadin.ui.VerticalSplitPanel;
 import com.vaadin.ui.renderers.DateRenderer;
 import com.vaadin.ui.themes.Reindeer;
 
-public class SearchComponent extends CustomComponent implements ClickListener {
+public class SearchComponent extends CustomComponent implements ClickListener,
+		ItemClickListener {
 
 	private static final long serialVersionUID = -5883684094223685184L;
 
@@ -147,6 +154,8 @@ public class SearchComponent extends CustomComponent implements ClickListener {
 		splitPanel.setLocked(true);
 		splitPanel.setSizeFull();
 		splitPanel.setSplitPosition(62, Unit.PERCENTAGE, true);
+		// Use a custom style
+		splitPanel.addStyleName("invisiblesplitter");
 
 		// topLayout
 		buildTopLayout();
@@ -338,6 +347,7 @@ public class SearchComponent extends CustomComponent implements ClickListener {
 		// Add all the intermediate nested properties (which are also
 		// beans)
 		resultsContainer.addNestedContainerBean("patient.jamaat");
+		resultsContainer.addNestedContainerBean("arzi.requestSubmitDate");
 		resultsContainer.addNestedContainerBean("arzi.currentStatus");
 		resultsContainer.addNestedContainerBean("arzi.arziType");
 		resultsContainer.addNestedContainerBean("arzi.bodyPart");
@@ -348,14 +358,20 @@ public class SearchComponent extends CustomComponent implements ClickListener {
 		// Setting the grid columns
 		resultsGrid.setColumns("patient.itsNumber", "patient.firstName",
 				"patient.lastName", "patient.jamaat.jamaatName",
-				"patient.jamaat.jamiyatName", "arzi.currentStatus.statusDesc",
-				"arzi.arziType.arziTypeName", "arzi.bodyPart.bodyPartName",
-				"arzi.condition.conditionName", "arzi.otherCondition",
+				"patient.jamaat.jamiyatName", "arzi.arziType.arziTypeName",
+				"arzi.currentStatus.statusDesc",
+				"arzi.requestSubmitDate.gregorianCalDate",
+				"arzi.bodyPart.bodyPartName", "arzi.condition.conditionName",
+				"arzi.otherCondition",
 				"arzi.conditionStartDate.gregorianCalDate",
 				"arzi.procedure.procedureName");
 
+		resultsGrid.addItemClickListener(this);
+
 		// Customize the grid columns
 		customizeResultsGridColumns();
+
+		// customizeEditDetails();
 	}
 
 	/**
@@ -366,8 +382,12 @@ public class SearchComponent extends CustomComponent implements ClickListener {
 	 */
 	private void customizeResultsGridColumns() {
 		// Sets the converter on the ITS number to remove the grouping used.
-		resultsGrid.getColumn("patient.itsNumber").setConverter(
-				MedicalArziUtils.itsNumberConverter());
+		resultsGrid.getColumn("patient.itsNumber").setMaximumWidth(100)
+				.setConverter(MedicalArziUtils.itsNumberConverter());
+		
+		resultsGrid.getColumn("patient.firstName").setMaximumWidth(110);
+		
+		resultsGrid.getColumn("patient.lastName").setMaximumWidth(110);
 
 		// Set Header captions
 		resultsGrid.getColumn("arzi.currentStatus.statusDesc")
@@ -375,6 +395,7 @@ public class SearchComponent extends CustomComponent implements ClickListener {
 
 		resultsGrid
 				.getColumn("arzi.conditionStartDate.gregorianCalDate")
+				.setMaximumWidth(160)
 				.setHeaderCaption("Condition Start Date")
 				.setRenderer(
 						new DateRenderer("%1$tB %1$td, %1$tY", Locale.ENGLISH));
@@ -384,6 +405,13 @@ public class SearchComponent extends CustomComponent implements ClickListener {
 
 		resultsGrid.getColumn("patient.jamaat.jamiyatName").setHeaderCaption(
 				"Jamiyat");
+
+		resultsGrid
+				.getColumn("arzi.requestSubmitDate.gregorianCalDate")
+				.setMaximumWidth(160)
+				.setHeaderCaption("Submit Date")
+				.setRenderer(
+						new DateRenderer("%1$tB %1$td, %1$tY", Locale.ENGLISH));
 
 		resultsGrid.getColumn("arzi.arziType.arziTypeName").setHeaderCaption(
 				"Type");
@@ -396,17 +424,23 @@ public class SearchComponent extends CustomComponent implements ClickListener {
 
 		resultsGrid.getColumn("arzi.procedure.procedureName").setHeaderCaption(
 				"Procedure");
+		
+		resultsGrid.getColumn("arzi.otherCondition").setMaximumWidth(150);
 
 		// This call prepends the header row to the existing grid
 		HeaderRow searchResultsHeader = resultsGrid.prependHeaderRow();
 
 		// Get hold of the columnID, mind you in my case this is a nestedID
 		// Join the arzi related cells
-		HeaderCell arziStatusCell = searchResultsHeader
-				.getCell("arzi.currentStatus.statusDesc");
 		HeaderCell arziTypeCell = searchResultsHeader
 				.getCell("arzi.arziType.arziTypeName");
-		searchResultsHeader.join(arziStatusCell, arziTypeCell).setText("Arzi");
+		HeaderCell arziStatusCell = searchResultsHeader
+				.getCell("arzi.currentStatus.statusDesc");
+		HeaderCell arziSubmitDtCell = searchResultsHeader
+				.getCell("arzi.requestSubmitDate.gregorianCalDate");
+		searchResultsHeader
+				.join(arziTypeCell, arziStatusCell, arziSubmitDtCell).setText(
+						"Arzi");
 
 		// Join the Medical info cells
 		HeaderCell bodyPartCell = searchResultsHeader
@@ -419,16 +453,19 @@ public class SearchComponent extends CustomComponent implements ClickListener {
 				.getCell("arzi.otherCondition");
 		HeaderCell condStartDtCell = searchResultsHeader
 				.getCell("arzi.conditionStartDate.gregorianCalDate");
-		searchResultsHeader.join(bodyPartCell, condCell, procCell, otherCondCell,
-				condStartDtCell).setText("Medical Information");
-		
+		searchResultsHeader.join(bodyPartCell, condCell, procCell,
+				otherCondCell, condStartDtCell).setText("Medical Information");
+
 		// Join the Patient info cells
-		HeaderCell itsNumCell = searchResultsHeader.getCell("patient.itsNumber");
-		HeaderCell firstNameCell = searchResultsHeader.getCell("patient.firstName");
-		HeaderCell lastNameCell = searchResultsHeader.getCell("patient.lastName");
-		searchResultsHeader.join(itsNumCell, firstNameCell, lastNameCell).setText(
-				"Patient");	
-		
+		HeaderCell itsNumCell = searchResultsHeader
+				.getCell("patient.itsNumber");
+		HeaderCell firstNameCell = searchResultsHeader
+				.getCell("patient.firstName");
+		HeaderCell lastNameCell = searchResultsHeader
+				.getCell("patient.lastName");
+		searchResultsHeader.join(itsNumCell, firstNameCell, lastNameCell)
+				.setText("Patient");
+
 	}
 
 	/**
@@ -488,6 +525,10 @@ public class SearchComponent extends CustomComponent implements ClickListener {
 
 					userEnteredSearchCriteria
 							.setSearchPeriodDate(dateForSearchPeriod);
+				} else {
+					// Reset the criteria
+					userEnteredSearchCriteria.setCurrentDate(null);
+					userEnteredSearchCriteria.setSearchPeriodDate(null);
 				}
 
 				List<ArziSearchResult> searchResultList = reviewerService
@@ -501,8 +542,15 @@ public class SearchComponent extends CustomComponent implements ClickListener {
 				 * BeanItemContainer::addAll method.
 				 */
 				resultsContainer.removeAllItems();
-				// Add data to the container
-				resultsContainer.addAll(searchResultList);
+				if (searchResultList != null && searchResultList.isEmpty()) {
+					String description = "No results found for the search criteria.";
+					MedicalArziUtils.createAndShowNotification(null,
+							description, Type.ERROR_MESSAGE, Position.TOP_LEFT,
+							"errorMsg", -1);
+				} else {
+					// Add data to the container
+					resultsContainer.addAll(searchResultList);
+				}
 
 			} catch (CommitException ce) {
 				logger.error(ce);
@@ -517,6 +565,45 @@ public class SearchComponent extends CustomComponent implements ClickListener {
 			}
 		}
 
+	}
+
+	@SuppressWarnings("unused")
+	private void customizeEditDetails() {
+		resultsGrid.setDetailsGenerator(new DetailsGenerator() {
+
+			private static final long serialVersionUID = -7252110495819838399L;
+
+			@Override
+			public Component getDetails(RowReference rowReference) {
+				ArziSearchResult res = (ArziSearchResult) rowReference
+						.getItemId();
+
+				VerticalLayout vLayout = new VerticalLayout();
+				vLayout.setMargin(true);
+				vLayout.setSpacing(true);
+
+				Button deleteBtn_grid = new Button("Delete Arzi");
+				Button submiteBtn_grid = new Button("Submit Arzi");
+
+				HorizontalLayout hLayout = new HorizontalLayout(deleteBtn_grid,
+						submiteBtn_grid);
+				hLayout.setComponentAlignment(deleteBtn_grid,
+						Alignment.MIDDLE_CENTER);
+
+				vLayout.addComponent(hLayout);
+
+				return vLayout;
+			}
+		});
+	}
+
+	@Override
+	public void itemClick(ItemClickEvent event) {
+
+		ArziSearchResult itemId = (ArziSearchResult) event.getItemId();
+		// Toggle the visibility of the details
+		resultsGrid.setDetailsVisible(itemId,
+				!resultsGrid.isDetailsVisible(itemId));
 	}
 
 }
