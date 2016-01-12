@@ -94,8 +94,9 @@ public class InboxComponent extends CustomComponent implements
 	private Button submitBtn;
 
 	private Button saveBtn;
-
 	
+	private Button deleteBtn;
+
 	@PropertyId("arziType")
 	private ComboBox arziType;
 
@@ -308,14 +309,22 @@ public class InboxComponent extends CustomComponent implements
 	private void buildButtonsLayout() {
 
 		buttonsLayout = new HorizontalLayout();
+		
+		// cancelBtn
+		deleteBtn = new Button(new ThemeResource("img/delete-arzi.png"));
+		deleteBtn.addClickListener(this);
+		deleteBtn.setStyleName(Reindeer.BUTTON_LINK);
+		buttonsLayout.addComponent(deleteBtn);
+		buttonsLayout.setExpandRatio(deleteBtn, 1.0f);
+		buttonsLayout.setComponentAlignment(deleteBtn, Alignment.MIDDLE_RIGHT);		
 
 		// saveBtn
 		saveBtn = new Button(new ThemeResource("img/save-arzi.png"));
 		saveBtn.addClickListener(this);
 		saveBtn.setStyleName(Reindeer.BUTTON_LINK);
 		buttonsLayout.addComponent(saveBtn);
-		buttonsLayout.setExpandRatio(saveBtn, 1.0f);
-		buttonsLayout.setComponentAlignment(saveBtn, Alignment.MIDDLE_RIGHT);
+		buttonsLayout.setExpandRatio(saveBtn, 0.2f);
+		buttonsLayout.setComponentAlignment(saveBtn, Alignment.MIDDLE_CENTER);
 
 		// submitBtn
 		submitBtn = new Button(new ThemeResource("img/submit-arzi.png"));
@@ -419,8 +428,9 @@ public class InboxComponent extends CustomComponent implements
 
 		arziGrid.getColumn("conditionStartDate.gregorianCalDate")
 				.setHeaderCaption("Condition Start Date")
+				.setMaximumWidth(150)
 				.setRenderer(
-						new DateRenderer("%1$tB %1$td, %1$tY", Locale.ENGLISH));
+						new DateRenderer("%1$tb %1$td, %1$tY", Locale.ENGLISH));
 
 		groupArziGridColumns();
 	}
@@ -664,6 +674,10 @@ public class InboxComponent extends CustomComponent implements
 	@Override
 	public void buttonClick(ClickEvent event) {
 		
+		Arzi selectedArzi = (Arzi) arziGrid.getSelectedRow();
+		
+		String successMsg = "";
+		
 		if (event.getButton().equals(saveBtn)
 				|| event.getButton().equals(submitBtn)) {
 			try {
@@ -674,8 +688,6 @@ public class InboxComponent extends CustomComponent implements
 				Arzi arzi = arziFieldsBinder.getItemDataSource().getBean();
 				
 				// Sets the arziId because the arziId is need for the update.
-				Arzi selectedArzi = (Arzi) arziGrid.getSelectedRow();
-				
 				arzi.setArziId(selectedArzi.getArziId());
 
 				GregHijDate ghReqSubmitDt = getLookupService()
@@ -692,7 +704,7 @@ public class InboxComponent extends CustomComponent implements
 										.getGregorianCalDate()));
 
 				Status arziStatus = new Status();
-				String successMsg = "";
+				
 				// Set the status to "Draft' when Save Btn is clicked and
 				// 'Submitted' when Submit Btn is clicked.
 				if (event.getButton().equals(saveBtn)) {
@@ -721,12 +733,7 @@ public class InboxComponent extends CustomComponent implements
 				// Update the arzi based on the arzi id.
 				getPatientService().updateAnExistingArziInDraftMode(arzi);
 				
-				// Retrieve the list of arzis again and refresh the container
-				// with the new set of data.
-				List<Arzi> arziList = getPatientService().retrieveAllArzisForPatient(patient
-						.getItsNumber());
-				arziContainer.removeAllItems();
-				arziContainer.addAll(arziList);
+				refreshGridWithFreshData();
 				
 				MedicalArziUtils.createAndShowNotification(null, successMsg,
 						Type.HUMANIZED_MESSAGE, Position.TOP_LEFT,
@@ -746,8 +753,40 @@ public class InboxComponent extends CustomComponent implements
 						Position.TOP_LEFT, "errorMsg", -1);
 			}
 
+		} else if (event.getButton().equals(deleteBtn)) {
+			// Deactivate the arzi
+			getPatientService().deactivateAnArziById(selectedArzi.getArziId());
+
+			successMsg = "The arzi \"" + selectedArzi.getArziId() + "\" for \""
+					+ MedicalArziUtils.constructPtntFullName(patient)
+					+ "\" is successfully deleted.";
+
+			refreshGridWithFreshData();
+			
+			MedicalArziUtils.createAndShowNotification(null, successMsg,
+					Type.HUMANIZED_MESSAGE, Position.TOP_LEFT,
+					"userFriendlyMsg",
+					MedicalArziConstants.USER_FRIENDLY_MSG_DELAY_MSEC);
 		}
 	}
+
+	/**
+	 * This method is responsible for fetching the arzis for the user from the
+	 * database and updating the datasource container for the arzi grid with the
+	 * latest set of data.
+	 * 
+	 */
+	private void refreshGridWithFreshData() {
+		// Retrieve the list of arzis again and refresh the container
+		// with the new set of data.
+		List<Arzi> arziList = getPatientService().retrieveAllArzisForPatient(patient
+				.getItsNumber());
+		
+		arziContainer.removeAllItems();
+		
+		arziContainer.addAll(arziList);
+	}
+	
 
 	@Override
 	public Component getDetails(RowReference rowReference) {
