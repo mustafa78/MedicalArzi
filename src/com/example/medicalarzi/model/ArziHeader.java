@@ -47,6 +47,8 @@ public class ArziHeader implements Serializable {
 	private GregHijDate currentStatusDate = new GregHijDate();
 
 	private GregHijDate conditionStartDate = new GregHijDate();
+	
+	private Boolean activeInd;
 
 	protected String createdBy;
 
@@ -183,6 +185,14 @@ public class ArziHeader implements Serializable {
 		this.otherCondition = otherCondition;
 	}
 	
+	public Boolean getActiveInd() {
+		return activeInd;
+	}
+
+	public void setActiveInd(Boolean activeInd) {
+		this.activeInd = activeInd;
+	}
+
 	@Override
 	public String toString() {
 		return (new ReflectionToStringBuilder(this,

@@ -98,5 +98,14 @@ public interface ArziMapper {
 	 * @param arziId
 	 */
 	public void deleteArziDetailById(@Param("arziId") Long arziId);
+	
+	/**
+	 * This method is responsible for updating the active indicator for the arzi
+	 * to 'N'. It is a soft delete of the arzi instead of purging it from the
+	 * database.
+	 * 
+	 * @param arziId
+	 */
+	public void updateArziHdrActiveInd(@Param("arziId") Long arziId);
 
 }

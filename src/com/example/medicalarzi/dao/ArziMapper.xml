@@ -6,6 +6,7 @@
 	    <id column="ARZI_ID" property="arziId" jdbcType="INTEGER" />
 	    <result column="ptntItsNbr" property="itsNumber" jdbcType="INTEGER" />
 	    <result column="otherCond" property="otherCondition" jdbcType="VARCHAR" />
+	    <result column="activeInd" property="activeInd" jdbcType="VARCHAR" javaType="BOOLEAN" />
 	    <result column="hdrCreateUserId" property="createdBy" jdbcType="VARCHAR" />
 	    <result column="hdrCreateTS" property="createdDate" jdbcType="TIMESTAMP" />
 	    <result column="hdrLastUpdUserId" property="updatedBy" jdbcType="VARCHAR" />
@@ -69,6 +70,7 @@
   		hdr.BDY_PRT_ID as "bodyPartId",
   		hdr.COND_ID as "conditionId",
   		hdr.OTHR_COND as "otherCond",
+  		hdr.ACTV_IND as "activeInd",
   		hdr.COND_STRT_DT_ID as "condStartDtId",
   		hdr.CURR_STATUS_ID as "currentStatusId",
   		hdr.CURR_STATUS_DT_ID as "currStatusDtId",
@@ -100,6 +102,7 @@
   		<where>
   			AND 1=1
   			AND hdr.CURR_STATUS_ID != 1000
+  			AND hdr.ACTV_IND = 'Y'
   			<if test="itsNumber != null and itsNumber != ''">
 				AND ptnt.PTNT_ITS_NBR = #{itsNumber,jdbcType=INTEGER}
 			</if>
@@ -142,7 +145,8 @@
 		on 
 			hdr.ARZI_ID = dtl.ARZI_ID
 		where 
-			hdr.ITS_NBR = #{itsNumber,jdbcType=INTEGER}
+			hdr.ITS_NBR = #{itsNumber,jdbcType=INTEGER} and
+			hdr.ACTV_IND = 'Y'
 	</select>
 	
 	<!-- Select an arzi for the patient based on the ITS number and arzi id -->
@@ -245,6 +249,11 @@
       		LST_UPDT_TS = now()
       		 where ARZI_ID = #{arziId,jdbcType=INTEGER}
 	    </set>
+    </update>
+    
+    <update id="updateArziHdrActiveInd">
+    	update F_ARZI_HDR set ACTV_IND = 'N' 
+    		where ARZI_ID = #{arziId,jdbcType=INTEGER}
     </update>
     
     <!-- Delete -->

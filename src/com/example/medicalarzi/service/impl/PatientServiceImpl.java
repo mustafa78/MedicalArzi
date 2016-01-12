@@ -176,4 +176,13 @@ public class PatientServiceImpl implements PatientService {
 
 	}
 
+	@Override
+	public void deactivateAnArziById(Long arziId) {
+		logger.debug("Deleting/Deactivating arzi with \"" + arziId + "\" ");
+
+		arziMapper.updateArziHdrActiveInd(arziId);
+
+		logger.debug("Arzi with \"" + arziId + "\" successfully deactivated");
+	}
+
 }

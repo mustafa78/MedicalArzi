@@ -111,5 +111,15 @@ public interface PatientService {
 	 * @param editedArzi
 	 */
 	public void updateAnExistingArziInDraftMode(Arzi editedArzi);
+	
+	/**
+	 * This method is responsible for the soft delete of an arzi instead of
+	 * purging it from the database. It just toggles the active indicator for
+	 * the arzi to 'N' when the user tries to delete an arzi in the 'Draft'
+	 * status
+	 * 
+	 * @param arziId
+	 */
+	public void deactivateAnArziById(Long arziId);
 
 }
