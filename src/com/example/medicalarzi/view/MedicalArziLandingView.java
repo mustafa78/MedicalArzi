@@ -60,7 +60,6 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.SelectedTabChangeEvent;
 import com.vaadin.ui.TabSheet.SelectedTabChangeListener;
-import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
@@ -116,8 +115,6 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 	private Button submitBtn;
 
 	private Button saveBtn;
-
-	private Button cancelBtn;
 
 	// Footer
 	private ArziFooterComponent footer;
@@ -178,7 +175,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 	@PropertyId("otherCondition")
 	private TextField otherCondition;
 
-	private TextArea description;
+	//private TextArea description;
 
 	// Binding Fields
 	private BeanFieldGroup<Patient> ptntFieldsBinder;
@@ -668,25 +665,16 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 
 		buttonsLayout = new HorizontalLayout();
 
-		// cancelBtn
-		cancelBtn = new Button(new ThemeResource("img/cancel.png"));
-		cancelBtn.setStyleName(Reindeer.BUTTON_LINK);
-		cancelBtn.addClickListener(this);
-		cancelBtn.setImmediate(true);
-		buttonsLayout.addComponent(cancelBtn);
-		buttonsLayout.setExpandRatio(cancelBtn, 1.0f);
-		buttonsLayout.setComponentAlignment(cancelBtn, Alignment.MIDDLE_RIGHT);
-
 		// saveBtn
-		saveBtn = new Button(new ThemeResource("img/save.png"));
+		saveBtn = new Button(new ThemeResource("img/save-arzi.png"));
 		saveBtn.addClickListener(this);
 		saveBtn.setStyleName(Reindeer.BUTTON_LINK);
 		buttonsLayout.addComponent(saveBtn);
-		buttonsLayout.setExpandRatio(saveBtn, 0.2f);
-		buttonsLayout.setComponentAlignment(saveBtn, Alignment.MIDDLE_CENTER);
+		buttonsLayout.setExpandRatio(saveBtn, 1.0f);
+		buttonsLayout.setComponentAlignment(saveBtn, Alignment.MIDDLE_RIGHT);
 
 		// submitBtn
-		submitBtn = new Button(new ThemeResource("img/submit.png"));
+		submitBtn = new Button(new ThemeResource("img/submit-arzi.png"));
 		submitBtn.addClickListener(this);
 		submitBtn.setStyleName(Reindeer.BUTTON_LINK);
 		buttonsLayout.addComponent(submitBtn);
@@ -704,10 +692,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 
 	@Override
 	public void buttonClick(ClickEvent event) {
-		if (event.getButton().equals(cancelBtn)) {
-			logger.debug("Cancel Button Clicked.");
-
-		} else if (event.getButton().equals(saveBtn)
+		if (event.getButton().equals(saveBtn)
 				|| event.getButton().equals(submitBtn)) {
 
 			// Insert a new arzi into the database and change the status to
