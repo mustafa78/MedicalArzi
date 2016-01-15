@@ -79,7 +79,6 @@ public class MedicalArziUtils {
 	 * @return com.vaadin.ui.Component
 	 */
 	public static Component findById(HasComponents root, String id) {
-		logger.debug("Finding the component: " + root);
 
 		Iterator<Component> iterate = root.iterator();
 
@@ -194,7 +193,9 @@ public class MedicalArziUtils {
 			String cssStyleName, int delayMsec) {
 		Notification notif = new Notification(caption, description, type, true);
 		notif.setDelayMsec(delayMsec);
-		notif.setStyleName(cssStyleName);
+		if(StringUtils.isNotBlank(cssStyleName)) {
+			notif.setStyleName(cssStyleName);
+		}
 		notif.setPosition(position);
 		notif.show(Page.getCurrent());
 	}
@@ -211,7 +212,7 @@ public class MedicalArziUtils {
 	}
 
 	/**
-	 * This method is responsible to access your request attributes through
+	 * This method is responsible to access the request attributes through
 	 * class VaadinService. It returns the object stored in the request for the
 	 * given key.
 	 * 
@@ -278,6 +279,8 @@ public class MedicalArziUtils {
 			fullName.append(ptnt.getLastName());
 		}
 		
+		logger.debug("Patient's full name: " + fullName.toString());
+		
 		return fullName.toString();
 	}	
 	
@@ -311,42 +314,55 @@ public class MedicalArziUtils {
 	 * 
 	 * @param caption
 	 * @param inputPrompt
-	 * @param requiredErrorMsg
 	 * @param items
 	 * @param propertyId
 	 * @param container
+	 * @param isRequired
+	 * @param requiredErrorMsg  
 	 * 
 	 * @return com.vaadin.ui.Field<?>
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static Field<?> getComboBox(String caption, String inputPrompt,
-			String requiredErrorMsg, Collection<?> items, Object propertyId,
-			Container container, Converter converter) {
+			Collection<?> items, Object propertyId, Container container,
+			Converter converter, Boolean isRequired, String requiredErrorMsg) {
 		ComboBox comboBox = new ComboBox(caption);
-		// comboBox.setNullSelectionAllowed(true);
+		comboBox.setImmediate(true);
 		comboBox.setInputPrompt(inputPrompt);
 		comboBox.setContainerDataSource(container);
 		comboBox.addItems(items);
 		comboBox.setItemCaptionMode(ItemCaptionMode.PROPERTY);
 		comboBox.setItemCaptionPropertyId(propertyId);
-		if(converter != null) {
+		if (converter != null) {
 			comboBox.setConverter(converter);
 		}
-		comboBox.setRequired(true);
-		comboBox.setRequiredError(requiredErrorMsg);
+		comboBox.setRequired(isRequired);
+		if (StringUtils.isNotBlank(requiredErrorMsg)) {
+			comboBox.setRequiredError(requiredErrorMsg);
+		}
 		return comboBox;
 	}
 	
+
 	/**
 	 * 
-	 * @param flag
+	 * @param caption
+	 * @param isEnabled
+	 * @param isRequired
+	 * @param requiredErrorMsg
 	 * 
 	 * @return com.vaadin.ui.Field<?>
 	 */
-	public static Field<?> getTextFieldEditor(Boolean flag) {
-	    TextField textField = new TextField();
-	    textField.setNullRepresentation("");
-	    textField.setEnabled(flag);
-	    return textField;
-	}	
+	public static Field<?> getTextFieldEditor(String caption,
+			Boolean isEnabled, Boolean isRequired, String requiredErrorMsg) {
+		TextField textField = new TextField(caption);
+		textField.setNullRepresentation("");
+		textField.setEnabled(isEnabled);
+		textField.setRequired(isRequired);
+		if (StringUtils.isNotBlank(requiredErrorMsg)) {
+			textField.setRequiredError(requiredErrorMsg);
+		}
+
+		return textField;
+	}
 }
