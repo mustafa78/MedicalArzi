@@ -395,10 +395,10 @@ public class SearchComponent extends CustomComponent implements ClickListener,
 
 		resultsGrid
 				.getColumn("arzi.conditionStartDate.gregorianCalDate")
-				.setMaximumWidth(160)
+				.setMaximumWidth(140)
 				.setHeaderCaption("Condition Start Date")
 				.setRenderer(
-						new DateRenderer("%1$tB %1$td, %1$tY", Locale.ENGLISH));
+						new DateRenderer("%1$tb %1$td, %1$tY", Locale.ENGLISH));
 
 		resultsGrid.getColumn("patient.jamaat.jamaatName").setHeaderCaption(
 				"Jamaat");
@@ -408,10 +408,10 @@ public class SearchComponent extends CustomComponent implements ClickListener,
 
 		resultsGrid
 				.getColumn("arzi.requestSubmitDate.gregorianCalDate")
-				.setMaximumWidth(160)
+				.setMaximumWidth(130)
 				.setHeaderCaption("Submit Date")
 				.setRenderer(
-						new DateRenderer("%1$tB %1$td, %1$tY", Locale.ENGLISH));
+						new DateRenderer("%1$tb %1$td, %1$tY", Locale.ENGLISH));
 
 		resultsGrid.getColumn("arzi.arziType.arziTypeName").setHeaderCaption(
 				"Type");
