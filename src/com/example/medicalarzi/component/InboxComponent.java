@@ -30,6 +30,8 @@ import com.example.medicalarzi.service.ServiceLocator;
 import com.example.medicalarzi.util.MedicalArziConstants;
 import com.example.medicalarzi.util.MedicalArziUtils;
 import com.vaadin.data.Container;
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.fieldgroup.PropertyId;
@@ -69,7 +71,7 @@ import com.vaadin.ui.themes.Reindeer;
  *
  */
 public class InboxComponent extends CustomComponent implements
-		ItemClickListener, SelectionListener, DetailsGenerator, ClickListener {
+		SelectionListener, ClickListener, ValueChangeListener {
 
 	private static final long serialVersionUID = 2521689363206700694L;
 	
@@ -192,7 +194,7 @@ public class InboxComponent extends CustomComponent implements
 		
 		// inboxViewLayout
 		inboxViewLayout = new VerticalLayout();
-		inboxViewLayout.setId(MedicalArziConstants.INBOX_TAB_VIEW_LAYOUT_ID);
+		inboxViewLayout.setId(MedicalArziConstants.INBOX_COMPONENT_VIEW_LAYOUT_ID);
 		inboxViewLayout.setSizeFull();
 		inboxViewLayout.setMargin(true);
 		inboxViewLayout.setSpacing(true);	
@@ -273,6 +275,7 @@ public class InboxComponent extends CustomComponent implements
 		leftFormLayout.addComponent(arziType);
 		
 		condition = (ComboBox) getField(Condition.class);
+		condition.addValueChangeListener(this);
 		leftFormLayout.addComponent(condition);
 		
 		otherCondition = (TextField) getField(String.class);
@@ -388,13 +391,9 @@ public class InboxComponent extends CustomComponent implements
 		// Customize the columns
 		customizeArziGridColumns();
 		
-		// Customize the details
-		arziGrid.setDetailsGenerator(this);
-		
 		//Add the event listener on the grid on selecting a row.
 		arziGrid.addSelectionListener(this);
 		//arziGrid.addItemClickListener(this);
-
 	}
 	
 	
@@ -556,7 +555,7 @@ public class InboxComponent extends CustomComponent implements
 		HeaderCell ptntArziInfoHeaderCell = ptntMedicalInfoHeader.join(arziId,
 				currentStatus, arziType);
 		
-		ptntArziInfoHeaderCell.setText("Arzi");
+		ptntArziInfoHeaderCell.setHtml("<b>Arzi</b>");
 		
 		// Get hold of the columnID, mind you in my case this is a nestedID
 		HeaderCell condition = ptntMedicalInfoHeader.getCell("condition.conditionName");
@@ -571,7 +570,7 @@ public class InboxComponent extends CustomComponent implements
 				condition, otherCondition, conditionStartDt, procedure,
 				bodyPart);
 
-		ptntMedicalInfoHeaderCell.setText("Medical Information");
+		ptntMedicalInfoHeaderCell.setHtml("<b>Medical Information</b>");
 	}
 	
 	/**
@@ -590,40 +589,6 @@ public class InboxComponent extends CustomComponent implements
 		return arziGridFieldsBinder;
 	}	
 
-	/**
-	 * This is the itemClick listener which listens to the click event on any of
-	 * the grid items (row). Override this when the ItemClickListener is added
-	 * to the grid
-	 * 
-	 * @param event
-	 */
-	@Override
-	public void itemClick(ItemClickEvent event) {
-		// Get the selected arzi item
-		Arzi selectedArzi = (Arzi) event.getItemId();
-		
-		if(event.isDoubleClick()) {
-			arziGrid.setDetailsVisible(selectedArzi, false);
-		}
-
-		// The patient can only delete or submit the arzis in draft status.
-		// The details section will have the Submit and Delete buttons.
-		if (selectedArzi.getCurrentStatus().getStatusId().intValue() == MedicalArziConstants.ARZI_DRAFT_STATUS
-				.intValue()) {
-			arziGrid.setEditorEnabled(true);
-
-			// Toggle the visibility of the details
-			arziGrid.setDetailsVisible(selectedArzi,
-					!arziGrid.isDetailsVisible(selectedArzi));
-		} else {
-			arziGrid.setEditorEnabled(false);
-		}
-
-		logger.debug("The patient with ITS number:-> " + patient.getItsNumber()
-				+ " selected arzi : " + selectedArzi.getArziId()
-				+ " for editing");
-
-	}
 
 	/**
 	 * This is the itemClick listener which listens to the click event on any of
@@ -638,28 +603,27 @@ public class InboxComponent extends CustomComponent implements
 		Arzi selectedArzi = (Arzi) arziGrid.getSelectedRow();
 
 		if (selectedArzi != null) {
+			
+			arziType.select(selectedArzi.getArziType());
+
+			condition.select(selectedArzi.getCondition());
+			
+			conditionStartDate.setValue(selectedArzi
+					.getConditionStartDate().getGregorianCalDate());
+
+			procedure.select(selectedArzi.getProcedure());
+
+			bodyPart.select(selectedArzi.getBodyPart());
+
+			if (StringUtils.isNotBlank(selectedArzi.getOtherCondition())) {
+				otherCondition.setValue(selectedArzi.getOtherCondition());
+			}			
 			// The form should not be editable if the arzi is in the 'Submitted'
 			// status
 			if (selectedArzi.getCurrentStatus().getStatusId().intValue() == MedicalArziConstants.ARZI_DRAFT_STATUS
 					.intValue()) {
-
 				// Set the form elements with the data of the selected arzi.
 				editArziFormLayout.setEnabled(true);
-
-				arziType.select(selectedArzi.getArziType());
-
-				condition.select(selectedArzi.getCondition());
-				
-				conditionStartDate.setValue(selectedArzi
-						.getConditionStartDate().getGregorianCalDate());
-
-				procedure.select(selectedArzi.getProcedure());
-
-				bodyPart.select(selectedArzi.getBodyPart());
-
-				if (StringUtils.isNotBlank(selectedArzi.getOtherCondition())) {
-					otherCondition.setValue(selectedArzi.getOtherCondition());
-				}
 
 			} else {
 				editArziFormLayout.setEnabled(false);
@@ -776,7 +740,7 @@ public class InboxComponent extends CustomComponent implements
 	 * latest set of data.
 	 * 
 	 */
-	private void refreshGridWithFreshData() {
+	public void refreshGridWithFreshData() {
 		// Retrieve the list of arzis again and refresh the container
 		// with the new set of data.
 		List<Arzi> arziList = getPatientService().retrieveAllArzisForPatient(patient
@@ -787,31 +751,6 @@ public class InboxComponent extends CustomComponent implements
 		arziContainer.addAll(arziList);
 	}
 	
-
-	@Override
-	public Component getDetails(RowReference rowReference) {
-		//Arzi arzi = (Arzi) rowReference.getItemId();
-		
-		VerticalLayout vLayout = new VerticalLayout();
-		vLayout.setMargin(true);
-		
-		Button deleteArziButton = new Button("Delete Arzi");
-		deleteArziButton.setId(MedicalArziConstants.INBOX_TAB_DELETE_ARZI_BUTTON);
-		deleteArziButton.addClickListener(this);
-		
-		Button submitArziButton = new Button("Submit Arzi");
-		submitArziButton.setId(MedicalArziConstants.INBOX_TAB_SUBMIT_ARZI_BUTTON);
-		submitArziButton.addClickListener(this);
-		
-		HorizontalLayout hLayout = new HorizontalLayout(deleteArziButton, submitArziButton);
-		hLayout.setMargin(true);
-		hLayout.setSpacing(true);
-		
-		vLayout.addComponent(hLayout);
-		vLayout.setComponentAlignment(hLayout, Alignment.MIDDLE_CENTER);
-		
-		return vLayout;
-	}	
 	
 	/**
 	 * This method is responsible for returning the right field based on the
@@ -864,6 +803,27 @@ public class InboxComponent extends CustomComponent implements
 		}
 
 		return field;
+	}
+
+	@Override
+	public void valueChange(ValueChangeEvent event) {
+
+		// Select/Deselect the other condition box based on the the value
+		// selection in the condition combobox.
+		if (event.getProperty().getValue() instanceof Condition) {
+
+			Condition selectedCondition = (Condition) event.getProperty()
+					.getValue();
+
+			if (selectedCondition.getConditionId().intValue() == MedicalArziConstants.MAP_OTHER_CONDITION_ID
+					.intValue()) {
+				otherCondition.setVisible(true);
+				otherCondition.setRequired(true);
+			} else {
+				otherCondition.setVisible(false);
+				otherCondition.setRequired(false);
+			}
+		}
 	}
 
 }
