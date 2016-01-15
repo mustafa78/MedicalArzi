@@ -74,6 +74,8 @@ public interface MedicalArziConstants {
 	final static public String FORGOT_PSWD_EMAIL_BODY = "FP_EmailBody";
 	
 	//Component Ids
+	final static public String ARZI_LANDING_VIEW_TABSHEET = "arziLandingView";
+	
 	final static public String HEADER_LOGOUT_BUTTON_ID = "header_logoutBtn";
 	
 	final static public String HEADER_LOGGED_IN_PTNT_NAME = "header_loggedInPtntName";
@@ -84,21 +86,25 @@ public interface MedicalArziConstants {
 	
 	final static public String NEW_ARZI_TAB_CAPTION = "New Arzi";
 	
-	final static public String NEW_ARI_TAB_COMPONENT_ID = "newArziTabComponent";
+	final static public String NEW_ARZI_TAB_COMPONENT_ID = "newArziTabComponent";
+	
+	final static public String ARZI_FORM_COMPONENT_VIEW_LAYOUT_ID = "arziFormComponentViewLayout";
 	
 	final static public String INBOX_TAB_CAPTION = "Inbox";
 	
 	final static public String INBOX_TAB_COMPONENT_ID = "inboxTabComponent";
 	
-	final static public String INBOX_TAB_VIEW_LAYOUT_ID = "inboxTabViewLayout";
+	final static public String INBOX_COMPONENT_VIEW_LAYOUT_ID = "inboxComponentViewLayout";
 	
-	final static public String INBOX_TAB_DELETE_ARZI_BUTTON = "inboxTabDeleteArziBtn";
+	final static public String INBOX_COMPONENT_DELETE_ARZI_BUTTON = "inboxComponentDeleteArziBtn";
 	
-	final static public String INBOX_TAB_SUBMIT_ARZI_BUTTON = "inboxTabSubmitArziBtn";
+	final static public String INBOX_COMPONENT_SUBMIT_ARZI_BUTTON = "inboxComponentSubmitArziBtn";
 	
 	final static public String SEARCH_TAB_CAPTION = "Search";
 	
 	final static public String SEARCH_TAB_COMPONENT_ID = "searchTabComponent";
+	
+	final static public String ADMIN_TAB_CAPTION = "Administration";
 	
 	//Hint texts, descriptions or any static texts
 	final static public String PASSWORD_HINT_TEXT = "Password must be at least 8 characters long and contain at least 1 number.";
