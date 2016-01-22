@@ -70,11 +70,14 @@ $v-error-indicator-color: #ed473b;
 	
 	/*To remove the horizontal scrollbar on the search tab*/
 	.v-scrollable {
-		overflow: hidden;
+		overflow-x: hidden;
 	}
 	
-
-	// Insert your own theme rules here
+	.v-grid-editor-message {
+		font-color: #B52525;
+	}
+	
+	/***Insert your own theme rules here******/
   	.banner {
 		//background-image: url("img/banner-bkgnd-1.png") !important;
 		background: -webkit-linear-gradient(left top, #1F323D, #93ADBE); /* For Safari 5.1 to 6.0 */
@@ -168,7 +171,7 @@ $v-error-indicator-color: #ed473b;
 		width: 100%;
 		margin-top: 108px !important;
 		font-size: 12px;
-		background-color: #ca3030;
+		background: #b40000 url(../reindeer/notification/img/error-close.png) no-repeat right top;
 	}
 	
 	.errorLabel {
@@ -211,5 +214,14 @@ $v-error-indicator-color: #ed473b;
 		padding-bottom: 10px;
 	}
 	
+	/*Make the vertical splitter invisible for the Vertical Split Panel*/
+	.v-splitpanel-vsplitter-invisiblesplitter, .v-splitpanel-vsplitter-invisiblesplitter-locked {
+    	height: 0px;
+	} 	
+	
+	/* Style the right container */
+	.invisiblesplitter .v-splitpanel-second-container {
+    	background: #B6C9D3;
+	}
 
 }
