@@ -8,6 +8,7 @@ import java.util.Locale;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.example.medicalarzi.model.Arzi;
 import com.example.medicalarzi.model.ArziSearchCriteria;
 import com.example.medicalarzi.model.ArziSearchResult;
 import com.example.medicalarzi.model.ArziType;
@@ -16,18 +17,21 @@ import com.example.medicalarzi.model.Condition;
 import com.example.medicalarzi.model.GregHijDate;
 import com.example.medicalarzi.model.Jamaat;
 import com.example.medicalarzi.model.Lookup;
+import com.example.medicalarzi.model.Patient;
 import com.example.medicalarzi.model.Procedure;
 import com.example.medicalarzi.service.ReviewerService;
 import com.example.medicalarzi.service.ServiceLocator;
 import com.example.medicalarzi.util.MedicalArziConstants;
 import com.example.medicalarzi.util.MedicalArziUtils;
+import com.example.medicalarzi.view.MedicalArziLandingView;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.fieldgroup.PropertyId;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.event.ItemClickEvent;
-import com.vaadin.event.ItemClickEvent.ItemClickListener;
+import com.vaadin.event.SelectionEvent;
+import com.vaadin.event.SelectionEvent.SelectionListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
+import com.vaadin.navigator.View;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.Position;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
@@ -40,20 +44,19 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Grid;
-import com.vaadin.ui.Grid.DetailsGenerator;
 import com.vaadin.ui.Grid.HeaderCell;
 import com.vaadin.ui.Grid.HeaderRow;
-import com.vaadin.ui.Grid.RowReference;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.VerticalSplitPanel;
 import com.vaadin.ui.renderers.DateRenderer;
 import com.vaadin.ui.themes.Reindeer;
 
-public class SearchComponent extends CustomComponent implements ClickListener,
-		ItemClickListener {
+public class SearchComponent extends CustomComponent implements ClickListener, SelectionListener
+		 {
 
 	private static final long serialVersionUID = -5883684094223685184L;
 
@@ -366,12 +369,11 @@ public class SearchComponent extends CustomComponent implements ClickListener,
 				"arzi.conditionStartDate.gregorianCalDate",
 				"arzi.procedure.procedureName");
 
-		resultsGrid.addItemClickListener(this);
+		resultsGrid.addSelectionListener(this);
 
 		// Customize the grid columns
 		customizeResultsGridColumns();
 
-		// customizeEditDetails();
 	}
 
 	/**
@@ -567,43 +569,117 @@ public class SearchComponent extends CustomComponent implements ClickListener,
 
 	}
 
-	@SuppressWarnings("unused")
-	private void customizeEditDetails() {
-		resultsGrid.setDetailsGenerator(new DetailsGenerator() {
-
-			private static final long serialVersionUID = -7252110495819838399L;
-
-			@Override
-			public Component getDetails(RowReference rowReference) {
-				ArziSearchResult res = (ArziSearchResult) rowReference
-						.getItemId();
-
-				VerticalLayout vLayout = new VerticalLayout();
-				vLayout.setMargin(true);
-				vLayout.setSpacing(true);
-
-				Button deleteBtn_grid = new Button("Delete Arzi");
-				Button submiteBtn_grid = new Button("Submit Arzi");
-
-				HorizontalLayout hLayout = new HorizontalLayout(deleteBtn_grid,
-						submiteBtn_grid);
-				hLayout.setComponentAlignment(deleteBtn_grid,
-						Alignment.MIDDLE_CENTER);
-
-				vLayout.addComponent(hLayout);
-
-				return vLayout;
-			}
-		});
-	}
-
 	@Override
-	public void itemClick(ItemClickEvent event) {
+	public void select(SelectionEvent event) {
+		ArziSearchResult selectedResult = (ArziSearchResult) resultsGrid
+				.getSelectedRow();
 
-		ArziSearchResult itemId = (ArziSearchResult) event.getItemId();
-		// Toggle the visibility of the details
-		resultsGrid.setDetailsVisible(itemId,
-				!resultsGrid.isDetailsVisible(itemId));
+		if (selectedResult != null) {
+			// Get the current view and set the selected tab to Inbox to
+			// display the newly saved/submitted arzi in the Inbox.
+			View currentView = UI.getCurrent().getNavigator().getCurrentView();
+
+			if (currentView instanceof MedicalArziLandingView) {
+				MedicalArziLandingView landingView = (MedicalArziLandingView) currentView;
+
+				ArziFormComponent reviewArziComponent = populateTheFormWithSelectedResult(selectedResult);
+
+				String reviewArziCaption = MedicalArziConstants.REVIEW_ARZI_TAB_CAPTION
+						+ " - " + selectedResult.getArzi().getArziId();
+
+				String reviewArziTabId = MedicalArziConstants.REVIEW_ARZI_TAB_ID_PREFIX
+						+ " _ " + selectedResult.getArzi().getArziId();
+
+				// Add the tab for the arzi which is being reviewed.
+				Tab reviewArziTab = landingView.getTabSheet().addTab(
+						reviewArziComponent, reviewArziCaption);
+				reviewArziTab.setId(reviewArziTabId);
+				reviewArziTab.setClosable(true);
+			}
+
+		}
+		
+	}
+	
+	/**
+	 * This method is responsible for populating the fields on the
+	 * ArziFormComponent with the arzi and patient information fetched from the
+	 * selected result row.
+	 * 
+	 * @param reviewArziComponent
+	 * @param selectedResult
+	 * 
+	 * @return com.example.medicalarzi.component.ArziFormComponent
+	 */
+	private ArziFormComponent populateTheFormWithSelectedResult(
+			ArziSearchResult selectedResult) {
+		
+		// Extract the arzi and the patient information
+		Arzi arziInfo = selectedResult.getArzi();
+		
+		Patient ptntInfo = selectedResult.getPatient();
+		
+		ArziFormComponent reviewArziComponent = new ArziFormComponent(ptntInfo, arziInfo);
+		
+		reviewArziComponent.getItsNumber().setValue(
+				String.valueOf(ptntInfo.getItsNumber()));
+		
+		makeFieldsReadOnlyWhenReviewing(reviewArziComponent);
+		
+		Component buttonLayout = MedicalArziUtils.findById(reviewArziComponent,
+				MedicalArziConstants.ARZI_FORM_COMPONENT_BUTTON_LAYOUT_ID);
+		
+		buttonLayout.setVisible(false);
+		
+		return reviewArziComponent;
+
+	}
+	
+	/**
+	 * 
+	 * @param reviewArziComponent
+	 */
+	private void makeFieldsReadOnlyWhenReviewing(
+			ArziFormComponent reviewArziComponent) {
+		// Patient's profile information set to read only.
+		reviewArziComponent.getItsNumber().setReadOnly(true);
+
+		reviewArziComponent.getFirstName().setReadOnly(true);
+
+		reviewArziComponent.getMiddleName().setReadOnly(true);
+
+		reviewArziComponent.getLastName().setReadOnly(true);
+
+		reviewArziComponent.getGender().setReadOnly(true);
+
+		reviewArziComponent.getDob().setReadOnly(true);
+
+		reviewArziComponent.getAddressLn1().setReadOnly(true);
+
+		reviewArziComponent.getAddressLn2().setReadOnly(true);
+
+		reviewArziComponent.getCity().setReadOnly(true);
+
+		reviewArziComponent.getCountryState().setReadOnly(true);
+
+		reviewArziComponent.getZip().setReadOnly(true);
+		
+		reviewArziComponent.getJamaat().setReadOnly(true);
+		
+		// Patient's arzi information set to read only.
+		reviewArziComponent.getArziType().setReadOnly(true);
+		
+		reviewArziComponent.getBodyPart().setReadOnly(true);
+		
+		reviewArziComponent.getProcedure().setReadOnly(true);
+		
+		reviewArziComponent.getCondition().setReadOnly(true);
+		
+		reviewArziComponent.getConditionStartDate().setReadOnly(true);
+		
+		if(reviewArziComponent.getOtherCondition() != null)
+			reviewArziComponent.getOtherCondition().setReadOnly(true);
+		
 	}
 
 }
