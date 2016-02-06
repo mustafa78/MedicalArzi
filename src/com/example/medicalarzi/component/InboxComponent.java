@@ -36,8 +36,6 @@ import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.fieldgroup.PropertyId;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.event.ItemClickEvent;
-import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.event.SelectionEvent;
 import com.vaadin.event.SelectionEvent.SelectionListener;
 import com.vaadin.server.ThemeResource;
@@ -47,15 +45,12 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Grid;
-import com.vaadin.ui.Grid.DetailsGenerator;
 import com.vaadin.ui.Grid.HeaderCell;
 import com.vaadin.ui.Grid.HeaderRow;
-import com.vaadin.ui.Grid.RowReference;
 import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -441,7 +436,7 @@ public class InboxComponent extends CustomComponent implements
 	 * grouping the similar columns together etc.
 	 * 
 	 */
-	private void customizeEditableArziGridColumns() {
+	public void customizeEditableArziGridColumns() {
 		
 		// Sets the grid editor to be enabled
 		arziGrid.setEditorEnabled(true);
@@ -777,7 +772,7 @@ public class InboxComponent extends CustomComponent implements
 			Container condContainer = MedicalArziUtils
 					.getContainer(Condition.class);
 
-			field = MedicalArziUtils.getComboBox("Condition:",
+			field = MedicalArziUtils.getComboBox("Medical Condition:",
 					"Please select a condition...", getLookupService()
 							.getListOfAllMedicalConditions(), "conditionName",
 					condContainer, null, true, "Condition is required!");
@@ -786,7 +781,7 @@ public class InboxComponent extends CustomComponent implements
 			Container procContainer = MedicalArziUtils
 					.getContainer(Procedure.class);
 
-			field = MedicalArziUtils.getComboBox("Procedure",
+			field = MedicalArziUtils.getComboBox("Medical Procedure",
 					"Please select a procedure...", getLookupService()
 							.getListOfAllMedicalProcedures(), "procedureName",
 					procContainer, null, true, "Procedure is required!");
