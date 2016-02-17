@@ -55,7 +55,7 @@ public class MedicalArziCommitHandler implements CommitHandler {
 			logger.debug("Updated arzi information: " + editedArzi);
 			
 			ServiceLocator.getInstance().getPatientService()
-					.updateAnExistingArziInDraftMode(editedArzi);
+					.updateAnExistingArzi(editedArzi);
 			
 			Notification.show("Arzi updated successfully!!!");
 		}
