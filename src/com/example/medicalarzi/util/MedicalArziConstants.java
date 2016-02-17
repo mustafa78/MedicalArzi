@@ -41,6 +41,8 @@ public interface MedicalArziConstants {
 	
 	final static public Long ARZI_SUBMITTED_STATUS = 1001L;
 	
+	final static public Long ARZI_IN_PROCESS_STATUS = 1002L;
+	
 	final static public Integer MAP_GENDER_MALE_ID = 1005;
 	
 	final static public Integer MAP_GENDER_FEMALE_ID = 1006;
@@ -61,9 +63,9 @@ public interface MedicalArziConstants {
 	// For sending email.
 	final static public String EMAIL_HOST = "EmailHost";
 
-	final static public String FORGOT_PSWD_EMAIL_FROM = "FP_EmailFrom";
+	final static public String FORGOT_EMAIL_FROM = "EmailFrom";
 
-	final static public String FORGOT_PSWD_EMAIL_REPLY_TO = "FP_EmailReplyTo";
+	final static public String FORGOT_EMAIL_REPLY_TO = "EmailReplyTo";
 
 	final static public String FORGOT_PSWD_EMAIL_TO = "FP_EmailTo";
 
@@ -92,6 +94,8 @@ public interface MedicalArziConstants {
 	
 	final static public String ARZI_FORM_COMPONENT_BUTTON_LAYOUT_ID = "arziFormComponentButtonsLayout";
 	
+	final static public String REVIEW_ARZI_COMPONENT_VIEW_LAYOUT_ID = "reviewArziComponentViewLayout";
+	
 	final static public String INBOX_TAB_CAPTION = "Inbox";
 	
 	final static public String INBOX_TAB_COMPONENT_ID = "inboxTabComponent";
@@ -108,9 +112,17 @@ public interface MedicalArziConstants {
 	
 	final static public String ADMIN_TAB_CAPTION = "Administration";
 	
+	final static public String ADMIN_TAB_COMPONENT_ID = "adminTabComponent";
+	
 	final static public String REVIEW_ARZI_TAB_CAPTION = "Review Arzi";
 	
-	final static public String REVIEW_ARZI_TAB_ID_PREFIX = "Review_Arzi";
+	final static public String REVIEW_ARZI_TAB_COMPONENT_ID = "Review_Arzi_Component";
+	
+	final static public String PENDING_TASKS_TAB_CAPTION = "Pending Tasks";
+	
+	final static public String PENDING_TASKS_TAB_COMPONENT_ID = "pendingTaskComponent";
+	
+	final static public String PENDING_TASKS_COMPONENT_VIEW_LAYOUT_ID = "pendingTasksComponentViewLayout";
 	
 	//Hint texts, descriptions or any static texts
 	final static public String PASSWORD_HINT_TEXT = "Password must be at least 8 characters long and contain at least 1 number.";
@@ -122,5 +134,4 @@ public interface MedicalArziConstants {
 	final static public Long SEC_ROLE_ID_QUEUE_MGR = 1002L;
 
 	final static public Long SEC_ROLE_ID_ADMIN = 1004L;
-
 }
