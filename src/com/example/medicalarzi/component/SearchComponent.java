@@ -1,9 +1,12 @@
 package com.example.medicalarzi.component;
 
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,6 +22,7 @@ import com.example.medicalarzi.model.Jamaat;
 import com.example.medicalarzi.model.Lookup;
 import com.example.medicalarzi.model.Patient;
 import com.example.medicalarzi.model.Procedure;
+import com.example.medicalarzi.model.Status;
 import com.example.medicalarzi.service.ReviewerService;
 import com.example.medicalarzi.service.ServiceLocator;
 import com.example.medicalarzi.util.MedicalArziConstants;
@@ -27,6 +31,7 @@ import com.example.medicalarzi.view.MedicalArziLandingView;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.fieldgroup.PropertyId;
+import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.SelectionEvent;
 import com.vaadin.event.SelectionEvent.SelectionListener;
@@ -40,16 +45,15 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.Grid.HeaderCell;
 import com.vaadin.ui.Grid.HeaderRow;
+import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.Notification.Type;
-import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.VerticalSplitPanel;
 import com.vaadin.ui.renderers.DateRenderer;
@@ -65,13 +69,19 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 	// Layout and components
 	private VerticalSplitPanel splitPanel;
 
-	private Grid resultsGrid;
-
+	/**Top Layout components & buttons**/
 	private VerticalLayout topLayout;
 
 	private CustomFormComponent searchCriteria;
 
 	private Button searchBtn;
+	
+	/**Bottom Layout components & buttons**/
+	private VerticalLayout bottomLayout;
+	
+	private Grid resultsGrid;
+	
+	private Button assignBtn;
 
 	// Search criteria fields bound to ArziSearchCriteria object.
 	@PropertyId("itsNumber")
@@ -106,6 +116,8 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 
 	// Grid container
 	private BeanItemContainer<ArziSearchResult> resultsContainer;
+	
+	private final Set<BeanItem<ArziSearchResult>> editedItems = new HashSet<BeanItem<ArziSearchResult>>();
 
 	/**
 	 * The constructor should first build the main layout, set the composition
@@ -164,11 +176,15 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 		buildTopLayout();
 		splitPanel.addComponent(topLayout);
 
-		// arziTable
-		buildResultsGrid();
-		splitPanel.addComponent(resultsGrid);
+		// bottomLayout
+		buildBottomLayout();
+		splitPanel.addComponent(bottomLayout);
 	}
 
+	/**
+	 * This method builds the top section of the split panel containing the
+	 * search criteria and the search button.
+	 */
 	private void buildTopLayout() {
 		// common part: create layout
 		topLayout = new VerticalLayout();
@@ -330,12 +346,42 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 		numOfDays.setItemCaptionPropertyId("lookupValue");
 		numOfDays.setRequired(false);
 	}
+	
+	/**
+	 * This method builds the bottom section of the split panel containing the
+	 * results grid and assign button..
+	 */
+	private void buildBottomLayout() {
+		bottomLayout = new VerticalLayout();
+		bottomLayout.setSizeFull();
+		bottomLayout.setImmediate(false);
+		bottomLayout.setMargin(true);
+		bottomLayout.setSpacing(true);
+		
+		buildResultsGrid();
+		bottomLayout.addComponent(resultsGrid);
+		bottomLayout.setExpandRatio(resultsGrid, 2.0f);
+	
+		// assignBtn
+		assignBtn = new Button(new ThemeResource("img/assign_me.png"));
+		assignBtn.addClickListener(this);
+		assignBtn.setStyleName(Reindeer.BUTTON_LINK);
+		bottomLayout.addComponent(assignBtn);
+		bottomLayout.setComponentAlignment(assignBtn, Alignment.MIDDLE_CENTER);
+		
+		// The bottom layout should not be visible initially. It should only be
+		// visible only when the user clicks on the "Search" button.
+		bottomLayout.setVisible(false);
+	}
 
 	@SuppressWarnings("unchecked")
 	private void buildResultsGrid() {
 		resultsGrid = new Grid();
 		resultsGrid.setSizeFull();
 		resultsGrid.setImmediate(false);
+		
+		// Sets the Multi selection mode for this grid.
+		resultsGrid.setSelectionMode(SelectionMode.MULTI);
 
 		resultsContainer = (BeanItemContainer<ArziSearchResult>) MedicalArziUtils
 				.getContainer(ArziSearchResult.class);
@@ -361,8 +407,8 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 		// Setting the grid columns
 		resultsGrid.setColumns("patient.itsNumber", "patient.firstName",
 				"patient.lastName", "patient.jamaat.jamaatName",
-				"patient.jamaat.jamiyatName", "arzi.arziType.arziTypeName",
-				"arzi.currentStatus.statusDesc",
+				"patient.jamaat.jamiyatName", "arzi.arziId",
+				"arzi.arziType.arziTypeName", "arzi.currentStatus.statusDesc",
 				"arzi.requestSubmitDate.gregorianCalDate",
 				"arzi.bodyPart.bodyPartName", "arzi.condition.conditionName",
 				"arzi.otherCondition",
@@ -434,15 +480,16 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 
 		// Get hold of the columnID, mind you in my case this is a nestedID
 		// Join the arzi related cells
+		HeaderCell arziIdCell = searchResultsHeader
+				.getCell("arzi.arziId");
 		HeaderCell arziTypeCell = searchResultsHeader
 				.getCell("arzi.arziType.arziTypeName");
 		HeaderCell arziStatusCell = searchResultsHeader
 				.getCell("arzi.currentStatus.statusDesc");
 		HeaderCell arziSubmitDtCell = searchResultsHeader
 				.getCell("arzi.requestSubmitDate.gregorianCalDate");
-		searchResultsHeader
-				.join(arziTypeCell, arziStatusCell, arziSubmitDtCell).setText(
-						"Arzi");
+		searchResultsHeader.join(arziIdCell, arziTypeCell, arziStatusCell,
+				arziSubmitDtCell).setText("Arzi");
 
 		// Join the Medical info cells
 		HeaderCell bodyPartCell = searchResultsHeader
@@ -479,17 +526,16 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 	@Override
 	public void buttonClick(ClickEvent event) {
 
+		ArziSearchCriteria userEnteredSearchCriteria = null;
+		
 		if (event.getButton().equals(searchBtn)) {
 			try {
 				// FieldGroup buffered mode is on, so commit() is required.
 				// Throws CommitException
 				searchCriteriaFieldsBinder.commit();
 
-				ArziSearchCriteria userEnteredSearchCriteria = searchCriteriaFieldsBinder
+				userEnteredSearchCriteria = searchCriteriaFieldsBinder
 						.getItemDataSource().getBean();
-
-				ReviewerService reviewerService = ServiceLocator.getInstance()
-						.getReviewerService();
 
 				Lookup searchPeriod = (Lookup) numOfDays.getValue();
 
@@ -506,7 +552,8 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 					// this would default to now
 					Calendar calendar = Calendar.getInstance();
 
-					// Subtract the number of days to get the
+					// Subtract the number of days to get the range between
+					// current date and number of days selected as the criteria.
 					if (searchPeriod.getLookupId().intValue() == MedicalArziConstants.SEARCH_PERIOD_LAST_7_DAYS_ID) {
 						calendar.add(Calendar.DAY_OF_MONTH, -7);
 					} else if (searchPeriod.getLookupId().intValue() == MedicalArziConstants.SEARCH_PERIOD_LAST_10_DAYS_ID) {
@@ -532,27 +579,10 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 					userEnteredSearchCriteria.setCurrentDate(null);
 					userEnteredSearchCriteria.setSearchPeriodDate(null);
 				}
-
-				List<ArziSearchResult> searchResultList = reviewerService
-						.searchArzisByCriteria(userEnteredSearchCriteria);
-
-				/**
-				 * Update the Grid with fresh data. Two step process of
-				 * replacing bean items. (1) First remove all BeanItem objects
-				 * with Container::removeAllItems method. (2) Then add
-				 * replacement BeanItem objects with the
-				 * BeanItemContainer::addAll method.
-				 */
-				resultsContainer.removeAllItems();
-				if (searchResultList != null && searchResultList.isEmpty()) {
-					String description = "No results found for the search criteria.";
-					MedicalArziUtils.createAndShowNotification(null,
-							description, Type.ERROR_MESSAGE, Position.TOP_LEFT,
-							"errorMsg", -1);
-				} else {
-					// Add data to the container
-					resultsContainer.addAll(searchResultList);
-				}
+				
+				// Populate and refresh the grid with the data based on the user
+				// entered search criteria.
+				refreshGridWithFreshData(userEnteredSearchCriteria);
 
 			} catch (CommitException ce) {
 				logger.error(ce);
@@ -565,121 +595,177 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 						errorDescription, Type.ERROR_MESSAGE,
 						Position.TOP_LEFT, "errorMsg", -1);
 			}
+		} else if (event.getButton().equals(assignBtn)) {
+
+			if (!editedItems.isEmpty()) {
+
+				ReviewerService reviewSer = ServiceLocator.getInstance()
+						.getReviewerService();
+
+				// Get the patient information from the session. In this tab,
+				// the patient also has the reviewer role so that he/she is able
+				// to review all the submitted arzis and take appropriate
+				// action.
+				Patient patient = (Patient) MedicalArziUtils
+						.getSessionAttribute(MedicalArziConstants.SESS_ATTR_PTNT_INFO);
+
+				for (BeanItem<ArziSearchResult> arziSearchResult : editedItems) {
+					Arzi arzi = arziSearchResult.getBean().getArzi();
+
+					// For ArziHeader to update the arzi
+					Status arziStatus = new Status();
+					arziStatus
+							.setStatusId(MedicalArziConstants.ARZI_IN_PROCESS_STATUS);
+					arzi.setCurrentStatus(arziStatus);
+
+					GregHijDate currentDate = ServiceLocator.getInstance()
+							.getLookupService()
+							.getRequestedGregorianHijriCalendar(new Date());
+
+					arzi.setCurrentStatusDate(currentDate);
+
+					// For Arzi to create a new record in the detail table.
+					arzi.setStatusChangeDate(currentDate);
+
+					arzi.setStatus(arziStatus);
+
+					arzi.setReviewDate(currentDate);
+
+					// The patient is also the reviewer.
+					Long reviewerItsNumber = patient.getItsNumber();
+
+					arzi.setReviewerItsNumber(reviewerItsNumber);
+
+					reviewSer.updateAnExistingArzi(arzi);
+				}
+				
+				// Refresh the grid so that the latest status displayed in the
+				// grid after the reviewer has assigned arzi for review.
+				refreshGridWithFreshData(userEnteredSearchCriteria);	
+
+				// Get the current view and set the selected tab to Inbox to
+				// display the newly saved/submitted arzi in the Inbox.
+				View currentView = UI.getCurrent().getNavigator()
+						.getCurrentView();
+
+				if (currentView instanceof MedicalArziLandingView) {
+					
+					MedicalArziLandingView landingView = (MedicalArziLandingView) currentView;
+
+					// Once the arzis are assigned, reconstruct the Pending
+					// Task tab to get the latest data and then switch the
+					// selection to the Pending Tasks tab with the user
+					// friendly success message.
+					landingView.setRefreshPendingTasks(true);
+
+					landingView.getTabSheet().setSelectedTab(
+							landingView.getPendingTasksComponent());
+
+					String successMsg = "\""
+							+ MedicalArziUtils.constructPtntFullName(patient)
+							+ "\" has been successfully assigned arzis to review.";
+
+					MedicalArziUtils.createAndShowNotification(null,
+							successMsg, Type.HUMANIZED_MESSAGE,
+							Position.TOP_LEFT, "userFriendlyMsg",
+							MedicalArziConstants.USER_FRIENDLY_MSG_DELAY_MSEC);
+				}
+			}
+
 		}
 
+	}
+
+	/**
+	 * This method is responsible for searching the database based on the user
+	 * selected search criteria and populating the results in the grid. If the
+	 * selected criteria does not fetch any result, the bottom layout is not
+	 * shown which contains the grid and the "Assign" button.
+	 * 
+	 * @param userEnteredSearchCriteria
+	 */
+	private void refreshGridWithFreshData(
+			ArziSearchCriteria userEnteredSearchCriteria) {
+		ReviewerService reviewerService = ServiceLocator.getInstance()
+				.getReviewerService();
+
+		List<ArziSearchResult> searchResultList = reviewerService
+				.searchArzisByCriteria(userEnteredSearchCriteria);
+
+		/**
+		 * Update the Grid with fresh data. Two step process of
+		 * replacing bean items. (1) First remove all BeanItem objects
+		 * with Container::removeAllItems method. (2) Then add
+		 * replacement BeanItem objects with the
+		 * BeanItemContainer::addAll method.
+		 */
+		resultsContainer.removeAllItems();
+		
+		if (searchResultList != null && searchResultList.isEmpty()) {
+			// Hide the bottom layout containing the grid and the
+			// "Assign" Button when the search yields 0 results.
+			bottomLayout.setVisible(false);
+			
+			String description = "No results found for the search criteria.";
+			
+			MedicalArziUtils.createAndShowNotification(null,
+					description, Type.ERROR_MESSAGE, Position.TOP_LEFT,
+					"errorMsg", -1);
+		} else {
+			// Add data to the container
+			resultsContainer.addAll(searchResultList);
+			
+			// Display the bottom layout with the results in the grid
+			// and the "Assign" Button.
+			bottomLayout.setVisible(true);
+			
+			// "Assign Me" button should be disabled by default and
+			// should only be enabled when the user starts selecting
+			// arzis for assignment.
+			assignBtn.setEnabled(false);
+		}
 	}
 
 	@Override
 	public void select(SelectionEvent event) {
-		ArziSearchResult selectedResult = (ArziSearchResult) resultsGrid
-				.getSelectedRow();
-
-		if (selectedResult != null) {
-			// Get the current view and set the selected tab to Inbox to
-			// display the newly saved/submitted arzi in the Inbox.
-			View currentView = UI.getCurrent().getNavigator().getCurrentView();
-
-			if (currentView instanceof MedicalArziLandingView) {
-				MedicalArziLandingView landingView = (MedicalArziLandingView) currentView;
-
-				ArziFormComponent reviewArziComponent = populateTheFormWithSelectedResult(selectedResult);
-
-				String reviewArziCaption = MedicalArziConstants.REVIEW_ARZI_TAB_CAPTION
-						+ " - " + selectedResult.getArzi().getArziId();
-
-				String reviewArziTabId = MedicalArziConstants.REVIEW_ARZI_TAB_ID_PREFIX
-						+ " _ " + selectedResult.getArzi().getArziId();
-
-				// Add the tab for the arzi which is being reviewed.
-				Tab reviewArziTab = landingView.getTabSheet().addTab(
-						reviewArziComponent, reviewArziCaption);
-				reviewArziTab.setId(reviewArziTabId);
-				reviewArziTab.setClosable(true);
-			}
-
+		// Logic for handling selection changes from Grid
+        boolean empty = event.getSelected().isEmpty();
+        
+        if (!empty) {
+            // Keep track of items currently being edited.
+            editedItems.addAll(getItemIds(event.getAdded()));
+            
+            editedItems.removeAll(getItemIds(event.getRemoved()));
+            
+        } else {
+            editedItems.clear();
+        }
+        
+        assignBtn.setEnabled(
+                resultsGrid.getSelectedRows().size() > 0);
+		
+	}
+	
+	/**
+     * Gets a list of BeanItems for given item IDs from the container of
+     * Grid.
+     *
+     * @param itemIds
+     *            set of item ids
+     * @return a collection of BeanItems for given itemIds
+     */
+	@SuppressWarnings({ "unchecked" })
+	private Collection<BeanItem<ArziSearchResult>> getItemIds(
+			Set<Object> itemIds) {
+		
+		Set<BeanItem<ArziSearchResult>> items = new HashSet<BeanItem<ArziSearchResult>>();
+		
+		for (Object id : itemIds) {
+			items.add((BeanItem<ArziSearchResult>) resultsGrid
+					.getContainerDataSource().getItem(id));
 		}
 		
-	}
-	
-	/**
-	 * This method is responsible for populating the fields on the
-	 * ArziFormComponent with the arzi and patient information fetched from the
-	 * selected result row.
-	 * 
-	 * @param reviewArziComponent
-	 * @param selectedResult
-	 * 
-	 * @return com.example.medicalarzi.component.ArziFormComponent
-	 */
-	private ArziFormComponent populateTheFormWithSelectedResult(
-			ArziSearchResult selectedResult) {
-		
-		// Extract the arzi and the patient information
-		Arzi arziInfo = selectedResult.getArzi();
-		
-		Patient ptntInfo = selectedResult.getPatient();
-		
-		ArziFormComponent reviewArziComponent = new ArziFormComponent(ptntInfo, arziInfo);
-		
-		reviewArziComponent.getItsNumber().setValue(
-				String.valueOf(ptntInfo.getItsNumber()));
-		
-		makeFieldsReadOnlyWhenReviewing(reviewArziComponent);
-		
-		Component buttonLayout = MedicalArziUtils.findById(reviewArziComponent,
-				MedicalArziConstants.ARZI_FORM_COMPONENT_BUTTON_LAYOUT_ID);
-		
-		buttonLayout.setVisible(false);
-		
-		return reviewArziComponent;
-
-	}
-	
-	/**
-	 * 
-	 * @param reviewArziComponent
-	 */
-	private void makeFieldsReadOnlyWhenReviewing(
-			ArziFormComponent reviewArziComponent) {
-		// Patient's profile information set to read only.
-		reviewArziComponent.getItsNumber().setReadOnly(true);
-
-		reviewArziComponent.getFirstName().setReadOnly(true);
-
-		reviewArziComponent.getMiddleName().setReadOnly(true);
-
-		reviewArziComponent.getLastName().setReadOnly(true);
-
-		reviewArziComponent.getGender().setReadOnly(true);
-
-		reviewArziComponent.getDob().setReadOnly(true);
-
-		reviewArziComponent.getAddressLn1().setReadOnly(true);
-
-		reviewArziComponent.getAddressLn2().setReadOnly(true);
-
-		reviewArziComponent.getCity().setReadOnly(true);
-
-		reviewArziComponent.getCountryState().setReadOnly(true);
-
-		reviewArziComponent.getZip().setReadOnly(true);
-		
-		reviewArziComponent.getJamaat().setReadOnly(true);
-		
-		// Patient's arzi information set to read only.
-		reviewArziComponent.getArziType().setReadOnly(true);
-		
-		reviewArziComponent.getBodyPart().setReadOnly(true);
-		
-		reviewArziComponent.getProcedure().setReadOnly(true);
-		
-		reviewArziComponent.getCondition().setReadOnly(true);
-		
-		reviewArziComponent.getConditionStartDate().setReadOnly(true);
-		
-		if(reviewArziComponent.getOtherCondition() != null)
-			reviewArziComponent.getOtherCondition().setReadOnly(true);
-		
+		return items;
 	}
 
 }
