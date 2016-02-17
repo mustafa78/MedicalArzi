@@ -14,6 +14,7 @@ import com.example.medicalarzi.component.ArziFooterComponent;
 import com.example.medicalarzi.component.ArziFormComponent;
 import com.example.medicalarzi.component.ArziHeaderComponent;
 import com.example.medicalarzi.component.InboxComponent;
+import com.example.medicalarzi.component.PendingTasksComponent;
 import com.example.medicalarzi.component.SearchComponent;
 import com.example.medicalarzi.model.Condition;
 import com.example.medicalarzi.model.Patient;
@@ -71,6 +72,9 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 
 	// Inbox Component
 	private InboxComponent inboxComponent;
+	
+	// Pending Tasks Component
+	private PendingTasksComponent pendingTasksComponent;
 
 	// Search Component
 	private SearchComponent searchComponent;
@@ -84,6 +88,8 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 	private Patient patient;
 
 	private Boolean refreshInbox = false;
+	
+	private Boolean refreshPendingTasks = false;
 
 	/**
 	 * Service stubs - Could use the @Autowire for the service stubs or get it
@@ -109,6 +115,11 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 	public InboxComponent getInboxComponent() {
 		return inboxComponent;
 	}
+		
+	// get PendingTasks component
+	public PendingTasksComponent getPendingTasksComponent() {
+		return pendingTasksComponent;
+	}
 
 	public Boolean isRefreshInbox() {
 		return refreshInbox;
@@ -116,6 +127,14 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 
 	public void setRefreshInbox(Boolean refreshInbox) {
 		this.refreshInbox = refreshInbox;
+	}
+
+	public Boolean isRefreshPendingTasks() {
+		return refreshPendingTasks;
+	}
+
+	public void setRefreshPendingTasks(Boolean refreshPendingTasks) {
+		this.refreshPendingTasks = refreshPendingTasks;
 	}
 
 	/**
@@ -139,14 +158,6 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 
 		newArziComponent.getItsNumber().setValue(
 				String.valueOf(patient.getItsNumber()));
-		newArziComponent.getGender().setValue(
-				patient.getGender().getDescription());
-
-		// Was trying to set the patient.getJamaat() in the select but actually
-		// the object is wrapped in a BeanItem so you have to fetch the item and
-		// select that item.
-		newArziComponent.getJamaat().select(
-				newArziComponent.getJamaat().getItem(patient.getJamaat()));
 
 		// Select the default condition as Other
 		List<Condition> listOfConditions = (List<Condition>) newArziComponent
@@ -159,7 +170,6 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 				break;
 			}
 		}
-		// getCondition().select(getCondition().getItemIds().iterator().next());
 
 		makeFieldsReadOnlyForNewArzi(true);
 
@@ -254,6 +264,14 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 
 		if (patient.getRoles().contains(adminRole)
 				|| patient.getRoles().contains(doctorRole)) {
+			
+			pendingTasksComponent = new PendingTasksComponent();
+			pendingTasksComponent.setId(MedicalArziConstants.PENDING_TASKS_TAB_COMPONENT_ID);
+			tabSheet.addTab(pendingTasksComponent,
+					MedicalArziConstants.PENDING_TASKS_TAB_CAPTION, new ThemeResource(
+							"icons/pendingTasks.png"));
+			
+			
 			searchComponent = new SearchComponent();
 			tabSheet.addTab(searchComponent,
 					MedicalArziConstants.SEARCH_TAB_CAPTION, new ThemeResource(
@@ -263,8 +281,10 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		// Admin Tab - only available for Admins
 		if (patient.getRoles().contains(adminRole)) {
 			adminComponent = new AdminComponent();
+			adminComponent.setId(MedicalArziConstants.ADMIN_TAB_COMPONENT_ID);
 			tabSheet.addTab(adminComponent,
-					MedicalArziConstants.ADMIN_TAB_CAPTION);
+					MedicalArziConstants.ADMIN_TAB_CAPTION, new ThemeResource(
+							"icons/administration.png"));
 		}
 	}
 
@@ -304,7 +324,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 					&& componentId.equals(inboxComponent.getId())
 					&& isRefreshInbox()) {
 
-				logger.debug("The user has selected the Inbox tab. Reload the tab with the latest content.");
+				logger.debug("Refresh the Inbox tab with the latest content.");
 
 				// We don't have to refresh the inbox every time we switch tab.
 				// Inbox has to be refresh with the latest content only after
@@ -313,6 +333,18 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 
 				inboxComponent.refreshGridWithFreshData();
 
+			} else if (pendingTasksComponent != null
+					&& componentId.equals(pendingTasksComponent.getId())) {
+
+				logger.debug("Refresh the Inbox tab with the latest content.");
+
+				// We don't have to refresh the Pending Tasks tab every time we
+				// switch tab. Pending Tasks tab has to be refresh with the
+				// latest content only after the reviewer assigns certain tasks
+				// to himself/herself.
+				//setRefreshPendingTasks(false);
+
+				pendingTasksComponent.refreshGridWithFreshData();
 			}
 		}
 	}
