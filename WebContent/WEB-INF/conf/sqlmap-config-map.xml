@@ -27,6 +27,7 @@
 		<typeAlias alias="Jamaat" type="com.example.medicalarzi.model.Jamaat" />
 		<typeAlias alias="ArziSearchCriteria" type="com.example.medicalarzi.model.ArziSearchCriteria" />
 		<typeAlias alias="ArziSearchResult" type="com.example.medicalarzi.model.ArziSearchResult" />
+		<typeAlias alias="ArziComment" type="com.example.medicalarzi.model.ArziComment" />
 	</typeAliases>
 
 	<typeHandlers>
