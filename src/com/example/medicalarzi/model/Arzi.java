@@ -3,8 +3,6 @@ package com.example.medicalarzi.model;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.validation.constraints.NotNull;
-
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
@@ -15,10 +13,11 @@ public class Arzi extends ArziHeader implements Serializable {
 	 */
 	private static final long serialVersionUID = -3071236194000826029L;
 
-	@NotNull(message = "Please enter the ITS number.")
 	private Long reviewerItsNumber;
 
 	private GregHijDate reviewDate;
+	
+	private Status status;
 
 	private GregHijDate statusChangeDate;
 
@@ -40,6 +39,14 @@ public class Arzi extends ArziHeader implements Serializable {
 
 	public void setReviewDate(GregHijDate reviewDate) {
 		this.reviewDate = reviewDate;
+	}
+
+	public Status getStatus() {
+		return status;
+	}
+
+	public void setStatus(Status status) {
+		this.status = status;
 	}
 
 	public GregHijDate getStatusChangeDate() {

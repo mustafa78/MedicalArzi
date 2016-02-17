@@ -5,6 +5,7 @@ package com.example.medicalarzi.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
@@ -47,6 +48,10 @@ public class ArziHeader implements Serializable {
 	private GregHijDate currentStatusDate = new GregHijDate();
 
 	private GregHijDate conditionStartDate = new GregHijDate();
+	
+	private String doctorConsultNote;
+	
+	private List<ArziComment> arziComments;
 	
 	private Boolean activeInd;
 
@@ -191,6 +196,22 @@ public class ArziHeader implements Serializable {
 
 	public void setActiveInd(Boolean activeInd) {
 		this.activeInd = activeInd;
+	}
+
+	public String getDoctorConsultNote() {
+		return doctorConsultNote;
+	}
+
+	public void setDoctorConsultNote(String doctorConsultNote) {
+		this.doctorConsultNote = doctorConsultNote;
+	}
+
+	public List<ArziComment> getArziComments() {
+		return arziComments;
+	}
+
+	public void setArziComments(List<ArziComment> arziComments) {
+		this.arziComments = arziComments;
 	}
 
 	@Override
