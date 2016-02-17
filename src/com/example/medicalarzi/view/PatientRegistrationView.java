@@ -1,5 +1,8 @@
 package com.example.medicalarzi.view;
 
+import java.text.MessageFormat;
+import java.util.Properties;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +16,10 @@ import com.example.medicalarzi.model.Patient;
 import com.example.medicalarzi.service.LookupService;
 import com.example.medicalarzi.service.PatientService;
 import com.example.medicalarzi.util.InstallPatientValidatorBlurListener;
+import com.example.medicalarzi.util.MAPMail;
 import com.example.medicalarzi.util.MedicalArziConstants;
 import com.example.medicalarzi.util.MedicalArziUtils;
+import com.example.medicalarzi.util.PropertyLoader;
 import com.example.medicalarzi.validator.PasswordValidator;
 import com.vaadin.annotations.Theme;
 import com.vaadin.data.Validator;
@@ -67,6 +72,9 @@ public class PatientRegistrationView extends CustomComponent implements View,
 			.getLogger(PatientRegistrationView.class);
 
 	public static final String NAME = "register";
+	
+	private static Properties properties = PropertyLoader
+			.loadProperties(MedicalArziConstants.MAP_PROPERTIES);
 
 	// View Components
 	private VerticalLayout mainLayout;
@@ -290,6 +298,7 @@ public class PatientRegistrationView extends CustomComponent implements View,
 		// dob
 		dob = new ArziDateField("Date of Birth:") ;
 		dob.setImmediate(true);
+		dob.setRequired(true);
 		dob.addBlurListener(new InstallPatientValidatorBlurListener(dob, "dob"));
 		viewLayout.addComponent(dob);
 
@@ -364,6 +373,54 @@ public class PatientRegistrationView extends CustomComponent implements View,
 		return buttonsLayout;
 
 	}
+	
+	/**
+	 * This method extracts the properties for the email config and emails the
+	 * registration information to the newly registered patient.
+	 * 
+	 */
+	private void emailRegistrationInfoToPatient() {
+		// Get the email host server from the properties file.
+		String host = properties.getProperty(MedicalArziConstants.EMAIL_HOST);
+
+		// Get the from name from the properties file.
+		String from = properties
+				.getProperty(MedicalArziConstants.FORGOT_EMAIL_FROM);
+
+		// Get the replyTo name from the properties file.
+		String replyTo = properties
+				.getProperty(MedicalArziConstants.FORGOT_EMAIL_REPLY_TO);
+
+		// Get the subject name from the properties file.
+		String subject = properties
+				.getProperty(MedicalArziConstants.FORGOT_PSWD_EMAIL_SUBJECT);
+
+		// Get the body name from the properties file.
+		String body = properties
+				.getProperty(MedicalArziConstants.FORGOT_PSWD_EMAIL_BODY);
+
+
+		String formattedSubject = MessageFormat.format(subject,
+				itsNumber.getValue());
+
+		String formattedBody = MessageFormat.format(body, new Object[] {
+				itsNumber.getValue(), newPassword.getValue() });
+
+		String[] toList = { emailAddress.getValue() };
+
+		// email password
+		MAPMail mail = new MAPMail();
+		
+		logger.debug("Sending registration info. email to email address --> "
+				+ emailAddress.getValue());
+
+		mail.sendMail(toList, from, replyTo, host, formattedBody,
+				formattedSubject, "Medical Arzi Admin");
+
+		logger.debug("Email successfully sent to email address --> "
+				+ emailAddress.getValue());
+	}
+	
 
 	@Override
 	public void buttonClick(ClickEvent event) {
@@ -420,6 +477,8 @@ public class PatientRegistrationView extends CustomComponent implements View,
 							.setSessionAttribute(
 									MedicalArziConstants.SESS_ATTR_IS_REGISTRATION_SUCCESSFUL,
 									true);
+					
+					emailRegistrationInfoToPatient();
 
 					getUI().getNavigator().navigateTo(SimpleLoginView.NAME);
 
