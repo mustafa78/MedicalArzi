@@ -13,6 +13,7 @@ import com.example.medicalarzi.dao.PatientMapper;
 import com.example.medicalarzi.model.Arzi;
 import com.example.medicalarzi.model.Patient;
 import com.example.medicalarzi.service.PatientService;
+import com.example.medicalarzi.util.MedicalArziConstants;
 
 /**
  * @author mkanchwa
@@ -138,6 +139,12 @@ public class PatientServiceImpl implements PatientService {
 				+ newArzi.getItsNumber());
 
 		arziMapper.insertPatientsNewArzi(newArzi);
+		
+		if (newArzi.getCurrentStatus().getStatusId()
+				.equals(MedicalArziConstants.ARZI_SUBMITTED_STATUS)) {
+
+			arziMapper.insertArziDetail(newArzi);
+		}
 
 		logger.debug("Arzi for patient with ITS number -> "
 				+ newArzi.getItsNumber() + " successfully registered");
@@ -164,12 +171,18 @@ public class PatientServiceImpl implements PatientService {
 	}
 
 	@Override
-	public void updateAnExistingArziInDraftMode(Arzi editedArzi) {
+	public void updateAnExistingArzi(Arzi editedArzi) {
 		logger.debug("Updating arzi with \"" + editedArzi.getArziId() + "\" "
 				+ "by the patient with ITS number: -> "
 				+ editedArzi.getItsNumber());
 
 		arziMapper.updateArziHdrSelective(editedArzi);
+		
+		if (!editedArzi.getCurrentStatus().getStatusId()
+				.equals(MedicalArziConstants.ARZI_DRAFT_STATUS)) {
+
+			arziMapper.insertArziDetail(editedArzi);
+		}
 
 		logger.debug("Arzi with \"" + editedArzi.getArziId()
 				+ "\" successfully updated");

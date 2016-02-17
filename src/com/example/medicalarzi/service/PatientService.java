@@ -106,11 +106,13 @@ public interface PatientService {
 	/**
 	 * This method is responsible for updating an existing arzi in the draft
 	 * mode before it is submitted. The patient can make the updates before
-	 * submitting if the information was not correct before it was saved.
+	 * submitting if the information was not correct before it was saved. Also
+	 * this method could be used by the reviewers to update the arzi and its
+	 * status.
 	 * 
 	 * @param editedArzi
 	 */
-	public void updateAnExistingArziInDraftMode(Arzi editedArzi);
+	public void updateAnExistingArzi(Arzi editedArzi);
 	
 	/**
 	 * This method is responsible for the soft delete of an arzi instead of
