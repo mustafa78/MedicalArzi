@@ -255,11 +255,11 @@ public class ForgotPasswordView extends CustomComponent implements View,
 
 		// Get the from name from the properties file.
 		String from = properties
-				.getProperty(MedicalArziConstants.FORGOT_PSWD_EMAIL_FROM);
+				.getProperty(MedicalArziConstants.FORGOT_EMAIL_FROM);
 
 		// Get the replyTo name from the properties file.
 		String replyTo = properties
-				.getProperty(MedicalArziConstants.FORGOT_PSWD_EMAIL_REPLY_TO);
+				.getProperty(MedicalArziConstants.FORGOT_EMAIL_REPLY_TO);
 
 		// Get the subject name from the properties file.
 		String subject = properties
