@@ -6,6 +6,7 @@
 	    <id column="ARZI_ID" property="arziId" jdbcType="INTEGER" />
 	    <result column="ptntItsNbr" property="itsNumber" jdbcType="INTEGER" />
 	    <result column="otherCond" property="otherCondition" jdbcType="VARCHAR" />
+	    <result column="drConsultNote" property="doctorConsultNote" jdbcType="VARCHAR" />
 	    <result column="activeInd" property="activeInd" jdbcType="VARCHAR" javaType="BOOLEAN" />
 	    <result column="hdrCreateUserId" property="createdBy" jdbcType="VARCHAR" />
 	    <result column="hdrCreateTS" property="createdDate" jdbcType="TIMESTAMP" />
@@ -39,7 +40,9 @@
 		<association property="conditionStartDate" column="condStartDtId" javaType="GregHijDate" 
 			select="com.example.medicalarzi.dao.LookupMapper.selectGregHijDateById" />
 		<association property="requestSubmitDate" column="requestSubmitDtId" javaType="GregHijDate" 
-			select="com.example.medicalarzi.dao.LookupMapper.selectGregHijDateById" />			
+			select="com.example.medicalarzi.dao.LookupMapper.selectGregHijDateById" />
+		<collection property="arziComments" column="arzi_id" javaType="java.util.ArrayList"
+  			ofType="ArziComment" select="selectCommentsByArziId" />		
   	</resultMap>
   	
   	<resultMap id="ArziResultMap" type="Arzi" extends="ArziHdrResultMap">
@@ -48,6 +51,10 @@
 	    <result column="dtlCreateTS" property="createdDate" jdbcType="TIMESTAMP" />
 	    <result column="dtlLastUpdUserId" property="updatedBy" jdbcType="VARCHAR" />
 	    <result column="dtlLastUpdTS" property="updatedDate" jdbcType="TIMESTAMP" />
+		<association property="status" column="dtlStatusId" javaType="Status">
+			<id 	property="statusId" 	column="dtlStatusId" />
+			<result property="statusDesc" 	column="dtlStatusDesc" />
+		</association>	    
 	    <association property="reviewDate" column="reviewDtId" javaType="GregHijDate" 
   			select="com.example.medicalarzi.dao.LookupMapper.selectGregHijDateById" />
   		<association property="statusChangeDate" column="statusChangeDtId" javaType="GregHijDate" 
@@ -61,6 +68,19 @@
 			select="selectArziById" />
   	</resultMap>
   	
+  	<resultMap id="ArziCommentResultMap" type="ArziComment" >
+  		<result column="cmntArziId" property="arziId" jdbcType="INTEGER" />
+  		<result column="cmntrItsNbr" property="commentorItsNumber" jdbcType="INTEGER" />
+  		<result column="cmntTs" property="commentTimestamp" jdbcType="TIMESTAMP" />
+  		<result column="cmntText" property="commentText" jdbcType="VARCHAR" />
+  		<result column="dtlCreateUserId" property="createdBy" jdbcType="VARCHAR" />
+	    <result column="dtlCreateTS" property="createdDate" jdbcType="TIMESTAMP" />
+	    <result column="dtlLastUpdUserId" property="updatedBy" jdbcType="VARCHAR" />
+	    <result column="dtlLastUpdTS" property="updatedDate" jdbcType="TIMESTAMP" />
+	    <association property="commentDate" column="cmntDateId" javaType="GregHijDate" 
+			select="com.example.medicalarzi.dao.LookupMapper.selectGregHijDateById" />
+  	</resultMap>
+  	
   	<!-- SQL fragments -->
   	<sql id="arziColumnList">
   		hdr.ITS_NBR as "ptntItsNbr",
@@ -70,6 +90,7 @@
   		hdr.BDY_PRT_ID as "bodyPartId",
   		hdr.COND_ID as "conditionId",
   		hdr.OTHR_COND as "otherCond",
+  		hdr.DR_CNSLT_NOTE as "drConsultNote",
   		hdr.ACTV_IND as "activeInd",
   		hdr.COND_STRT_DT_ID as "condStartDtId",
   		hdr.CURR_STATUS_ID as "currentStatusId",
@@ -80,7 +101,7 @@
   		hdr.LST_UPDT_USR_ID as "hdrLastUpdUserId",
   		hdr.LST_UPDT_TS as "hdrLastUpdTS",
   		dtl.RVWR_ITS_NBR as "reviewerItsNbr",
-  		dtl.STATUS_ID as "status_id",
+  		dtl.STATUS_ID as "dtlStatusId",
   		dtl.STATUS_CHG_DT_ID as "statusChangeDtId",
   		dtl.RVW_DT_ID as "reviewDtId",
   		dtl.CREATE_USR_ID as "dtlCreateUserId",
@@ -94,7 +115,20 @@
   		(SELECT BDY_PRT_NM FROM D_BDY_PRT WHERE BDY_PRT_ID = hdr.BDY_PRT_ID) AS "bodyPartName",
   		(SELECT BDY_PRT_PRFX_CD FROM D_BDY_PRT WHERE BDY_PRT_ID = hdr.BDY_PRT_ID) AS "bodyPartPrefixCd",
   		(SELECT ARZI_TYP FROM D_ARZI_TYP WHERE ARZI_TYP_ID = hdr.ARZI_TYP_ID) AS "arziTypeName",
-  		(SELECT STATUS_DESC FROM D_STATUS WHERE STATUS_ID = hdr.CURR_STATUS_ID) AS "currentStatusDesc"
+  		(SELECT STATUS_DESC FROM D_STATUS WHERE STATUS_ID = hdr.CURR_STATUS_ID) AS "currentStatusDesc",
+  		(SELECT STATUS_DESC FROM D_STATUS WHERE STATUS_ID = dtl.STATUS_ID) AS "dtlStatusDesc"
+  	</sql>
+  	
+  	<sql id="arziCommentColumnList">
+  		cmnt.ARZI_ID as "cmntArziId",
+  		cmnt.CMNTR_ITS_NBR as "cmntrItsNbr",
+  		cmnt.CMNT_DT_ID as "cmntDateId",
+  		cmnt.CMNT_TS as "cmntTs",
+  		cmnt.CMNT_TXT as "cmntText",
+  		cmnt.CREATE_USR_ID as "cmntCreateUserId",
+  		cmnt.CREATE_TS as "cmntCreateTS",
+  		cmnt.LST_UPDT_USR_ID as "cmntLastUpdUserId",
+  		cmnt.LST_UPDT_TS as "cmntLastUpdTS"
   	</sql>
   	
   	<!-- where clause fragment for the arzi search which are not in draft status. Part of it is in CDATA because of the ('>' & '<' )-->
@@ -187,9 +221,43 @@
 		<include refid="arziSearchWhere" />
 		order by ptnt.LAST_NM, ptnt.FIRST_NM, hdr.ARZI_ID
 	</select>
+	
+	<select id="selectArzisByReviewerItsNumber" resultMap="ArziSearchResultMap" parameterType="Long">
+		select
+			ptnt.PTNT_ITS_NBR as "ptntItsNbr",
+			hdr.ARZI_ID as "arziId"
+		from 
+			F_ARZI_HDR hdr
+				join 
+			 		D_PTNT ptnt on ptnt.PTNT_ITS_NBR = hdr.ITS_NBR	
+				left join 
+			 		F_ARZI_DTL dtl on hdr.ARZI_ID = dtl.ARZI_ID
+		where 
+			dtl.RVWR_ITS_NBR = #{reviewerItsNumber,jdbcType=INTEGER} and
+			dtl.STATUS_ID = 1002 and
+			hdr.CURR_STATUS_ID != 1001
+	</select>
+	
+	<select id="selectCommentsByArziId" resultMap="ArziCommentResultMap">
+		select
+			<include refid="arziCommentColumnList" />
+		from 
+			F_ARZI_CMNT cmnt
+		where 
+			cmnt.ARZI_ID = #{arziId,jdbcType=INTEGER}
+	</select>
+	
+	<select id="selectCommentsByDate" resultMap="ArziCommentResultMap">
+		select
+			<include refid="arziCommentColumnList" />
+		from 
+			F_ARZI_CMNT cmnt
+		where 
+			cmnt.CMNT_TS = #{commentTimestamp,jdbcType=DATE}
+	</select>
   	
 	<!-- Insert -->
-	<insert id="insertPatientsNewArzi" parameterType="Arzi">
+	<insert id="insertPatientsNewArzi" parameterType="Arzi" useGeneratedKeys="true" keyProperty="arziId" keyColumn="ARZI_ID">
 		<![CDATA[
 			insert into F_ARZI_HDR (
 				ITS_NBR,
@@ -201,6 +269,8 @@
 				COND_STRT_DT_ID,
 				CREATE_USR_ID,
 				CREATE_TS,
+				LST_UPDT_USR_ID,
+				LST_UPDT_TS,
 				RQST_SMT_DT_ID,
 				CURR_STATUS_ID,
 				CURR_STATUS_DT_ID
@@ -214,11 +284,66 @@
 			#{conditionStartDate.gregorianDateId,jdbcType=INTEGER},
 			#{itsNumber,jdbcType=INTEGER},
 			now(),
+			#{itsNumber,jdbcType=INTEGER},
+			now(),
 			#{requestSubmitDate.gregorianDateId,jdbcType=INTEGER},
 			#{currentStatus.statusId,jdbcType=INTEGER},
 			#{currentStatusDate.gregorianDateId,jdbcType=INTEGER}
 			 ) ]]>
+		 <selectKey keyProperty="arziId" resultType="long" order="AFTER"> 
+			 SELECT LAST_INSERT_ID()
+   		</selectKey> 
 	</insert> 
+	
+	<insert id="insertArziDetail" parameterType="Arzi">
+		<![CDATA[
+			insert into F_ARZI_DTL (
+				ARZI_ID,
+				STATUS_ID,
+				STATUS_CHG_DT_ID,
+				RVWR_ITS_NBR,
+				RVW_DT_ID,
+				CREATE_USR_ID,
+				CREATE_TS,
+				LST_UPDT_USR_ID,
+				LST_UPDT_TS
+			) values (
+			#{arziId,jdbcType=INTEGER},
+			#{status.statusId,jdbcType=INTEGER},
+			#{statusChangeDate.gregorianDateId,jdbcType=INTEGER},
+			#{reviewerItsNumber,jdbcType=INTEGER},
+			#{reviewDate.gregorianDateId,jdbcType=INTEGER},
+			#{itsNumber,jdbcType=INTEGER},
+			now(),
+			#{itsNumber,jdbcType=INTEGER},
+			now()
+			 ) ]]>
+	</insert>
+	
+	<insert id="insertArziComment" parameterType="ArziComment">
+		<![CDATA[
+			insert into F_ARZI_CMNT (
+				ARZI_ID,
+				CMNTR_ITS_NBR,
+				CMNT_DT_ID,
+				CMNT_TS,
+				CMNT_TXT,
+				CREATE_USR_ID,
+				CREATE_TS,
+				LST_UPDT_USR_ID,
+				LST_UPDT_TS
+			) values (
+			#{arziId,jdbcType=INTEGER},
+			#{commentorItsNumber,jdbcType=INTEGER},
+			#{commentDate.gregorianDateId,jdbcType=INTEGER},
+			#{commentTimestamp,jdbcType=TIMESTAMP},
+			#{commentText,jdbcType=VARCHAR},
+			#{commentorItsNumber,jdbcType=INTEGER},
+			now(),
+			#{commentorItsNumber,jdbcType=INTEGER},
+			now()
+			 ) ]]>
+	</insert>	
 	
 	<!-- Update --> 
 	<update id="updateArziHdrSelective" parameterType="Arzi">
@@ -254,6 +379,21 @@
     <update id="updateArziHdrActiveInd">
     	update F_ARZI_HDR set ACTV_IND = 'N' 
     		where ARZI_ID = #{arziId,jdbcType=INTEGER}
+    </update>
+    
+    <update id="updateArziHdrCurrentStatus" parameterType="Arzi">
+    	update F_ARZI_HDR
+    	<set>
+    		<if test="currentStatus != null">
+      			CURR_STATUS_ID = #{currentStatus.statusId,jdbcType=INTEGER},
+      		</if>
+      		<if test="currentStatusDate != null">
+      			CURR_STATUS_DT_ID = (select DT_ID from D_DATE where CAL_DT = #{currentStatusDate.gregorianCalDate,jdbcType=DATE}),
+      		</if>
+      		LST_UPDT_USR_ID = #{itsNumber,jdbcType=VARCHAR},
+      		LST_UPDT_TS = now()
+      		 where ARZI_ID = #{arziId,jdbcType=INTEGER}
+	    </set>
     </update>
     
     <!-- Delete -->
