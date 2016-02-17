@@ -40,12 +40,12 @@ public class StringToLookupConverter implements Converter<String, Lookup> {
         }
 		
 		Lookup lookup = null;
-		if(value.equalsIgnoreCase("M")) {
-			lookup = new Lookup (MedicalArziConstants.MAP_GENDER_MALE_ID, value);
+		if(value.equalsIgnoreCase("M") || value.equalsIgnoreCase("Male")) {
+			lookup = new Lookup (MedicalArziConstants.MAP_GENDER_MALE_ID, "M");
 			lookup.setDescription("Male");
 		}
-		else {
-			lookup = new Lookup (MedicalArziConstants.MAP_GENDER_FEMALE_ID, value);
+		else if(value.equalsIgnoreCase("F") || value.equalsIgnoreCase("Female")) {
+			lookup = new Lookup (MedicalArziConstants.MAP_GENDER_FEMALE_ID, "F");
 			lookup.setDescription("Female");
 		}
 		return lookup;
