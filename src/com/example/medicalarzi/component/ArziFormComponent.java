@@ -66,6 +66,11 @@ public class ArziFormComponent extends CustomComponent implements
 	private Panel ptntInfoSection;
 
 	private CustomFormComponent ptntInfoForm;
+	
+	// Patient Medical History
+	private Panel ptntMedHistSection;
+	
+	private CustomFormComponent ptntMedHistForm;
 
 	// Patient Medical Info
 	private Panel ptntMedicalInfoSection;
@@ -141,18 +146,65 @@ public class ArziFormComponent extends CustomComponent implements
 	private BeanFieldGroup<Arzi> arziFieldsBinder;
 
 	private Patient patient;
+	
+	private Arzi arzi;
 
 	/**
+	 * The constructor should first build the main layout, set the composition
+	 * root and then do any custom initialization.
 	 * 
 	 */
 	public ArziFormComponent() {
-		buildViewlayout();
+		// Get the patient information from the session. Will be used to bind
+		// fields to model.
+		patient = (Patient) MedicalArziUtils
+				.getSessionAttribute(MedicalArziConstants.SESS_ATTR_PTNT_INFO);
 
-		// Bind the member fields to the model
-		bindFieldsToModel();
+		// Initialize the arzi. Will be used to bind fields to model.
+		arzi = new Arzi();
 
-		// The root component. Must be set
-		setCompositionRoot(viewLayout);
+		initForm();
+	}
+
+	/**
+	 * 
+	 * @param patient
+	 */
+	public ArziFormComponent(Patient patient) {
+		// Set the patient information from the passed argument. Will be used to
+		// bind fields to model.
+		this.patient = patient;
+
+		initForm();
+	}
+
+	/**
+	 * 
+	 * @param arzi
+	 */
+	public ArziFormComponent(Arzi arzi) {
+		// Set the arzi information from the passed argument. Will be used to
+		// bind fields to model.
+		this.arzi = arzi;
+
+		initForm();
+	}
+
+	/**
+	 * 
+	 * @param patient
+	 * @param arzi
+	 */
+	public ArziFormComponent(Patient patient, Arzi arzi) {
+		// Set the patient information from the passed argument. Will be used to
+		// bind fields to model.
+		this.patient = patient;
+
+		// Set the arzi information from the passed argument. Will be used to
+		// bind fields to model.
+		this.arzi = arzi;
+
+		initForm();
 	}
 
 	/**
@@ -193,12 +245,72 @@ public class ArziFormComponent extends CustomComponent implements
 		return middleName;
 	}
 
+	public ArziDateField getDob() {
+		return dob;
+	}
+
+	public TextField getAddressLn1() {
+		return addressLn1;
+	}
+
+	public TextField getAddressLn2() {
+		return addressLn2;
+	}
+
+	public TextField getCountryState() {
+		return state;
+	}
+
+	public TextField getCity() {
+		return city;
+	}
+
+	public ComboBox getArziType() {
+		return arziType;
+	}
+
+	public ComboBox getBodyPart() {
+		return bodyPart;
+	}
+
+	public ComboBox getProcedure() {
+		return procedure;
+	}
+
+	public ArziDateField getConditionStartDate() {
+		return conditionStartDate;
+	}
+
+	public TextField getOtherCondition() {
+		return otherCondition;
+	}
+
 	public ComboBox getJamaat() {
 		return jamaat;
 	}
 
 	public ComboBox getCondition() {
 		return condition;
+	}
+	
+	public TextField getZip() {
+		return zip;
+	}
+
+	/**
+	 * Initialize this component with the layout and form components and bind
+	 * the form fields to the model.
+	 * 
+	 */
+	private void initForm() {
+		// Build the layout and elements
+		buildViewlayout();
+
+		// Bind the member fields to the model
+		bindFieldsToModel();
+
+		// The root component. Must be set
+		setCompositionRoot(viewLayout);		
 	}
 
 
@@ -209,10 +321,6 @@ public class ArziFormComponent extends CustomComponent implements
 	 */
 	private void bindFieldsToModel() {
 		logger.debug("Binding the patient and the arzi fields to their respective models.");
-		
-		// Get the patient's full name from the session
-		patient = (Patient) MedicalArziUtils
-				.getSessionAttribute(MedicalArziConstants.SESS_ATTR_PTNT_INFO);
 
 		/* Bind the patient fields */
 		ptntFieldsBinder = new BeanFieldGroup<Patient>(Patient.class);
@@ -228,7 +336,6 @@ public class ArziFormComponent extends CustomComponent implements
 		ptntFieldsBinder.setBuffered(true);
 
 		/* Bind the arzi fields. */
-		Arzi arzi = new Arzi();
 		arziFieldsBinder = new BeanFieldGroup<Arzi>(Arzi.class);
 		/**
 		 * =======>IMPORTANT: Binding for nested bean will work by switching
@@ -427,33 +534,8 @@ public class ArziFormComponent extends CustomComponent implements
 		arziType.setItemCaptionPropertyId("arziTypeName");
 		arziType.setRequired(true);
 		leftFormLayout.addComponent(arziType);
-
-		// bodyPart
-		bodyPart = new ComboBox("Body Part:");
-		bodyPart.setContainerDataSource(MedicalArziUtils
-				.getContainer(BodyPart.class));
-		bodyPart.addItems(getLookupService().getListOfAllBodyParts());
-		bodyPart.setInputPrompt("Please select the affected body part.");
-		bodyPart.setItemCaptionMode(ItemCaptionMode.PROPERTY);
-		bodyPart.setItemCaptionPropertyId("bodyPartName");
-		bodyPart.setRequired(true);
-		leftFormLayout.addComponent(bodyPart);
-
-		conditionStartDate = new ArziDateField("Condition Start Date:");
-		conditionStartDate.setImmediate(true);
-		conditionStartDate
-				.setDescription("Please enter the date in the dd/MM/yyy format.");
-		conditionStartDate.setRequired(true);
-		leftFormLayout.addComponent(conditionStartDate);
-
-		/**
-		 * Add the fields to the right FormLayout.
-		 * 
-		 */
-		FormLayout rightFormLayout = (FormLayout) MedicalArziUtils.findById(
-				ptntMedicalInfoForm,
-				MedicalArziConstants.CUSTOM_FORM_RIGHTFORM_LAYOUT_ID);
-
+		
+		// condition
 		condition = new ComboBox("Medical Condition:");
 		condition.setImmediate(true);
 		condition.setContainerDataSource(MedicalArziUtils
@@ -464,7 +546,42 @@ public class ArziFormComponent extends CustomComponent implements
 		condition.setItemCaptionPropertyId("conditionName");
 		condition.setRequired(true);
 		condition.addValueChangeListener(this);
-		rightFormLayout.addComponent(condition);
+		leftFormLayout.addComponent(condition);
+
+		// other condition
+		otherCondition = new TextField("Other Condition:");
+		otherCondition.setDescription("Please enter your condition..");
+		otherCondition.setWidth("300px");
+		otherCondition.setNullRepresentation("");
+		leftFormLayout.addComponent(otherCondition);		
+
+
+		/**
+		 * Add the fields to the right FormLayout.
+		 * 
+		 */
+		FormLayout rightFormLayout = (FormLayout) MedicalArziUtils.findById(
+				ptntMedicalInfoForm,
+				MedicalArziConstants.CUSTOM_FORM_RIGHTFORM_LAYOUT_ID);
+
+		// bodyPart
+		bodyPart = new ComboBox("Body Part:");
+		bodyPart.setContainerDataSource(MedicalArziUtils
+				.getContainer(BodyPart.class));
+		bodyPart.addItems(getLookupService().getListOfAllBodyParts());
+		bodyPart.setInputPrompt("Please select the affected body part.");
+		bodyPart.setItemCaptionMode(ItemCaptionMode.PROPERTY);
+		bodyPart.setItemCaptionPropertyId("bodyPartName");
+		bodyPart.setRequired(true);
+		rightFormLayout.addComponent(bodyPart);
+		
+		// condition start date
+		conditionStartDate = new ArziDateField("Condition Start Date:");
+		conditionStartDate.setImmediate(true);
+		conditionStartDate
+				.setDescription("Please enter the date in the dd/MM/yyy format.");
+		conditionStartDate.setRequired(true);
+		rightFormLayout.addComponent(conditionStartDate);
 
 		// procedure
 		procedure = new ComboBox("Medical Procedure:");
@@ -476,17 +593,12 @@ public class ArziFormComponent extends CustomComponent implements
 		procedure.setItemCaptionPropertyId("procedureName");
 		procedure.setRequired(true);
 		rightFormLayout.addComponent(procedure);
-
-		otherCondition = new TextField("Other Condition:");
-		otherCondition.setDescription("Please enter your condition..");
-		otherCondition.setWidth("300px");
-		otherCondition.setNullRepresentation("");
-		rightFormLayout.addComponent(otherCondition);
 	}
 
 	private void buildButtonsLayout() {
 
 		buttonsLayout = new HorizontalLayout();
+		buttonsLayout.setId(MedicalArziConstants.ARZI_FORM_COMPONENT_BUTTON_LAYOUT_ID);
 
 		// saveBtn
 		saveBtn = new Button(new ThemeResource("img/save-arzi.png"));
@@ -535,19 +647,18 @@ public class ArziFormComponent extends CustomComponent implements
 				// Throws CommitException
 				arziFieldsBinder.commit();
 
-				Arzi arzi = arziFieldsBinder.getItemDataSource().getBean();
+				Arzi arziInfo = arziFieldsBinder.getItemDataSource().getBean();
 
 				GregHijDate ghReqSubmitDt = getLookupService()
 						.getRequestedGregorianHijriCalendar(new Date());
 
-				arzi.setRequestSubmitDate(ghReqSubmitDt);
-				arzi.setCurrentStatusDate(ghReqSubmitDt);
+				arziInfo.setCurrentStatusDate(ghReqSubmitDt);
 
 				// Get the entire data for the GregHijDate based on the
 				// gregorian date.
-				arzi.setConditionStartDate(getLookupService()
+				arziInfo.setConditionStartDate(getLookupService()
 						.getRequestedGregorianHijriCalendar(
-								arzi.getConditionStartDate()
+								arziInfo.getConditionStartDate()
 										.getGregorianCalDate()));
 
 				Status arziStatus = new Status();
@@ -557,24 +668,32 @@ public class ArziFormComponent extends CustomComponent implements
 					arziStatus
 							.setStatusId(MedicalArziConstants.ARZI_DRAFT_STATUS);
 				} else {
+					arziInfo.setRequestSubmitDate(ghReqSubmitDt);
+					
 					arziStatus
 							.setStatusId(MedicalArziConstants.ARZI_SUBMITTED_STATUS);
+					
+					// Needed for the entry in the detail table. Only after the
+					// arzi is submitted, the detail rable is updated.
+					arziInfo.setStatus(arziStatus);
+					arziInfo.setStatusChangeDate(ghReqSubmitDt);
 				}
 
-				arzi.setCurrentStatus(arziStatus);
+				arziInfo.setCurrentStatus(arziStatus);
 
 				logger.debug("Inserting a new arzi for patient with ITS number-> \""
 						+ ptntInfo.getItsNumber() + "\"");
 
 				// Insert the new arzi for the patient
-				getPatientService().createNewArzi(arzi);
+				getPatientService().createNewArzi(arziInfo);
 
 				// Create a user friendly notification on success.
 				String successMsg = "The arzi for \""
 						+ MedicalArziUtils.constructPtntFullName(ptntInfo)
 						+ "\" is successfully created";
 
-				// tabSheet.setSelectedTab(inboxComponent);
+				// Get the current view and set the selected tab to Inbox to
+				// display the newly saved/submitted arzi in the Inbox.
 				View currentView = UI.getCurrent().getNavigator()
 						.getCurrentView();
 
