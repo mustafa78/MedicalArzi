@@ -24,6 +24,7 @@ public class ReviewerServiceImpl implements ReviewerService {
 	public static Logger logger = (Logger) LogManager
 			.getLogger(ReviewerServiceImpl.class);
 	
+	// DAO mappers to be used for database operation in this service.
 	private ArziMapper arziMapper;
 	
 	private LookupMapper lookupMapper;
@@ -54,6 +55,8 @@ public class ReviewerServiceImpl implements ReviewerService {
 	@Override
 	public List<ArziSearchResult> searchArzisByCriteria(
 			ArziSearchCriteria criteria) {
+
+		logger.debug("Searching arzis based on the search criteria");
 		
 		List<ArziSearchResult> searchResults = arziMapper
 				.selectArzisBySearchCriteria(criteria);
@@ -65,6 +68,9 @@ public class ReviewerServiceImpl implements ReviewerService {
 	public List<ArziSearchResult> retrieveArzisAssignedToReviewer(
 			Long reviewerItsNumber) {
 		
+		logger.debug("Retreiving arzis assigned to the reviwer with ITS number: -> "
+				+ reviewerItsNumber);
+		
 		List<ArziSearchResult> pendingTaskResults = arziMapper
 				.selectArzisByReviewerItsNumber(reviewerItsNumber);
 		
@@ -72,9 +78,9 @@ public class ReviewerServiceImpl implements ReviewerService {
 	}
 
 	@Override
-	public void updateAnExistingArzi(Arzi editedArzi) {
-		logger.debug("Updating arzi with arzi id: \"" + editedArzi.getArziId()
-				+ "\" " + "by the reviewer with ITS number: -> "
+	public void assignArziForReview(Arzi editedArzi) {
+		logger.debug("Assigning arzi with arzi id: \"" + editedArzi.getArziId()
+				+ "\" " + "for review by the reviewer with ITS number: -> "
 				+ editedArzi.getReviewerItsNumber() + " to status: ->"
 				+ editedArzi.getCurrentStatus().getStatusDesc());
 
@@ -89,6 +95,24 @@ public class ReviewerServiceImpl implements ReviewerService {
 		arziMapper.insertArziDetail(editedArzi);
 		
 		logger.debug("Inserted record successfully.");	
+	}
+
+	@Override
+	public void approveArzi(Arzi editedArzi) {
+		
+		logger.debug("Appoving arzi with arzi id: \"" + editedArzi.getArziId()
+				+ "\" by the reviewer with ITS number:-> "
+				+ editedArzi.getReviewerItsNumber());
+		
+		arziMapper.updateArziHdrSelective(editedArzi);
+		
+		logger.debug("Doctor's consultation notes for arzi with \""
+				+ editedArzi.getArziId() + "\" updated successfully.");
+		
+		arziMapper.insertArziDetail(editedArzi);
+		
+		logger.debug("Inserted record in the arzi detail table successfully on the approval of the arzi by the reviewer with ITS number:-> "
+				+ editedArzi.getReviewerItsNumber());
 	}
 	
 }

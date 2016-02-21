@@ -10,7 +10,7 @@ import com.example.medicalarzi.model.ArziSearchCriteria;
 import com.example.medicalarzi.model.ArziSearchResult;
 
 /**
- * This purpose of this service is to help the Doctors perform various actions
+ * This purpose of this service is to help the 'Reviewers' perform various actions
  * during the lifecycle of the MAP application
  * 
  * @author mkanchwa
@@ -47,7 +47,14 @@ public interface ReviewerService {
 	 * 
 	 * @param editedArzi
 	 */
-	public void updateAnExistingArzi(Arzi editedArzi);
+	public void assignArziForReview(Arzi editedArzi);
 	
 
+	/**
+	 * This method is responsible for updating the arzi status when the reviewer
+	 * approves the arzi to move it to the next stage in the workflow.
+	 * 
+	 * @param editedArzi
+	 */
+	public void approveArzi(Arzi editedArzi);
 }
