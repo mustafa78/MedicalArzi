@@ -36,6 +36,7 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.Layout;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Grid.HeaderCell;
 import com.vaadin.ui.Grid.HeaderRow;
@@ -103,7 +104,7 @@ public class PendingTasksComponent extends CustomComponent implements
 		viewLayout.setSpacing(true);
 
 		Label pendingTaskDesc = new Label();
-		pendingTaskDesc.setValue("My Pending Tasks: (Select to edit)");
+		pendingTaskDesc.setValue("My Pending Tasks: (Double Click to Edit)");
 		pendingTaskDesc.setStyleName("v-captiontext");
 		viewLayout.addComponent(pendingTaskDesc);
 		viewLayout.setExpandRatio(pendingTaskDesc, 0.1f);
@@ -430,8 +431,9 @@ public class PendingTasksComponent extends CustomComponent implements
 				Long reviewerItsNumber = patient.getItsNumber();
 
 				arzi.setReviewerItsNumber(reviewerItsNumber);
+				arzi.setUpdatedBy(String.valueOf(reviewerItsNumber));
 
-				reviewSer.updateAnExistingArzi(arzi);
+				reviewSer.assignArziForReview(arzi);
 			}
 			
 			refreshGridWithFreshData();
@@ -502,9 +504,25 @@ public class PendingTasksComponent extends CustomComponent implements
 					Tab reviewArziTab = null;
 					if (reviewArziTabComponent == null) {
 
-						// Add the new tab for review of the arzi.
+						// Set the unique id to track if the arzi to be reviewed is already open.
 						reviewArziComponent.setId(reviewArziTabComponentId);
+						
+						// Add the reviewer section in the main(viewLayout)
+						// layout where the reviewer enters their comments for
+						// the arzi
+						Layout mainLayoutForReviewArzi = (VerticalLayout) MedicalArziUtils
+								.findById(
+										reviewArziComponent,
+										MedicalArziConstants.ARZI_FORM_COMPONENT_VIEW_LAYOUT_ID);
+						
+						ReviewArziComponent reviewerSection = new ReviewArziComponent(
+								mainLayoutForReviewArzi,
+								selectedResult.getArzi());
+						
+						reviewerSection
+								.setId(MedicalArziConstants.REVIEW_ARZI_COMPONENT_ID);
 
+						// Add the new tab for the arzi to be reviewed.
 						reviewArziTab = landingView.getTabSheet().addTab(
 								reviewArziComponent, reviewArziCaption);
 
