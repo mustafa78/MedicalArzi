@@ -14,6 +14,8 @@ import com.example.medicalarzi.model.Status;
 import com.example.medicalarzi.service.ServiceLocator;
 import com.example.medicalarzi.util.MedicalArziConstants;
 import com.example.medicalarzi.util.MedicalArziUtils;
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.fieldgroup.PropertyId;
@@ -28,6 +30,7 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
@@ -38,7 +41,7 @@ import com.vaadin.ui.themes.Reindeer;
  *
  */
 public class ReviewArziComponent extends CustomComponent implements
-		ClickListener {
+		ClickListener, ValueChangeListener {
 
 	private static final long serialVersionUID = -6040343713306953370L;
 	
@@ -46,6 +49,9 @@ public class ReviewArziComponent extends CustomComponent implements
 	
 	// Main View Layout
 	private VerticalLayout viewLayout;
+	
+	// Selection of section
+	private OptionGroup reviewerOptions;
 
 	// Reviewer Section
 	private Panel reviewerSection;
@@ -68,11 +74,6 @@ public class ReviewArziComponent extends CustomComponent implements
 	private Button approveBtn;
 	
 	private Button requestInfoBtn;
-	
-	// Comments button
-	private Button addCommentBtn;
-	
-	private Button removeCommentBtn;
 	
 	private BeanFieldGroup<Arzi> arziFieldsBinder;
 	
@@ -108,6 +109,9 @@ public class ReviewArziComponent extends CustomComponent implements
 			VerticalLayout verticalLayout = (VerticalLayout) viewLayout;
 			
 			// Build the layout and elements
+			buildReviewerOptions();
+			verticalLayout.addComponent(reviewerOptions);
+
 			buildCommentsSection();
 			verticalLayout.addComponent(commentsSection);
 			
@@ -144,7 +148,7 @@ public class ReviewArziComponent extends CustomComponent implements
 		arziFieldsBinder.setBuffered(true);
 
 	}	
-
+	
 	/**
 	 * This method is responsible for building the view layout and add the
 	 * reviewer section to it.
@@ -157,6 +161,9 @@ public class ReviewArziComponent extends CustomComponent implements
 		viewLayout.setImmediate(false);
 		viewLayout.setMargin(true);
 		viewLayout.setSpacing(true);
+		
+		buildReviewerOptions();
+		viewLayout.addComponent(reviewerOptions);
 		
 		buildCommentsSection();
 		// adds commentsSection to the viewLayout
@@ -173,6 +180,21 @@ public class ReviewArziComponent extends CustomComponent implements
 				.setComponentAlignment(buttonsLayout, Alignment.MIDDLE_CENTER);
 	}
 	
+	private void buildReviewerOptions() {
+		// gender
+		reviewerOptions = new OptionGroup("Please select if you are ready to approve or require more information about the arzi:");
+		
+		reviewerOptions.addItem(0);
+		reviewerOptions.setItemCaption(0, "Need more information about this arzi. ");
+		
+		reviewerOptions.addItem(1);
+		reviewerOptions.setItemCaption(1, "Ready to approve");
+    
+		reviewerOptions.setRequired(true);
+		reviewerOptions.addValueChangeListener(this);
+	}
+	
+
 	/**
 	 * This method is responsible for building the Reviewer section Panel with
 	 * the Textarea for the reviewer to add his comments or consultation notes
@@ -181,6 +203,7 @@ public class ReviewArziComponent extends CustomComponent implements
 	private void buildReviewerInfoSection() {
 		reviewerSection = new Panel("Reviewer Section :");
 		reviewerSection.setSizeFull();
+		reviewerSection.setVisible(false);
 		reviewerSection.addStyleName("arziContent");
 		
 		reviewerForm = new FormLayout();
@@ -238,29 +261,12 @@ public class ReviewArziComponent extends CustomComponent implements
 		buttonsLayout = new HorizontalLayout();
 		buttonsLayout.setId(MedicalArziConstants.ARZI_FORM_COMPONENT_BUTTON_LAYOUT_ID);
 		
-		// addCommentBtn
-		addCommentBtn = new Button(new ThemeResource("img/add-comment.png"));
-		addCommentBtn.addClickListener(this);
-		addCommentBtn.setStyleName(Reindeer.BUTTON_LINK);
-		buttonsLayout.addComponent(addCommentBtn);
-		buttonsLayout.setExpandRatio(addCommentBtn, 1.0f);
-		
-		// removeCommentBtn
-		removeCommentBtn = new Button(new ThemeResource("img/remove-comment.png"));
-		removeCommentBtn.addClickListener(this);
-		removeCommentBtn.setStyleName(Reindeer.BUTTON_LINK);
-		// Hide the button. Should only be visible when the reviewer adds
-		// comment/note on the arzi requesting for more information.
-		removeCommentBtn.setVisible(false);
-		buttonsLayout.addComponent(removeCommentBtn);
-		buttonsLayout.setExpandRatio(removeCommentBtn, 1.0f);		
-		
 		// requestInfoBtn
 		requestInfoBtn = new Button(new ThemeResource("img/request-info.png"));
 		requestInfoBtn.addClickListener(this);
 		requestInfoBtn.setStyleName(Reindeer.BUTTON_LINK);
-		// Hide the button. Should only be visible when the reviewer adds
-		// comment/note on the arzi requesting for more information.
+		// Hide the button. Should only be visible when the reviewer selects the
+		// correct option.
 		requestInfoBtn.setVisible(false);
 		buttonsLayout.addComponent(requestInfoBtn);
 		buttonsLayout.setExpandRatio(requestInfoBtn, 1.0f);
@@ -269,6 +275,9 @@ public class ReviewArziComponent extends CustomComponent implements
 		approveBtn = new Button(new ThemeResource("img/approve.png"));
 		approveBtn.addClickListener(this);
 		approveBtn.setStyleName(Reindeer.BUTTON_LINK);
+		// Hide the button. Should only be visible when the reviewer selects the
+		// correct option.
+		approveBtn.setVisible(false);
 		buttonsLayout.addComponent(approveBtn);
 		buttonsLayout.setExpandRatio(approveBtn, 1.0f);
 
@@ -328,34 +337,40 @@ public class ReviewArziComponent extends CustomComponent implements
 						errorDescription, Type.ERROR_MESSAGE,
 						Position.TOP_LEFT, "errorMsg", -1);
 			}	
-			
-		} else if(event.getButton().equals(addCommentBtn)) {
-			
+		} 
+		
+	}
+
+	@Override
+	public void valueChange(ValueChangeEvent event) {
+		// Get the item id
+		Integer itemId = (Integer) event.getProperty().getValue();
+		
+		// If 'Need more infor about arzi' is selected
+		if (itemId.intValue() == 0) {
+
+			// Hide the reviewer summary section and display the comments
+			// section
 			commentsSection.setVisible(true);
 			reviewerSection.setVisible(false);
-			
-			// Hide the 'Approve' and 'Add Comments' button
-			approveBtn.setVisible(false);
-			addCommentBtn.setVisible(false);
-			
-			// Display the 'Request Info' and 'Remove Comments' button
+
+			// Display the 'Request Info' Button
 			requestInfoBtn.setVisible(true);
-			removeCommentBtn.setVisible(true);
-				
-		} else if(event.getButton().equals(removeCommentBtn)) {
-			
+			// Hide the 'Approve' Button
+			approveBtn.setVisible(false);
+
+		} else if (itemId.intValue() == 1) {
+
+			// Display the reviewer summary section and hide the comments
+			// section
 			commentsSection.setVisible(false);
 			reviewerSection.setVisible(true);
-		
-			// Hide the 'Request Info' and 'Remove Comments' button
-			requestInfoBtn.setVisible(false);
-			removeCommentBtn.setVisible(false);
-			
-			// Display the 'Approve' and 'Add Comments' button
+			// Display the 'Approve' Button
 			approveBtn.setVisible(true);
-			addCommentBtn.setVisible(true);
+			// Hide the 'Request Info' Button
+			requestInfoBtn.setVisible(false);
 		}
-		
+
 	}
 
 }
