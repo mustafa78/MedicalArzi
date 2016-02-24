@@ -48,12 +48,13 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Grid;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.Grid.HeaderCell;
 import com.vaadin.ui.Grid.HeaderRow;
 import com.vaadin.ui.Grid.SelectionMode;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.VerticalSplitPanel;
 import com.vaadin.ui.renderers.DateRenderer;
@@ -636,7 +637,7 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 
 					arzi.setReviewerItsNumber(reviewerItsNumber);
 
-					reviewSer.updateAnExistingArzi(arzi);
+					reviewSer.assignArziForReview(arzi);
 				}
 				
 				// Refresh the grid so that the latest status displayed in the
@@ -737,13 +738,46 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
             
             editedItems.removeAll(getItemIds(event.getRemoved()));
             
+            // The "Assign Me" button is enabled only when atleast one row is selected.
+            assignBtn.setEnabled(
+                    resultsGrid.getSelectedRows().size() > 0);
+
+			// Iterate through the selected arzis to find out if the status of
+			// those selected arzis are different than the 'Submitted Status'.
+			// If any arzi is in a different status, disable the "Assign Me"
+			// button because only the arzis in the 'Submitted Status' are
+			// allowed to be assigned for review.
+    		for (BeanItem<ArziSearchResult> arziSearchResult : editedItems) {
+    			
+    			Arzi arzi = arziSearchResult.getBean().getArzi();
+    			
+    			if (!arzi.getCurrentStatus().getStatusId()
+    					.equals(MedicalArziConstants.ARZI_SUBMITTED_STATUS)) {
+    				
+					// Deselect the item based on the condition. Our condition
+					// is that, only the arzis in the 'Submitted Status' are
+					// allowed to be assigned for review.
+    				//TODO: Throwing invocation error when more than 1 selected (with one in a different status (not 'Submitted'). Don't know why. Have to investigate more
+					/*MultiSelectionModel selectionModel = (MultiSelectionModel) resultsGrid
+							.getSelectionModel();
+					selectionModel.deselect(arziSearchResult.getBean());*/
+    				
+    				assignBtn.setEnabled(false);
+    				
+					Notification
+							.show("Only arzis with 'Submitted' status can be selected for assignment!!",
+									Type.ERROR_MESSAGE);
+    			}
+    		}
+            
         } else {
             editedItems.clear();
+            
+            // The "Assign Me" button is enabled only when atleast one row is selected.
+            assignBtn.setEnabled(
+                    resultsGrid.getSelectedRows().size() > 0);
         }
         
-        assignBtn.setEnabled(
-                resultsGrid.getSelectedRows().size() > 0);
-		
 	}
 	
 	/**
