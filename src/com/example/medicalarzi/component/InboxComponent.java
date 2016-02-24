@@ -362,18 +362,8 @@ public class InboxComponent extends CustomComponent implements
 		// Get the patient's full name from the session
 		patient = (Patient) MedicalArziUtils.getSessionAttribute(
 				MedicalArziConstants.SESS_ATTR_PTNT_INFO);
-		List<Arzi> arziList = getPatientService().retrieveAllArzisForPatient(patient
-				.getItsNumber());
-
-		/**
-		 * Update the Grid with fresh data. Two step process of replacing bean
-		 * items. (1) First remove all BeanItem objects with
-		 * Container::removeAllItems method. (2) Then add replacement BeanItem
-		 * objects with the BeanItemContainer::addAll method.
-		 */
-		arziContainer.removeAllItems();
-		// Add data to the container
-		arziContainer.addAll(arziList);
+		
+		refreshGridWithFreshData();
 
 		// Add nested properties to the header
 		arziContainer.addNestedContainerBean("currentStatus");
@@ -690,7 +680,7 @@ public class InboxComponent extends CustomComponent implements
 						+ patient.getItsNumber() + "\"");
 
 				// Update the arzi based on the arzi id.
-				getPatientService().updateAnExistingArziInDraftMode(arzi);
+				getPatientService().updateAnExistingArzi(arzi);
 				
 				refreshGridWithFreshData();
 				
@@ -740,7 +730,12 @@ public class InboxComponent extends CustomComponent implements
 		// with the new set of data.
 		List<Arzi> arziList = getPatientService().retrieveAllArzisForPatient(patient
 				.getItsNumber());
-		
+		/**
+		 * Update the Grid with fresh data. Two step process of replacing bean
+		 * items. (1) First remove all BeanItem objects with
+		 * Container::removeAllItems method. (2) Then add replacement BeanItem
+		 * objects with the BeanItemContainer::addAll method.
+		 */
 		arziContainer.removeAllItems();
 		
 		arziContainer.addAll(arziList);
