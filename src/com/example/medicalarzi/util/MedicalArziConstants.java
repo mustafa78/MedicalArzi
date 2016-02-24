@@ -43,6 +43,8 @@ public interface MedicalArziConstants {
 	
 	final static public Long ARZI_IN_PROCESS_STATUS = 1002L;
 	
+	final static public Long ARZI_DOCTOR_APPROVED_STATUS = 1006L;
+	
 	final static public Integer MAP_GENDER_MALE_ID = 1005;
 	
 	final static public Integer MAP_GENDER_FEMALE_ID = 1006;
@@ -94,6 +96,8 @@ public interface MedicalArziConstants {
 	
 	final static public String ARZI_FORM_COMPONENT_BUTTON_LAYOUT_ID = "arziFormComponentButtonsLayout";
 	
+	final static public String REVIEW_ARZI_COMPONENT_ID = "reviewArziComponent";
+	
 	final static public String REVIEW_ARZI_COMPONENT_VIEW_LAYOUT_ID = "reviewArziComponentViewLayout";
 	
 	final static public String INBOX_TAB_CAPTION = "Inbox";
@@ -134,4 +138,10 @@ public interface MedicalArziConstants {
 	final static public Long SEC_ROLE_ID_QUEUE_MGR = 1002L;
 
 	final static public Long SEC_ROLE_ID_ADMIN = 1004L;
+	
+	final static public Long COND_OTHER_ID = -1L;
+	
+	final static public Long PROC_OTHER_ID = -1L;
+	
+	final static public Long BODY_PART_OTHER_ID = -1L;
 }
