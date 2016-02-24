@@ -49,6 +49,8 @@ public class ArziHeader implements Serializable {
 
 	private GregHijDate conditionStartDate = new GregHijDate();
 	
+	private String arziSummary;
+	
 	private String doctorConsultNote;
 	
 	private List<ArziComment> arziComments;
@@ -196,6 +198,14 @@ public class ArziHeader implements Serializable {
 
 	public void setActiveInd(Boolean activeInd) {
 		this.activeInd = activeInd;
+	}
+
+	public String getArziSummary() {
+		return arziSummary;
+	}
+
+	public void setArziSummary(String arziSummary) {
+		this.arziSummary = arziSummary;
 	}
 
 	public String getDoctorConsultNote() {

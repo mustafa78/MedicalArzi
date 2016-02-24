@@ -43,6 +43,7 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -61,28 +62,54 @@ public class ArziFormComponent extends CustomComponent implements
 
 	// Main View Layout
 	private VerticalLayout viewLayout;
-
-	// Patient Personal Info
-	private Panel ptntInfoSection;
-
-	private CustomFormComponent ptntInfoForm;
 	
-	// Patient Medical History
+	/****************************
+	 * Arzi Details
+	 ***************************/
+	private Panel arziDetailsSection;
+
+	private CustomFormComponent arziDetailsForm;
+	
+	// Arzi Details fields bound to the "Arzi" model
+	@PropertyId("arziType")
+	private ComboBox arziType;
+
+	@PropertyId("bodyPart")
+	private ComboBox bodyPart;
+
+	@PropertyId("procedure")
+	private ComboBox procedure;
+
+	@PropertyId("condition")
+	private ComboBox condition;
+
+	@PropertyId("conditionStartDate.gregorianCalDate")
+	private ArziDateField conditionStartDate;
+
+	@PropertyId("otherCondition")
+	private TextField otherCondition;	
+
+	/******************
+	 * Arzi Summary
+	 *******************/
+	private Panel arziSummarySection;
+	
+	private FormLayout arziSummaryForm;
+	
+	@PropertyId("arziSummary")
+	private TextArea arziSummary;
+	
+	/****************************
+	 * Patient Medical History
+	 ****************************/
 	private Panel ptntMedHistSection;
 	
 	private CustomFormComponent ptntMedHistForm;
 
-	// Patient Medical Info
-	private Panel ptntMedicalInfoSection;
+	/**Patient Personal Info**/
+	private Panel ptntInfoSection;
 
-	private CustomFormComponent ptntMedicalInfoForm;
-
-	// Buttons layout
-	private HorizontalLayout buttonsLayout;
-
-	private Button submitBtn;
-
-	private Button saveBtn;
+	private CustomFormComponent ptntInfoForm;
 
 	// Personal information fields bound to the "Patient" model
 	@PropertyId("itsNumber")
@@ -120,25 +147,15 @@ public class ArziFormComponent extends CustomComponent implements
 
 	@PropertyId("jamaat")
 	private ComboBox jamaat;
+	
+	/*******************
+	 * Buttons layout
+	 ********************/
+	private HorizontalLayout buttonsLayout;
 
-	// Medical information fields bound to the "Arzi" model
-	@PropertyId("arziType")
-	private ComboBox arziType;
+	private Button submitBtn;
 
-	@PropertyId("bodyPart")
-	private ComboBox bodyPart;
-
-	@PropertyId("procedure")
-	private ComboBox procedure;
-
-	@PropertyId("condition")
-	private ComboBox condition;
-
-	@PropertyId("conditionStartDate.gregorianCalDate")
-	private ArziDateField conditionStartDate;
-
-	@PropertyId("otherCondition")
-	private TextField otherCondition;
+	private Button saveBtn;	
 
 	// Binding Fields
 	private BeanFieldGroup<Patient> ptntFieldsBinder;
@@ -363,14 +380,27 @@ public class ArziFormComponent extends CustomComponent implements
 		viewLayout.setMargin(true);
 		viewLayout.setSpacing(true);
 
+		// arziDetailsSection
+		buildArziDetailsSection();
+		viewLayout.addComponent(arziDetailsSection);
+		viewLayout.setExpandRatio(arziDetailsSection, 1.0f);
+		
+		// arziSummarySection
+		buildArziSummarySection();
+		viewLayout.addComponent(arziSummarySection);
+		viewLayout.setExpandRatio(arziSummarySection, 1.0f);
+		
 		// ptntInfoSection
 		buildPatientInfoSection();
+		viewLayout.addComponent(ptntInfoSection);
+		viewLayout.setExpandRatio(ptntInfoSection, 1.0f);
 
-		// ptntMedicalSection
-		buildPatientMedicalSection();
-		
 		// buttons
 		buildButtonsLayout();
+		// adds buttonLayout to the viewLayout
+		viewLayout.addComponent(buttonsLayout);
+		viewLayout
+				.setComponentAlignment(buttonsLayout, Alignment.MIDDLE_CENTER);
 	}
 
 	/**
@@ -382,8 +412,6 @@ public class ArziFormComponent extends CustomComponent implements
 		ptntInfoSection = new Panel("Patient Information :");
 		ptntInfoSection.setSizeFull();
 		ptntInfoSection.addStyleName("arziContent");
-		viewLayout.addComponent(ptntInfoSection);
-		viewLayout.setExpandRatio(ptntInfoSection, 1.0f);
 
 		// Patient info customForm
 		ptntInfoForm = new CustomFormComponent();
@@ -496,33 +524,31 @@ public class ArziFormComponent extends CustomComponent implements
 	/**
 	 * 
 	 */
-	private void buildPatientMedicalSection() {
-		ptntMedicalInfoSection = new Panel("Medical Conditions :");
-		ptntMedicalInfoSection.setSizeFull();
-		ptntMedicalInfoSection.addStyleName("arziContent");
-		viewLayout.addComponent(ptntMedicalInfoSection);
-		viewLayout.setExpandRatio(ptntMedicalInfoSection, 1.0f);
+	private void buildArziDetailsSection() {
+		arziDetailsSection = new Panel("Arzi Details:");
+		arziDetailsSection.setSizeFull();
+		arziDetailsSection.addStyleName("arziContent");
 
-		// Patient info customForm
-		ptntMedicalInfoForm = new CustomFormComponent();
-		ptntMedicalInfoForm.setImmediate(false);
-		ptntMedicalInfoForm.setSizeFull();
-		ptntMedicalInfoForm.setStyleName("customForm");
-		ptntMedicalInfoSection.setContent(ptntMedicalInfoForm);
+		// Arzi Details CustomForm
+		arziDetailsForm = new CustomFormComponent();
+		arziDetailsForm.setImmediate(false);
+		arziDetailsForm.setSizeFull();
+		arziDetailsForm.setStyleName("customForm");
+		arziDetailsSection.setContent(arziDetailsForm);
 
 		// This is needed so that if the panel has a fixed or percentual size
 		// and its content becomes too big to fit in the content area, the panel
 		// will scroll in the direction so that the content is visible or else
 		// the content will be cut to the width/height of the panel and cannot
 		// be scrolled and viewed entirely.
-		ptntMedicalInfoSection.getContent().setHeightUndefined();
+		arziDetailsSection.getContent().setHeightUndefined();
 
 		/**
 		 * Add the fields to the left FormLayout.
 		 * 
 		 */
 		FormLayout leftFormLayout = (FormLayout) MedicalArziUtils.findById(
-				ptntMedicalInfoForm,
+				arziDetailsForm,
 				MedicalArziConstants.CUSTOM_FORM_LEFTFORM_LAYOUT_ID);
 		// arziType
 		arziType = new ComboBox("Arzi Type:");
@@ -561,7 +587,7 @@ public class ArziFormComponent extends CustomComponent implements
 		 * 
 		 */
 		FormLayout rightFormLayout = (FormLayout) MedicalArziUtils.findById(
-				ptntMedicalInfoForm,
+				arziDetailsForm,
 				MedicalArziConstants.CUSTOM_FORM_RIGHTFORM_LAYOUT_ID);
 
 		// bodyPart
@@ -594,6 +620,27 @@ public class ArziFormComponent extends CustomComponent implements
 		procedure.setRequired(true);
 		rightFormLayout.addComponent(procedure);
 	}
+	
+	private void buildArziSummarySection() {
+		arziSummarySection = new Panel("Brief Summary of Arzi:");
+		arziSummarySection.setSizeFull();
+		arziSummarySection.addStyleName("arziContent");
+		
+		arziSummaryForm = new FormLayout();
+		arziSummaryForm.setImmediate(false);
+		arziSummaryForm.setSizeFull();
+		arziSummaryForm.setStyleName("customForm");
+		arziSummarySection.setContent(arziSummaryForm);
+		
+		arziSummary = new TextArea("Summary:");
+		arziSummary.setImmediate(false);
+		arziSummary.setNullRepresentation("");
+		arziSummary.setWidth(70, Unit.PERCENTAGE);
+		arziSummary.setWordwrap(true);
+		arziSummary.setMaxLength(4000);
+		arziSummary.setRequired(true);
+		arziSummaryForm.addComponent(arziSummary);
+	}	
 
 	private void buildButtonsLayout() {
 
@@ -618,11 +665,6 @@ public class ArziFormComponent extends CustomComponent implements
 
 		buttonsLayout.setSpacing(true);
 		buttonsLayout.setStyleName("ptntRegistrationBtn");
-
-		// adds buttonLayout to the viewLayout
-		viewLayout.addComponent(buttonsLayout);
-		viewLayout
-				.setComponentAlignment(buttonsLayout, Alignment.MIDDLE_CENTER);
 	}
 
 	@Override

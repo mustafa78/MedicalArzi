@@ -6,6 +6,7 @@
 	    <id column="ARZI_ID" property="arziId" jdbcType="INTEGER" />
 	    <result column="ptntItsNbr" property="itsNumber" jdbcType="INTEGER" />
 	    <result column="otherCond" property="otherCondition" jdbcType="VARCHAR" />
+	    <result column="arziSummary" property="arziSummary" jdbcType="VARCHAR" />
 	    <result column="drConsultNote" property="doctorConsultNote" jdbcType="VARCHAR" />
 	    <result column="activeInd" property="activeInd" jdbcType="VARCHAR" javaType="BOOLEAN" />
 	    <result column="hdrCreateUserId" property="createdBy" jdbcType="VARCHAR" />
@@ -90,6 +91,7 @@
   		hdr.BDY_PRT_ID as "bodyPartId",
   		hdr.COND_ID as "conditionId",
   		hdr.OTHR_COND as "otherCond",
+  		hdr.ARZI_SMRY as "arziSummary",
   		hdr.DR_CNSLT_NOTE as "drConsultNote",
   		hdr.ACTV_IND as "activeInd",
   		hdr.COND_STRT_DT_ID as "condStartDtId",
@@ -235,7 +237,7 @@
 		where 
 			dtl.RVWR_ITS_NBR = #{reviewerItsNumber,jdbcType=INTEGER} and
 			dtl.STATUS_ID = 1002 and
-			hdr.CURR_STATUS_ID != 1001
+			hdr.CURR_STATUS_ID = 1002
 	</select>
 	
 	<select id="selectCommentsByArziId" resultMap="ArziCommentResultMap">
@@ -267,6 +269,7 @@
 				COND_ID,
 				OTHR_COND,
 				COND_STRT_DT_ID,
+				ARZI_SMRY,
 				CREATE_USR_ID,
 				CREATE_TS,
 				LST_UPDT_USR_ID,
@@ -282,6 +285,7 @@
 			#{condition.conditionId,jdbcType=INTEGER},
 			#{otherCondition,jdbcType=VARCHAR},
 			#{conditionStartDate.gregorianDateId,jdbcType=INTEGER},
+			#{arziSummary,jdbcType=VARCHAR},
 			#{itsNumber,jdbcType=INTEGER},
 			now(),
 			#{itsNumber,jdbcType=INTEGER},
@@ -361,18 +365,26 @@
       		<if test="otherCondition != null">
       			OTHR_COND = #{otherCondition,jdbcType=VARCHAR},
       		</if>
+      		<if test="arziSummary != null">
+      			ARZI_SMRY = #{arziSummary,jdbcType=VARCHAR},
+      		</if>
       		<if test="conditionStartDate != null">
       			COND_STRT_DT_ID = (select DT_ID from D_DATE where CAL_DT = #{conditionStartDate.gregorianCalDate,jdbcType=DATE}),
       		</if>
       		<if test="procedure != null">
       			PROC_ID = #{procedure.procedureId,jdbcType=INTEGER},
       		</if>
+      		<if test="doctorConsultNote != null">
+      			DR_CNSLT_NOTE = #{doctorConsultNote,jdbcType=VARCHAR},
+      		</if>
       		<if test="currentStatus != null">
       			CURR_STATUS_ID = #{currentStatus.statusId,jdbcType=INTEGER},
       		</if>
-      		LST_UPDT_USR_ID = #{itsNumber,jdbcType=VARCHAR},
+      		<if test="updatedBy != null">
+      			LST_UPDT_USR_ID = #{updatedBy,jdbcType=VARCHAR},
+      		</if>
       		LST_UPDT_TS = now()
-      		 where ARZI_ID = #{arziId,jdbcType=INTEGER}
+      		where ARZI_ID = #{arziId,jdbcType=INTEGER}
 	    </set>
     </update>
     
@@ -390,9 +402,11 @@
       		<if test="currentStatusDate != null">
       			CURR_STATUS_DT_ID = (select DT_ID from D_DATE where CAL_DT = #{currentStatusDate.gregorianCalDate,jdbcType=DATE}),
       		</if>
-      		LST_UPDT_USR_ID = #{itsNumber,jdbcType=VARCHAR},
+      		<if test="updatedBy != null">
+      			LST_UPDT_USR_ID = #{updatedBy,jdbcType=VARCHAR},
+      		</if>      		
       		LST_UPDT_TS = now()
-      		 where ARZI_ID = #{arziId,jdbcType=INTEGER}
+      		where ARZI_ID = #{arziId,jdbcType=INTEGER}
 	    </set>
     </update>
     
