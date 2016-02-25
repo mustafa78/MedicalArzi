@@ -32,10 +32,10 @@ public class ArziFooterComponent extends CustomComponent {
 	 * visual editor.
 	 */
 	public ArziFooterComponent() {
+		
 		buildMainLayout();
+		
 		setCompositionRoot(mainLayout);
-
-		// TODO add user code here
 	}
 
 	private void buildMainLayout() {
@@ -44,6 +44,8 @@ public class ArziFooterComponent extends CustomComponent {
 
 		// the main layout and components will be created here
 		mainLayout = new VerticalLayout();
+		mainLayout.setSpacing(true);
+		mainLayout.setMargin(true);
 
 		String currentYear = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
 
