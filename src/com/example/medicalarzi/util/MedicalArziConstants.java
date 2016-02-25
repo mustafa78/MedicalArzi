@@ -49,8 +49,6 @@ public interface MedicalArziConstants {
 	
 	final static public Integer MAP_GENDER_FEMALE_ID = 1006;
 	
-	final static public Integer MAP_OTHER_CONDITION_ID = 3016;
-	
 	final static public Integer SEARCH_PERIOD_LAST_7_DAYS_ID = 1007;
 	
 	final static public Integer SEARCH_PERIOD_LAST_10_DAYS_ID = 1008;
@@ -139,9 +137,9 @@ public interface MedicalArziConstants {
 
 	final static public Long SEC_ROLE_ID_ADMIN = 1004L;
 	
-	final static public Long COND_OTHER_ID = -1L;
+	final static public Long CONDITION_OTHER_ID = -3L;
 	
-	final static public Long PROC_OTHER_ID = -1L;
+	final static public Long PROCEDURE_OTHER_ID = -3L;
 	
-	final static public Long BODY_PART_OTHER_ID = -1L;
+	final static public Long BODY_PART_OTHER_ID = -3L;
 }

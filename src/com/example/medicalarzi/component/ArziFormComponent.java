@@ -87,7 +87,13 @@ public class ArziFormComponent extends CustomComponent implements
 	private ArziDateField conditionStartDate;
 
 	@PropertyId("otherCondition")
-	private TextField otherCondition;	
+	private TextField otherCondition;
+	
+	@PropertyId("otherProcedure")
+	private TextField otherProcedure;
+	
+	@PropertyId("otherBodyPart")
+	private TextField otherBodyPart;
 
 	/******************
 	 * Arzi Summary
@@ -574,22 +580,6 @@ public class ArziFormComponent extends CustomComponent implements
 		condition.addValueChangeListener(this);
 		leftFormLayout.addComponent(condition);
 
-		// other condition
-		otherCondition = new TextField("Other Condition:");
-		otherCondition.setDescription("Please enter your condition..");
-		otherCondition.setWidth("300px");
-		otherCondition.setNullRepresentation("");
-		leftFormLayout.addComponent(otherCondition);		
-
-
-		/**
-		 * Add the fields to the right FormLayout.
-		 * 
-		 */
-		FormLayout rightFormLayout = (FormLayout) MedicalArziUtils.findById(
-				arziDetailsForm,
-				MedicalArziConstants.CUSTOM_FORM_RIGHTFORM_LAYOUT_ID);
-
 		// bodyPart
 		bodyPart = new ComboBox("Body Part:");
 		bodyPart.setContainerDataSource(MedicalArziUtils
@@ -599,16 +589,8 @@ public class ArziFormComponent extends CustomComponent implements
 		bodyPart.setItemCaptionMode(ItemCaptionMode.PROPERTY);
 		bodyPart.setItemCaptionPropertyId("bodyPartName");
 		bodyPart.setRequired(true);
-		rightFormLayout.addComponent(bodyPart);
+		leftFormLayout.addComponent(bodyPart);
 		
-		// condition start date
-		conditionStartDate = new ArziDateField("Condition Start Date:");
-		conditionStartDate.setImmediate(true);
-		conditionStartDate
-				.setDescription("Please enter the date in the dd/MM/yyy format.");
-		conditionStartDate.setRequired(true);
-		rightFormLayout.addComponent(conditionStartDate);
-
 		// procedure
 		procedure = new ComboBox("Medical Procedure:");
 		procedure.setContainerDataSource(MedicalArziUtils
@@ -618,7 +600,46 @@ public class ArziFormComponent extends CustomComponent implements
 		procedure.setItemCaptionMode(ItemCaptionMode.PROPERTY);
 		procedure.setItemCaptionPropertyId("procedureName");
 		procedure.setRequired(true);
-		rightFormLayout.addComponent(procedure);
+		leftFormLayout.addComponent(procedure);
+		
+		/**
+		 * Add the fields to the right FormLayout.
+		 * 
+		 */
+		FormLayout rightFormLayout = (FormLayout) MedicalArziUtils.findById(
+				arziDetailsForm,
+				MedicalArziConstants.CUSTOM_FORM_RIGHTFORM_LAYOUT_ID);
+
+		// condition start date
+		conditionStartDate = new ArziDateField("Condition Start Date:");
+		conditionStartDate.setImmediate(true);
+		conditionStartDate
+				.setDescription("Please enter the date in the dd/MM/yyy format.");
+		conditionStartDate.setRequired(true);
+		rightFormLayout.addComponent(conditionStartDate);
+
+		// other condition
+		otherCondition = new TextField("Other Condition:");
+		otherCondition.setDescription("Please enter your condition..");
+		otherCondition.setWidth("300px");
+		otherCondition.setNullRepresentation("");
+		rightFormLayout.addComponent(otherCondition);
+		
+		// other procedure
+		otherProcedure = new TextField("Other Procedure:");
+		otherProcedure.setDescription("Please enter your procedure..");
+		otherProcedure.setWidth("300px");
+		otherProcedure.setNullRepresentation("");
+		rightFormLayout.addComponent(otherProcedure);
+		
+		// other body part
+		otherBodyPart = new TextField("Other Body Part:");
+		otherBodyPart.setDescription("Please enter your body part..");
+		otherBodyPart.setWidth("300px");
+		otherBodyPart.setNullRepresentation("");
+		rightFormLayout.addComponent(otherBodyPart);		
+		
+		
 	}
 	
 	private void buildArziSummarySection() {
@@ -778,7 +799,7 @@ public class ArziFormComponent extends CustomComponent implements
 			Condition selectedCondition = (Condition) event.getProperty()
 					.getValue();
 
-			if (selectedCondition.getConditionId().intValue() == MedicalArziConstants.MAP_OTHER_CONDITION_ID
+			if (selectedCondition.getConditionId().intValue() == MedicalArziConstants.CONDITION_OTHER_ID
 					.intValue()) {
 				otherCondition.setVisible(true);
 				otherCondition.setRequired(true);
@@ -786,6 +807,34 @@ public class ArziFormComponent extends CustomComponent implements
 			} else {
 				otherCondition.setVisible(false);
 				otherCondition.setRequired(false);
+			}
+		} else if (event.getProperty().getValue() instanceof Procedure) {
+
+			Procedure selectedProcedure = (Procedure) event.getProperty()
+					.getValue();
+
+			if (selectedProcedure.getProcedureId().intValue() == MedicalArziConstants.PROCEDURE_OTHER_ID
+					.intValue()) {
+				otherProcedure.setVisible(true);
+				otherProcedure.setRequired(true);
+
+			} else {
+				otherProcedure.setVisible(false);
+				otherProcedure.setRequired(false);
+			}
+		} else if (event.getProperty().getValue() instanceof BodyPart) {
+
+			BodyPart selectedBodyPart = (BodyPart) event.getProperty()
+					.getValue();
+
+			if (selectedBodyPart.getBodyPartId().intValue() == MedicalArziConstants.BODY_PART_OTHER_ID
+					.intValue()) {
+				otherBodyPart.setVisible(true);
+				otherBodyPart.setRequired(true);
+
+			} else {
+				otherBodyPart.setVisible(false);
+				otherBodyPart.setRequired(false);
 			}
 		}
 	}

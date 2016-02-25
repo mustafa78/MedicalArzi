@@ -16,8 +16,10 @@ import com.example.medicalarzi.component.ArziHeaderComponent;
 import com.example.medicalarzi.component.InboxComponent;
 import com.example.medicalarzi.component.PendingTasksComponent;
 import com.example.medicalarzi.component.SearchComponent;
+import com.example.medicalarzi.model.BodyPart;
 import com.example.medicalarzi.model.Condition;
 import com.example.medicalarzi.model.Patient;
+import com.example.medicalarzi.model.Procedure;
 import com.example.medicalarzi.model.SecurityRole;
 import com.example.medicalarzi.service.LookupService;
 import com.example.medicalarzi.service.PatientService;
@@ -146,7 +148,6 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		logger.debug("Inside the Medical Arzi Landing View.");
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void enter(ViewChangeEvent event) {
 		// Get the patient's full name from the session
@@ -160,16 +161,12 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 				String.valueOf(patient.getItsNumber()));
 
 		// Select the default condition as Other
-		List<Condition> listOfConditions = (List<Condition>) newArziComponent
-				.getCondition().getItemIds();
-		for (Iterator<Condition> iterator = listOfConditions.iterator(); iterator
-				.hasNext();) {
-			Condition condition = (Condition) iterator.next();
-			if (condition.getConditionName().equals("Other")) {
-				newArziComponent.getCondition().select(condition);
-				break;
-			}
-		}
+		setDefaultCondition();
+		// Select the default procedure as Other
+		setDefaultProcedure();
+		// Select the default body part as Other
+		setDefaultBodyPart();
+		
 
 		makeFieldsReadOnlyForNewArzi(true);
 
@@ -186,6 +183,63 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 
 		Notification.show("Welcome to the Medical Arzi View!!!");
 	}
+
+	/**
+	 * This method is responsible for iterating through the list of 'Conditions'
+	 * and setting the 'Other' as the default condition.
+	 */
+	@SuppressWarnings("unchecked")
+	private void setDefaultCondition() {
+		List<Condition> listOfConditions = (List<Condition>) newArziComponent
+				.getCondition().getItemIds();
+		for (Iterator<Condition> iterator = listOfConditions.iterator(); iterator
+				.hasNext();) {
+			Condition condition = (Condition) iterator.next();
+			if (condition.getConditionId().equals(MedicalArziConstants.CONDITION_OTHER_ID)) {
+				newArziComponent.getCondition().select(condition);
+				break;
+			}
+		}
+	}
+	
+	/**
+	 * This method is responsible for iterating through the list of 'Procedure'
+	 * and setting the 'Other' as the default procedure.
+	 */
+	@SuppressWarnings("unchecked")
+	private void setDefaultProcedure() {
+		List<Procedure> listOfProcedures = (List<Procedure>) newArziComponent
+				.getProcedure().getItemIds();
+		for (Iterator<Procedure> iterator = listOfProcedures.iterator(); iterator
+				.hasNext();) {
+			Procedure procedure = (Procedure) iterator.next();
+			if (procedure.getProcedureId().equals(MedicalArziConstants.PROCEDURE_OTHER_ID)) {
+				newArziComponent.getProcedure().select(procedure);
+				break;
+			}
+		}
+	}
+
+	/**
+	 * This method is responsible for iterating through the list of 'BodyParts'
+	 * and setting the 'Other' as the default body part.
+	 */
+	@SuppressWarnings("unchecked")
+	private void setDefaultBodyPart() {
+		List<BodyPart> listOfBodyParts = (List<BodyPart>) newArziComponent
+				.getBodyPart().getItemIds();
+		for (Iterator<BodyPart> iterator = listOfBodyParts.iterator(); iterator
+				.hasNext();) {
+			BodyPart bodyPart = (BodyPart) iterator.next();
+			if (bodyPart.getBodyPartId().equals(MedicalArziConstants.BODY_PART_OTHER_ID)) {
+				newArziComponent.getBodyPart().select(bodyPart);
+				break;
+			}
+		}
+	}
+	
+	
+	
 
 	/**
 	 * This method should first build the main layout, set the composition root

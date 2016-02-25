@@ -6,6 +6,8 @@
 	    <id column="ARZI_ID" property="arziId" jdbcType="INTEGER" />
 	    <result column="ptntItsNbr" property="itsNumber" jdbcType="INTEGER" />
 	    <result column="otherCond" property="otherCondition" jdbcType="VARCHAR" />
+	    <result column="otherProc" property="otherProcedure" jdbcType="VARCHAR" />
+	    <result column="otherBdyPrt" property="otherBodyPart" jdbcType="VARCHAR" />
 	    <result column="arziSummary" property="arziSummary" jdbcType="VARCHAR" />
 	    <result column="drConsultNote" property="doctorConsultNote" jdbcType="VARCHAR" />
 	    <result column="activeInd" property="activeInd" jdbcType="VARCHAR" javaType="BOOLEAN" />
@@ -91,6 +93,8 @@
   		hdr.BDY_PRT_ID as "bodyPartId",
   		hdr.COND_ID as "conditionId",
   		hdr.OTHR_COND as "otherCond",
+  		hdr.OTHR_PROC as "otherProc",
+  		hdr.OTHR_BDY_PRT as "otherBdyPrt",
   		hdr.ARZI_SMRY as "arziSummary",
   		hdr.DR_CNSLT_NOTE as "drConsultNote",
   		hdr.ACTV_IND as "activeInd",
@@ -268,6 +272,8 @@
 				BDY_PRT_ID,
 				COND_ID,
 				OTHR_COND,
+				OTHR_PROC,
+				OTHR_BDY_PRT,
 				COND_STRT_DT_ID,
 				ARZI_SMRY,
 				CREATE_USR_ID,
@@ -284,6 +290,8 @@
 			#{bodyPart.bodyPartId,jdbcType=INTEGER},
 			#{condition.conditionId,jdbcType=INTEGER},
 			#{otherCondition,jdbcType=VARCHAR},
+			#{otherProcedure,jdbcType=VARCHAR},
+			#{otherBodyPart,jdbcType=VARCHAR},
 			#{conditionStartDate.gregorianDateId,jdbcType=INTEGER},
 			#{arziSummary,jdbcType=VARCHAR},
 			#{itsNumber,jdbcType=INTEGER},
@@ -364,6 +372,12 @@
       		</if>
       		<if test="otherCondition != null">
       			OTHR_COND = #{otherCondition,jdbcType=VARCHAR},
+      		</if>
+      		<if test="otherProcedure != null">
+      			OTHR_PROC = #{otherProcedure,jdbcType=VARCHAR},
+      		</if>
+      		<if test="otherBodyPart != null">
+      			OTHR_BDY_PRT = #{otherBodyPart,jdbcType=VARCHAR},
       		</if>
       		<if test="arziSummary != null">
       			ARZI_SMRY = #{arziSummary,jdbcType=VARCHAR},

@@ -805,7 +805,7 @@ public class InboxComponent extends CustomComponent implements
 			Condition selectedCondition = (Condition) event.getProperty()
 					.getValue();
 
-			if (selectedCondition.getConditionId().intValue() == MedicalArziConstants.MAP_OTHER_CONDITION_ID
+			if (selectedCondition.getConditionId().intValue() == MedicalArziConstants.CONDITION_OTHER_ID
 					.intValue()) {
 				otherCondition.setVisible(true);
 				otherCondition.setRequired(true);

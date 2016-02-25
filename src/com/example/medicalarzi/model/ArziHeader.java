@@ -39,6 +39,10 @@ public class ArziHeader implements Serializable {
 	private Status currentStatus;
 	
 	private String otherCondition;
+	
+	private String otherProcedure;
+	
+	private String otherBodyPart;
 
 	// These properties are initialized because when we are binding the
 	// properties to the UI widgets, the nested properties throw exceptions if
@@ -192,6 +196,22 @@ public class ArziHeader implements Serializable {
 		this.otherCondition = otherCondition;
 	}
 	
+	public String getOtherProcedure() {
+		return otherProcedure;
+	}
+
+	public void setOtherProcedure(String otherProcedure) {
+		this.otherProcedure = otherProcedure;
+	}
+
+	public String getOtherBodyPart() {
+		return otherBodyPart;
+	}
+
+	public void setOtherBodyPart(String otherBodyPart) {
+		this.otherBodyPart = otherBodyPart;
+	}
+
 	public Boolean getActiveInd() {
 		return activeInd;
 	}
