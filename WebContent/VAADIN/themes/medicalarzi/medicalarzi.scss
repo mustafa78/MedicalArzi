@@ -37,7 +37,7 @@ $v-error-indicator-color: #ed473b;
 		background-color: #DAF1F2;
 	}
 
-	.v-caption, .v-captiontext {
+	.v-caption, .v-captiontext, .v-checkbox {
 		font-family: Verdana;
 		font-size: 12px;
 		font-weight: bold;
@@ -224,4 +224,34 @@ $v-error-indicator-color: #ed473b;
     	background: #B6C9D3;
 	}
 
+	/*for the other info textarea component*/
+	.ptntMedHist {
+		margin-left: 10px;
+		margin-bottom: 10px;
+	}
+	
+	/*for the other info textarea caption*/
+	.v-caption-ptntMedHist {
+		margin-left: 12px;
+		margin-bottom: 5px;
+	}
+	
+	/*for the ptnt address instruction text*/
+	.v-caption-instructionTxt .v-captiontext {
+		margin-left: 10px;	
+		color: #6E646F;
+	}
+	
+	.v-caption-primLoc-captiontxt {
+		margin-left: 15px;
+	}
+	
+	.primLoc-captiontxt .v-select-option {
+		margin-left: 15px;
+		margin-top: 15px;
+		margin-bottom: 10px;
+		font-family: verdana;
+		font-weight: bold;
+		font-size: 12px;
+	}
 }
