@@ -25,6 +25,7 @@
 		<typeAlias alias="Lookup" type="com.example.medicalarzi.model.Lookup" />
 		<typeAlias alias="GregHijDate" type="com.example.medicalarzi.model.GregHijDate" />
 		<typeAlias alias="Jamaat" type="com.example.medicalarzi.model.Jamaat" />
+		<typeAlias alias="Location" type="com.example.medicalarzi.model.Location" />
 		<typeAlias alias="ArziSearchCriteria" type="com.example.medicalarzi.model.ArziSearchCriteria" />
 		<typeAlias alias="ArziSearchResult" type="com.example.medicalarzi.model.ArziSearchResult" />
 		<typeAlias alias="ArziComment" type="com.example.medicalarzi.model.ArziComment" />
