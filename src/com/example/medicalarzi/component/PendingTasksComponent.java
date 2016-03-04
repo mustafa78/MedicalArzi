@@ -354,12 +354,6 @@ public class PendingTasksComponent extends CustomComponent implements
 		// Patient's profile information set to read only.
 		reviewArziComponent.getItsNumber().setReadOnly(true);
 
-		reviewArziComponent.getFirstName().setReadOnly(true);
-
-		reviewArziComponent.getMiddleName().setReadOnly(true);
-
-		reviewArziComponent.getLastName().setReadOnly(true);
-
 		reviewArziComponent.getGender().setReadOnly(true);
 
 		reviewArziComponent.getDob().setReadOnly(true);
@@ -368,9 +362,9 @@ public class PendingTasksComponent extends CustomComponent implements
 
 		reviewArziComponent.getAddressLn2().setReadOnly(true);
 
-		reviewArziComponent.getCity().setReadOnly(true);
+		//reviewArziComponent.getCity().setReadOnly(true);
 
-		reviewArziComponent.getCountryState().setReadOnly(true);
+		//reviewArziComponent.getCountryState().setReadOnly(true);
 
 		reviewArziComponent.getZip().setReadOnly(true);
 
