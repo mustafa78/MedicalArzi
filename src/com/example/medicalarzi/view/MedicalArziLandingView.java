@@ -352,13 +352,9 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 	private void makeFieldsReadOnlyForNewArzi(boolean flag) {
 		newArziComponent.getItsNumber().setReadOnly(true);
 
-		newArziComponent.getFirstName().setReadOnly(true);
-
-		newArziComponent.getMiddleName().setReadOnly(true);
-
-		newArziComponent.getLastName().setReadOnly(true);
-
 		newArziComponent.getGender().setReadOnly(true);
+		
+		newArziComponent.getDob().setReadOnly(true);
 	}
 
 	@Override
