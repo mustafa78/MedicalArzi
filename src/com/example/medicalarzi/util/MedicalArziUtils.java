@@ -31,14 +31,14 @@ import com.vaadin.server.Page;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.Position;
+import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.HasComponents;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.TextField;
 
 /**
  * @author Mkanchwa
@@ -97,6 +97,7 @@ public class MedicalArziUtils {
 
 		return null;
 	}
+	
 
 	/**
 	 * Constructs a com.vaadin.data.util.BeanItemContainer container based on a
@@ -135,6 +136,9 @@ public class MedicalArziUtils {
 		else if (objClass == ArziSearchResult.class)
 			container = new BeanItemContainer<ArziSearchResult>(
 					(Class<? super ArziSearchResult>) objClass);
+		else if(objClass == String.class)
+			container = new BeanItemContainer<String>(
+					(Class<? super String>) objClass);
 
 		return container;
 	}
