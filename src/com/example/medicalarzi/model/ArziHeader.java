@@ -57,6 +57,21 @@ public class ArziHeader implements Serializable {
 	
 	private String doctorConsultNote;
 	
+	/*
+	 * If the location at the time of submitting the arzi is not the patient's
+	 * primary location, all this information will be stored along with the arzi
+	 * and the primary location info in the Patient's table will not be updated.
+	 */
+	private String tempHomeAddress1;
+
+	private String tempHomeAddress2;
+	
+	private String tempPhoneNum;
+
+	private Location tempLocation;
+	
+	private String tempZip;
+	
 	private List<ArziComment> arziComments;
 	
 	private Boolean activeInd;
@@ -234,6 +249,46 @@ public class ArziHeader implements Serializable {
 
 	public void setDoctorConsultNote(String doctorConsultNote) {
 		this.doctorConsultNote = doctorConsultNote;
+	}
+
+	public String getTempHomeAddress1() {
+		return tempHomeAddress1;
+	}
+
+	public void setTempHomeAddress1(String tempHomeAddress1) {
+		this.tempHomeAddress1 = tempHomeAddress1;
+	}
+
+	public String getTempHomeAddress2() {
+		return tempHomeAddress2;
+	}
+
+	public void setTempHomeAddress2(String tempHomeAddress2) {
+		this.tempHomeAddress2 = tempHomeAddress2;
+	}
+	
+	public String getTempPhoneNum() {
+		return tempPhoneNum;
+	}
+
+	public void setTempPhoneNum(String tempPhoneNum) {
+		this.tempPhoneNum = tempPhoneNum;
+	}
+	
+	public Location getTempLocation() {
+		return tempLocation;
+	}
+
+	public void setTempLocation(Location tempLocation) {
+		this.tempLocation = tempLocation;
+	}
+
+	public String getTempZip() {
+		return tempZip;
+	}
+
+	public void setTempZip(String tempZip) {
+		this.tempZip = tempZip;
 	}
 
 	public List<ArziComment> getArziComments() {

@@ -16,6 +16,7 @@ import com.example.medicalarzi.model.BodyPart;
 import com.example.medicalarzi.model.Condition;
 import com.example.medicalarzi.model.GregHijDate;
 import com.example.medicalarzi.model.Jamaat;
+import com.example.medicalarzi.model.Location;
 import com.example.medicalarzi.model.Lookup;
 import com.example.medicalarzi.model.Procedure;
 import com.example.medicalarzi.model.SecurityRole;
@@ -148,6 +149,34 @@ public class LookupServiceImpl implements LookupService {
 	@Override
 	public SecurityRole getSecurityRoleById(Long securityRole) {
 		return securityMapper.selectSecurityRoleById(securityRole);
+	}
+
+	@Override
+	public List<String> getListOfAllCountries() {
+		return lookupMapper.selectAllDistinctCountries();
+	}
+
+	@Override
+	public List<String> getListOfAllStatesForCountry(String country) {
+		return lookupMapper.selectAllDistinctStatesByCountry(country);
+	}
+
+	@Override
+	public List<String> getListOfAllCitiesForStateAndCountry(String state,
+			String country) {
+		return lookupMapper.selectAllCitiesByStateAndCountry(state, country);
+	}
+
+	@Override
+	public Location getLocationForAddress(String city, String state,
+			String country) {
+		return lookupMapper.selectLocationByCityStateAndCountry(city, state,
+				country);
+	}
+
+	@Override
+	public Location getLocation(Long locationId) {
+		return lookupMapper.selectLocationById(locationId);
 	}
 
 }

@@ -65,10 +65,8 @@ public class Patient implements Serializable {
 
 	private String homeAddress2;
 
-	private String city;
-
-	private String state;
-
+	private Location location;
+	
 	private String zip;
 
 	private Jamaat jamaat;
@@ -287,33 +285,17 @@ public class Patient implements Serializable {
 	}
 
 	/**
-	 * @return the city
+	 * @return the location
 	 */
-	public String getCity() {
-		return city;
+	public Location getLocation() {
+		return location;
 	}
 
 	/**
-	 * @param city
-	 *            the city to set
+	 * @param location the location to set
 	 */
-	public void setCity(String city) {
-		this.city = city;
-	}
-
-	/**
-	 * @return the state
-	 */
-	public String getState() {
-		return state;
-	}
-
-	/**
-	 * @param state
-	 *            the state to set
-	 */
-	public void setState(String state) {
-		this.state = state;
+	public void setLocation(Location location) {
+		this.location = location;
 	}
 
 	/**

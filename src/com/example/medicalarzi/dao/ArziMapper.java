@@ -41,7 +41,7 @@ public interface ArziMapper {
 	 * @param comment
 	 */
 	public void insertArziComment(ArziComment comment);
-
+	
 	/**
 	 * This method is responsible for returning all the saved or submitted arzis
 	 * for a patient based on their ITS Number.
@@ -166,5 +166,4 @@ public interface ArziMapper {
 	 * @param arziId
 	 */
 	public void deleteArziDetailById(@Param("arziId") Long arziId);
-
 }

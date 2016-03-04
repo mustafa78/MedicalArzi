@@ -14,9 +14,6 @@
 	    <result column="EMAIL_ADDR1" property="emailAddress" jdbcType="VARCHAR" />
 	    <result column="ADDR_LN_1" property="homeAddress1" jdbcType="VARCHAR" />
 	    <result column="ADDR_LN_2" property="homeAddress2" jdbcType="VARCHAR" />
-	    <result column="CITY" property="city" jdbcType="VARCHAR" />
-	    <result column="ST_CD" property="state" jdbcType="VARCHAR" />
-	    <result column="CNTY_ID" property="updatedDate" jdbcType="INTEGER" />
 	    <result column="ZIP_CD" property="zip" jdbcType="VARCHAR" />
 	    <result column="ACTV_IND" property="activeInd" jdbcType="VARCHAR" javaType="BOOLEAN" />
 	    <result column="CREATE_USR_ID" property="createdBy" jdbcType="VARCHAR" />
@@ -38,10 +35,32 @@
 		</association>
 		<association property="jamaat" column="jamaatId" javaType="Jamaat" 
 			select="com.example.medicalarzi.dao.LookupMapper.selectJamaatById" />
+		<association property="location" column="locationId" javaType="Location" 
+			select="com.example.medicalarzi.dao.LookupMapper.selectLocationById"/>
 		<collection column="PTNT_ITS_NBR" property="roles" ofType="SecurityRole" javaType="java.util.ArrayList" 
 			select="com.example.medicalarzi.dao.SecurityMapper.selectSecurityRolesForUser" />
   	</resultMap>
   	
+  	<resultMap id="medicalHistoryResultMap" type="MedicalHistory" >
+  		<id column="ptntItsNbr" property="itsNumber" jdbcType="INTEGER" />
+  		<result column="primaryDrName" property="primaryDrName" jdbcType="TIMESTAMP" />
+  		<result column="primaryDrPhone" property="primaryDrPhone" jdbcType="VARCHAR" />
+  		<result column="asthmaInd" property="asthmaInd" jdbcType="VARCHAR" javaType="BOOLEAN" />
+  		<result column="cholesterolInd" property="cholesterolInd" jdbcType="VARCHAR" javaType="BOOLEAN" />
+  		<result column="atrialfibInd" property="atrialFibrillationInd" jdbcType="VARCHAR" javaType="BOOLEAN" />
+  		<result column="diabetesInd" property="diabetesInd" jdbcType="VARCHAR" javaType="BOOLEAN" />
+  		<result column="hyperTensionInd" property="hyperTensionInd" jdbcType="VARCHAR" javaType="BOOLEAN" />
+  		<result column="thyroidDisId" property="thyroidDisorderInd" jdbcType="VARCHAR" javaType="BOOLEAN" />
+  		<result column="cancerType" property="cancerType" jdbcType="VARCHAR" />
+  		<result column="heartDiseaseType" property="heartDiseaseType" jdbcType="VARCHAR" />
+  		<result column="otherInfo" property="otherInfo" jdbcType="VARCHAR" />
+  		<result column="medHistCreateUserId" property="createdBy" jdbcType="VARCHAR" />
+	    <result column="medHistCreateTS" property="createdDate" jdbcType="TIMESTAMP" />
+	    <result column="medHistLastUpdUserId" property="updatedBy" jdbcType="VARCHAR" />
+	    <result column="medHistLastUpdTS" property="updatedDate" jdbcType="TIMESTAMP" />
+  	</resultMap>
+
+	<!-- SQL fragments -->  	
   	<sql id="ptntColumnList">
   		PTNT_ITS_NBR,
   		TTL_ID AS "ptntTitleId",
@@ -57,9 +76,7 @@
   		EMAIL_ADDR1,
   		ADDR_LN_1,
   		ADDR_LN_2,
-  		CITY,
-  		ST_CD,
-  		CNTY_ID,
+  		LOC_ID AS "locationId",
   		ZIP_CD,
   		JAMAAT_ID AS "jamaatId",
   		ACTV_IND,
@@ -72,6 +89,25 @@
   		(SELECT LKUP_VAL FROM D_LOOKUPS WHERE LKUP_ID = GNDR_IND_ID) AS "genderVal",
   		(SELECT LKUP_DESC FROM D_LOOKUPS WHERE LKUP_ID = GNDR_IND_ID) AS "genderDescription"
   	</sql>
+  	
+  	<sql id="medHistColumnList">
+  		mhst.ITS_NBR as "ptntItsNbr",
+  		mhst.PRIM_DR_NM as "primaryDrName",
+  		mhst.PRIM_DR_PHN as "primaryDrPhone",
+  		mhst.ASTHMA_IND as "asthmaInd",
+  		mhst.CHLSTRL_IND as "cholesterolInd",
+  		mhst.AFIB_IND as "atrialfibInd",
+  		mhst.DBTS_IND as "diabetesInd",
+  		mhst.HYPR_TNSN_IND as "hypertensionId",
+  		mhst.THYRD_DISORD_IND as "thyroidDisId",
+  		mhst.CANCER_TYP as "cancerType",
+  		mhst.HEART_DIS_TYP as "heartDiseaseType",
+  		mhst.OTH_INFO as "otherInfo",
+  		mhst.CREATE_USR_ID as "medHistCreateUserId",
+  		mhst.CREATE_TS as "medHistCreateTS",
+  		mhst.LST_UPDT_USR_ID as "medHistLastUpdUserId",
+  		mhst.LST_UPDT_TS as "medHistLastUpdTS"
+  	</sql>  	
 
 	<!-- All the tables name and column names should be in CAPS or else it would not work in MySQL -->
   	<!-- Insert -->
@@ -105,6 +141,45 @@
 			now()) ]]>
 	</insert>
 	
+	<insert id="insertPtntMedicalHistory" parameterType="MedicalHistory">
+		<![CDATA[
+			insert into F_MED_HIST (
+				ITS_NBR,
+				PRIM_DR_NM,
+				PRIM_DR_PHN,
+				ASTHMA_IND,
+				CHLSTRL_IND,
+				AFIB_IND,
+				DBTS_IND,
+				HYPR_TNSN_IND,
+				THYRD_DISORD_IND,
+				CANCER_TYP,
+				HEART_DIS_TYP,
+				OTH_INFO,
+				CREATE_USR_ID,
+				CREATE_TS,
+				LST_UPDT_USR_ID,
+				LST_UPDT_TS
+			) values (
+			#{itsNumber,jdbcType=INTEGER},
+			#{primaryDrName,jdbcType=VARCHAR},
+			#{primaryDrPhone,jdbcType=VARCHAR},
+			#{asthmaInd,jdbcType=VARCHAR,javaType=BOOLEAN},
+			#{cholesterolInd,jdbcType=VARCHAR,javaType=BOOLEAN},
+			#{atrialFibrillationInd,jdbcType=VARCHAR,javaType=BOOLEAN},
+			#{diabetesInd,jdbcType=VARCHAR,javaType=BOOLEAN},
+			#{hyperTensionInd,jdbcType=VARCHAR,javaType=BOOLEAN},
+			#{thyroidDisorderInd,jdbcType=VARCHAR,javaType=BOOLEAN},
+			#{cancerType,jdbcType=VARCHAR},
+			#{heartDiseaseType,jdbcType=VARCHAR},
+			#{otherInfo,jdbcType=VARCHAR},
+			#{itsNumber,jdbcType=INTEGER},
+			now(),
+			#{itsNumber,jdbcType=INTEGER},
+			now()
+			 ) ]]>
+	</insert>	
+	
 	<!-- Update -->
 	<update id="updatePatientSelective" parameterType="Patient">
     	update D_PTNT
@@ -121,11 +196,8 @@
       		<if test="homeAddress2 != null">
       			addr_ln_2 = #{homeAddress2,jdbcType=VARCHAR},
       		</if>
-      		<if test="city != null">
-      			city = #{city,jdbcType=VARCHAR},
-      		</if>
-      		<if test="state != null">
-      			st_cd = #{state,jdbcType=VARCHAR},
+      		<if test="location != null">
+      			loc_id = #{location.locationId,jdbcType=VARCHAR},
       		</if>
       		<if test="zip != null">
       			zip_cd = #{zip,jdbcType=VARCHAR},
@@ -138,6 +210,50 @@
       		 where PTNT_ITS_NBR = #{itsNumber,jdbcType=INTEGER}
 	    </set>
     </update>
+    
+    <update id="updatePtntMedicalHistory" parameterType="MedicalHistory">
+     	update F_MED_HIST
+	    <set>
+      		<if test="primaryDrName != null">
+      			PRIM_DR_NM = #{primaryDrName,jdbcType=VARCHAR},
+      		</if>
+      		<if test="primaryDrPhone != null">
+      			PRIM_DR_PHN = #{primaryDrPhone,jdbcType=VARCHAR},
+      		</if>
+      		<if test="asthmaInd != null">
+      			ASTHMA_IND = #{asthmaInd,jdbcType=VARCHAR,javaType=BOOLEAN},
+      		</if>
+      		<if test="cholesterolInd != null">
+      			CHLSTRL_IND = #{cholesterolInd,jdbcType=VARCHAR,javaType=BOOLEAN},
+      		</if>
+      		<if test="atrialFibrillationInd != null">
+      			AFIB_IND = #{atrialFibrillationInd,jdbcType=VARCHAR,javaType=BOOLEAN},
+      		</if>
+      		<if test="diabetesInd != null">
+      			DBTS_IND = #{diabetesInd,jdbcType=VARCHAR,javaType=BOOLEAN},
+      		</if>
+      		<if test="hyperTensionInd != null">
+      			HYPR_TNSN_IND = #{hyperTensionInd,jdbcType=VARCHAR,javaType=BOOLEAN},
+      		</if>
+      		<if test="thyroidDisorderInd != null">
+      			THYRD_DISORD_IND = #{thyroidDisorderInd,jdbcType=VARCHAR,javaType=BOOLEAN},
+      		</if>
+      		<if test="cancerType != null">
+      			CANCER_TYP = #{cancerType,jdbcType=VARCHAR},
+      		</if>
+      		<if test="heartDiseaseType != null">
+      			HEART_DIS_TYP = #{heartDiseaseType,jdbcType=VARCHAR},
+      		</if>
+      		<if test="otherInfo != null">
+      			OTH_INFO = #{otherInfo,jdbcType=VARCHAR},
+      		</if>
+      		<if test="itsNumber != null">
+      			LST_UPDT_USR_ID = #{itsNumber,jdbcType=INTEGER},
+      		</if>
+      		LST_UPDT_TS = now()
+      		where ITS_NBR = #{itsNumber,jdbcType=INTEGER}
+	    </set>   
+    </update>    
 
 	<!-- Select -->
 	<select id="checkPatientPassword" resultType="string">
@@ -167,4 +283,10 @@
 		where PTNT_ITS_NBR = #{itsNumber,jdbcType=INTEGER}
 	</select>
 	
+	<select id="retrievePtntMedicalHistory" resultMap="medicalHistoryResultMap">
+		select
+			<include refid="medHistColumnList" />
+		from F_MED_HIST
+		where ITS_NBR = #{itsNumber,jdbcType=INTEGER}
+	</select>
 </mapper>

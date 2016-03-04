@@ -10,6 +10,7 @@ import com.example.medicalarzi.model.BodyPart;
 import com.example.medicalarzi.model.Condition;
 import com.example.medicalarzi.model.GregHijDate;
 import com.example.medicalarzi.model.Jamaat;
+import com.example.medicalarzi.model.Location;
 import com.example.medicalarzi.model.Lookup;
 import com.example.medicalarzi.model.Procedure;
 
@@ -26,14 +27,14 @@ public interface LookupMapper {
 	 *
 	 * @param lookupType
 	 *
-	 * @return java.util.List
+	 * @return java.util.List<com.example.medicalarzi.model.Lookup>
 	 */
 	public List<Lookup> selectByLookupType(
 			@Param("lookupType") String lookupType);
 
 	/**
 	 *
-	 * @return java.util.List
+	 * @return java.util.List<com.example.medicalarzi.model.Lookup>
 	 */
 	public List<Lookup> selectDistinctLookupTypes();
 
@@ -41,7 +42,7 @@ public interface LookupMapper {
 	 *
 	 * @param lookupType
 	 *
-	 * @return java.util.List
+	 * @return java.util.List<com.example.medicalarzi.model.Lookup>
 	 */
 	public List<Lookup> selectByLookupTypeValueSort(
 			@Param("lookupType") String lookupType);
@@ -90,25 +91,25 @@ public interface LookupMapper {
 	
 	/**
 	 * 
-	 * @return com.example.medicalarzi.model.Condition
+	 * @return java.util.List<com.example.medicalarzi.model.Condition>
 	 */
 	public List<Condition> selectAllMedicalConditions();
 	
 	/**
 	 * 
-	 * @return com.example.medicalarzi.model.Procedure
+	 * @return java.util.List<com.example.medicalarzi.model.Procedure>
 	 */
 	public List<Procedure> selectAllMedicalProcedures();
 	
 	/**
 	 * 
-	 * @return com.example.medicalarzi.model.BodyPart
+	 * @return java.util.List<com.example.medicalarzi.model.BodyPart>
 	 */
 	public List<BodyPart> selectAllBodyParts();
 	
 	/**
 	 * 
-	 * @return com.example.medicalarzi.model.ArziType
+	 * @return java.util.List<com.example.medicalarzi.model.ArziType>
 	 */
 	public List<ArziType> selectAllArziTypes();
 	
@@ -133,6 +134,7 @@ public interface LookupMapper {
 	public GregHijDate selectGregHijDateById(@Param("dateId") Long dateId);
 	
 	/**
+	 * This method is responsible for selecting all the available jamaats. 
 	 * 
 	 * @return com.example.medicalarzi.model.Jamaat
 	 */
@@ -147,4 +149,58 @@ public interface LookupMapper {
 	 * @return com.example.medicalarzi.model.Jamaat
 	 */
 	public Jamaat selectJamaatById(@Param("jamaatId") Long jamaatId);
+	
+	/**
+	 * This method is responsible for selecting all the distinct countries from
+	 * the D_LOCATION table.
+	 * 
+	 * @return java.util.List<java.util.String>
+	 */
+	public List<String> selectAllDistinctCountries();
+
+	/**
+	 * This method is responsible for selecting all the distinct states based on
+	 * the country from the D_LOCATION table.
+	 * 
+	 * @param country
+	 * 
+	 * @return java.util.List<java.lang.String>
+	 */
+	public List<String> selectAllDistinctStatesByCountry(
+			@Param("country") String country);
+
+	/**
+	 * This method is responsible for selecting all the cities based on the
+	 * state and country from the D_LOCATION table.
+	 * 
+	 * @param state
+	 * @param country
+	 * 
+	 * @return java.util.List<java.lang.String>
+	 */
+	public List<String> selectAllCitiesByStateAndCountry(
+			@Param("state") String state, @Param("country") String country);
+	
+	/**
+	 * This method is responsible for selecting the location based on the city,
+	 * state and country.
+	 * 
+	 * @param country
+	 * @param state
+	 * @param city
+	 * 
+	 * @return com.example.medicalarzi.model.Location
+	 */
+	public Location selectLocationByCityStateAndCountry(
+			@Param("city") String city, @Param("state") String state,
+			@Param("country") String country);
+	
+	/**
+	 * This method is responsible for selecting the location based on the id.
+	 * 
+	 * @param locationId
+	 * 
+	 * @return com.example.medicalarzi.model.Location
+	 */
+	public Location selectLocationById(@Param("locationId") Long locationId); 
 }

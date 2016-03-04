@@ -11,6 +11,7 @@ import org.apache.logging.log4j.core.Logger;
 import com.example.medicalarzi.dao.ArziMapper;
 import com.example.medicalarzi.dao.PatientMapper;
 import com.example.medicalarzi.model.Arzi;
+import com.example.medicalarzi.model.MedicalHistory;
 import com.example.medicalarzi.model.Patient;
 import com.example.medicalarzi.service.PatientService;
 import com.example.medicalarzi.util.MedicalArziConstants;
@@ -186,7 +187,6 @@ public class PatientServiceImpl implements PatientService {
 
 		logger.debug("Arzi with \"" + editedArzi.getArziId()
 				+ "\" successfully updated");
-
 	}
 
 	@Override
@@ -198,4 +198,34 @@ public class PatientServiceImpl implements PatientService {
 		logger.debug("Arzi with \"" + arziId + "\" successfully deactivated");
 	}
 
+	@Override
+	public MedicalHistory retreivePatientsMedicalHistory(Long itsNumber) {
+		
+		logger.debug("Retreiving medical history for patient with ITS number: \""
+				+ itsNumber + "\" ");
+		
+		MedicalHistory medHist = ptntMapper.retrievePtntMedicalHistory(itsNumber);
+		
+		return medHist;
+	}
+
+	@Override
+	public void savePatientsMedicalHistory(MedicalHistory medicalHistory) {
+		logger.debug("Saving medical history for patient with ITS number: \""
+				+ medicalHistory.getItsNumber() + "\" ");
+		
+		ptntMapper.insertPtntMedicalHistory(medicalHistory);
+		
+		logger.debug("Medical history successfully saved.");
+	}
+
+	@Override
+	public void updatePatientsMedicalHistory(MedicalHistory medicalHistory) {
+		logger.debug("Updating medical history for patient with ITS number: \""
+				+ medicalHistory.getItsNumber() + "\" ");
+		
+		ptntMapper.updatePtntMedicalHistory(medicalHistory);
+		
+		logger.debug("Medical history successfully updated.");
+	}
 }

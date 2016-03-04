@@ -11,6 +11,7 @@ import com.example.medicalarzi.model.BodyPart;
 import com.example.medicalarzi.model.Condition;
 import com.example.medicalarzi.model.GregHijDate;
 import com.example.medicalarzi.model.Jamaat;
+import com.example.medicalarzi.model.Location;
 import com.example.medicalarzi.model.Lookup;
 import com.example.medicalarzi.model.Procedure;
 import com.example.medicalarzi.model.SecurityRole;
@@ -120,5 +121,56 @@ public interface LookupService {
 	 * @return
 	 */
 	public SecurityRole getSecurityRoleById(Long securityRole);
+	
+	/**
+	 * This method is responsible for getting a list of all the available
+	 * countries.
+	 * 
+	 * @return
+	 */
+	public List<String> getListOfAllCountries();
 
+	/**
+	 * This method is responsible for getting a list of all the available states
+	 * for a country based on the name of the country.
+	 * 
+	 * @param country
+	 * 
+	 * @return java.util.List<java.lang.String>
+	 */
+	public List<String> getListOfAllStatesForCountry(String country);
+
+	/**
+	 * This method is responsible for getting a list of all the cities for a
+	 * state/province in a country based on teh country and the state name.
+	 * 
+	 * @param state
+	 * @param country
+	 * 
+	 * @return java.util.List<java.lang.String>
+	 */
+	public List<String> getListOfAllCitiesForStateAndCountry(String state,
+			String country);
+
+	/**
+	 * This method is responsible for getting the unique location for the user
+	 * based on the city, state and country of his residence.
+	 * 
+	 * @param city
+	 * @param state
+	 * @param country
+	 * 
+	 * @return com.example.medicalarzi.model.Location
+	 */
+	public Location getLocationForAddress(String city, String state, String country);
+	
+	/**
+	 * This method is responsible for getting the location based on the location
+	 * id.
+	 * 
+	 * @param locationId
+	 * 
+	 * @return com.example.medicalarzi.model.Location
+	 */
+	public Location getLocation(Long locationId);
 }

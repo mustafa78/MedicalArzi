@@ -6,6 +6,7 @@ package com.example.medicalarzi.service;
 import java.util.List;
 
 import com.example.medicalarzi.model.Arzi;
+import com.example.medicalarzi.model.MedicalHistory;
 import com.example.medicalarzi.model.Patient;
 
 /**
@@ -123,5 +124,31 @@ public interface PatientService {
 	 * @param arziId
 	 */
 	public void deactivateAnArziById(Long arziId);
+	
+	/**
+	 * This method is responsible for retreiving the patient's medical history
+	 * based on the patient's ITS number.
+	 * 
+	 * @param itsNumber
+	 * 
+	 * @return com.example.medicalarzi.model.MedicalHistory
+	 */
+	public MedicalHistory retreivePatientsMedicalHistory(Long itsNumber);
+	
+	/**
+	 * This method is responsible for saving the medical history for the patient
+	 * if the patient has not previously saved their medical history information
+	 * 
+	 * @param medicalHistory
+	 */
+	public void savePatientsMedicalHistory(MedicalHistory medicalHistory);
+	
+	/**
+	 * This method is responsible for updating the medical history for the
+	 * patient if the patient updates their information later.
+	 * 
+	 * @param medicalHistory
+	 */
+	public void updatePatientsMedicalHistory(MedicalHistory medicalHistory);
 
 }

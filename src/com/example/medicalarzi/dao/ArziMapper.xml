@@ -11,6 +11,9 @@
 	    <result column="arziSummary" property="arziSummary" jdbcType="VARCHAR" />
 	    <result column="drConsultNote" property="doctorConsultNote" jdbcType="VARCHAR" />
 	    <result column="activeInd" property="activeInd" jdbcType="VARCHAR" javaType="BOOLEAN" />
+	    <result column="ADDR_LN_1" property="tempHomeAddress1" jdbcType="VARCHAR" />
+	    <result column="ADDR_LN_2" property="tempHomeAddress2" jdbcType="VARCHAR" />
+	    <result column="ZIP_CD" property="tempZip" jdbcType="VARCHAR" />	    
 	    <result column="hdrCreateUserId" property="createdBy" jdbcType="VARCHAR" />
 	    <result column="hdrCreateTS" property="createdDate" jdbcType="TIMESTAMP" />
 	    <result column="hdrLastUpdUserId" property="updatedBy" jdbcType="VARCHAR" />
@@ -38,6 +41,8 @@
 			<id 	property="statusId" 	column="currentStatusId" />
 			<result property="statusDesc" 	column="currentStatusDesc" />
 		</association>
+		<association property="tempLocation" column="locationId" javaType="Location" 
+			select="com.example.medicalarzi.dao.LookupMapper.selectLocationById"/>
 		<association property="currentStatusDate" column="currStatusDtId" javaType="GregHijDate" 
 			select="com.example.medicalarzi.dao.LookupMapper.selectGregHijDateById" />
 		<association property="conditionStartDate" column="condStartDtId" javaType="GregHijDate" 
@@ -72,7 +77,7 @@
   	</resultMap>
   	
   	<resultMap id="ArziCommentResultMap" type="ArziComment" >
-  		<result column="cmntArziId" property="arziId" jdbcType="INTEGER" />
+  		<id column="cmntArziId" property="arziId" jdbcType="INTEGER" />
   		<result column="cmntrItsNbr" property="commentorItsNumber" jdbcType="INTEGER" />
   		<result column="cmntTs" property="commentTimestamp" jdbcType="TIMESTAMP" />
   		<result column="cmntText" property="commentText" jdbcType="VARCHAR" />
@@ -97,6 +102,10 @@
   		hdr.OTHR_BDY_PRT as "otherBdyPrt",
   		hdr.ARZI_SMRY as "arziSummary",
   		hdr.DR_CNSLT_NOTE as "drConsultNote",
+  		hdr.ADDR_LN_1 as "addressLn1",
+  		hdr.ADDR_LN_2 as "addressLn2",
+  		hdr.LOC_ID as "locationId",
+  		hdr.ZIP_CD as "zipCd",  		
   		hdr.ACTV_IND as "activeInd",
   		hdr.COND_STRT_DT_ID as "condStartDtId",
   		hdr.CURR_STATUS_ID as "currentStatusId",
@@ -276,6 +285,10 @@
 				OTHR_BDY_PRT,
 				COND_STRT_DT_ID,
 				ARZI_SMRY,
+				ADDR_LN_1,
+				ADDR_LN_2,
+				LOC_ID,
+				ZIP_CD,
 				CREATE_USR_ID,
 				CREATE_TS,
 				LST_UPDT_USR_ID,
@@ -294,6 +307,10 @@
 			#{otherBodyPart,jdbcType=VARCHAR},
 			#{conditionStartDate.gregorianDateId,jdbcType=INTEGER},
 			#{arziSummary,jdbcType=VARCHAR},
+			#{tempHomeAddress1,jdbcType=VARCHAR},
+			#{tempHomeAddress2,jdbcType=VARCHAR},
+			#{tempLocation.locationId,jdbcType=INTEGER},
+			#{tempZip,jdbcType=VARCHAR},
 			#{itsNumber,jdbcType=INTEGER},
 			now(),
 			#{itsNumber,jdbcType=INTEGER},
@@ -355,7 +372,7 @@
 			#{commentorItsNumber,jdbcType=INTEGER},
 			now()
 			 ) ]]>
-	</insert>	
+	</insert>
 	
 	<!-- Update --> 
 	<update id="updateArziHdrSelective" parameterType="Arzi">

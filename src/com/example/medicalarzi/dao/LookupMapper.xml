@@ -83,6 +83,16 @@
 	    <result column="LST_UPDT_USR_ID" property="updatedBy" jdbcType="VARCHAR" />
 	    <result column="LST_UPDT_TS" property="updatedDate" jdbcType="TIMESTAMP" />
   	</resultMap>
+  	<resultMap type="Location" id="LocationResultMap">
+  		<id column="LOC_ID" property="locationId" jdbcType="INTEGER" />
+  		<result column="CITY_NM" property="city" jdbcType="VARCHAR" />
+  		<result column="STATE_NM" property="state" jdbcType="VARCHAR" />
+   		<result column="CNTRY_NM" property="country" jdbcType="VARCHAR" />
+  		<result column="CREATE_USR_ID" property="createdBy" jdbcType="VARCHAR" />
+	    <result column="CREATE_TS" property="createdDate" jdbcType="TIMESTAMP" />
+	    <result column="LST_UPDT_USR_ID" property="updatedBy" jdbcType="VARCHAR" />
+	    <result column="LST_UPDT_TS" property="updatedDate" jdbcType="TIMESTAMP" />
+  	</resultMap>  	
 
 	<!-- SQL fragments -->
   	<sql id="Base_Column_List" >
@@ -111,6 +121,10 @@
   	</sql>
   	<sql id="Jamaat_Column_List">
 		JAMAAT_ID, JAMAAT_NM, JAMIYAT_NM, REGION, COUNTRY,
+		CREATE_USR_ID, CREATE_TS, LST_UPDT_USR_ID, LST_UPDT_TS
+	</sql>
+  	<sql id="Location_Column_List">
+		LOC_ID, CITY_NM, STATE_NM, CNTRY_NM,
 		CREATE_USR_ID, CREATE_TS, LST_UPDT_USR_ID, LST_UPDT_TS
 	</sql>
 
@@ -219,7 +233,57 @@
 	    <include refid="Jamaat_Column_List" />
 	    from D_JAMAAT
   	</select>
+  	
+  	<!-- Select all the distinct countries from the D_LOCATION table -->
+	<select id="selectAllDistinctCountries" resultType="java.lang.String">
+		select 
+			distinct CNTRY_NM 
+		from D_LOCATION;
+	</select>  	
 
+  	<!-- Select all the distinct states from the D_LOCATION table based on the selected country -->
+	<select id="selectAllDistinctStatesByCountry" resultType="java.lang.String">
+		select 
+			distinct STATE_NM 
+		from 
+			D_LOCATION 
+		where 
+			CNTRY_NM = #{country,jdbcType=VARCHAR}
+	</select> 
+	
+	<!-- Select all the cities from the D_LOCATION table based on the selected country and state -->
+	<select id="selectAllCitiesByStateAndCountry" resultType="java.lang.String">
+		select 
+			CITY_NM 
+		from 
+			D_LOCATION 
+		where 
+			STATE_NM = #{state,jdbcType=VARCHAR} and
+			CNTRY_NM = #{country,jdbcType=VARCHAR}
+	</select>
+	
+	<!-- Select the location based on the country, state and city -->
+  	<select id="selectLocationByCityStateAndCountry" resultMap="LocationResultMap">
+		select
+			<include refid="Location_Column_List" />
+		from 
+			D_LOCATION
+		where 
+			CITY_NM = #{city,jdbcType=VARCHAR} and
+			STATE_NM = #{state,jdbcType=VARCHAR} and
+			CNTRY_NM = #{country,jdbcType=VARCHAR}
+	</select>	
+
+	<!-- Select the location by id -->
+  	<select id="selectLocationById" resultMap="LocationResultMap">
+		select
+			<include refid="Location_Column_List" />
+		from 
+			D_LOCATION
+		where 
+			LOC_ID = #{locationId,jdbcType=INTEGER}	
+	</select>
+	
   	<!-- Insert Statements -->
   	<insert id="insertLookup" parameterType="Lookup">
       insert into D_LOOKUPS (LKUP_ID, LKUP_TYPE, LKUP_VAL, CREATE_TS, CREATE_USR_ID
