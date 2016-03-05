@@ -45,8 +45,8 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
@@ -76,6 +76,8 @@ public class ArziFormComponent extends CustomComponent implements
 	 * Arzi Details
 	 ***************************/
 	private Panel arziDetailsSection;
+	
+	private VerticalLayout arziDetailsLayout;
 
 	private CustomFormComponent arziDetailsForm;
 	
@@ -97,20 +99,17 @@ public class ArziFormComponent extends CustomComponent implements
 
 	@PropertyId("otherCondition")
 	private TextField otherCondition;
+	private Label otherCondPlaceHolder;
 	
 	@PropertyId("otherProcedure")
 	private TextField otherProcedure;
+	private Label otherProcPlaceHolder;
 	
 	@PropertyId("otherBodyPart")
 	private TextField otherBodyPart;
+	private Label otherBdyPrtPlaceHolder;
 
-	/******************
-	 * Arzi Summary
-	 *******************/
-	private Panel arziSummarySection;
-	
-	private FormLayout arziSummaryForm;
-	
+	// arzi summary part of the arzi details section
 	@PropertyId("arziSummary")
 	private TextArea arziSummary;
 	
@@ -156,7 +155,9 @@ public class ArziFormComponent extends CustomComponent implements
 	@PropertyId("otherInfo")
 	private TextArea otherProblems;
 
-	/**Patient Personal Info**/
+	/**************************
+	 * Patient Personal Info *
+	 ***************************/
 	private Panel ptntInfoSection;
 	
 	private VerticalLayout ptntInfoAddrLayout;
@@ -426,11 +427,6 @@ public class ArziFormComponent extends CustomComponent implements
 		viewLayout.addComponent(arziDetailsSection);
 		viewLayout.setExpandRatio(arziDetailsSection, 1.0f);
 		
-		// arziSummarySection
-		buildArziSummarySection();
-		viewLayout.addComponent(arziSummarySection);
-		viewLayout.setExpandRatio(arziSummarySection, 1.0f);
-		
 		// ptntMedHistSection
 		buildMedicalHistorySection();
 		viewLayout.addComponent(ptntMedHistSection);
@@ -470,8 +466,7 @@ public class ArziFormComponent extends CustomComponent implements
 		
 		Label addressInstruction = new Label();
 		addressInstruction
-				.setCaption("Please enter the contact information where the patient is currently located: <i>(In case patient is out of town)</i>");
-		addressInstruction.setCaptionAsHtml(true);
+				.setCaption("Please enter the contact information where the patient is currently located:");
 		addressInstruction.setStyleName("instructionTxt", true);
 		ptntInfoAddrLayout.addComponent(addressInstruction);
 		
@@ -580,7 +575,6 @@ public class ArziFormComponent extends CustomComponent implements
 		addressLn1.setWidth("300px");
 		addressLn1.setMaxLength(200);
 		addressLn1.setNullRepresentation("");
-		addressLn1.setRequired(true);
 		leftFormLayout.addComponent(addressLn1);
 
 		// addressLn2
@@ -595,7 +589,6 @@ public class ArziFormComponent extends CustomComponent implements
 		zip.setWidth("100px");
 		zip.setMaxLength(10);
 		zip.setNullRepresentation("");
-		zip.setRequired(true);
 		leftFormLayout.addComponent(zip);
 		
 		// phoneNum
@@ -603,7 +596,6 @@ public class ArziFormComponent extends CustomComponent implements
 		phoneNum.setWidth("100px");
 		phoneNum.setMaxLength(10);
 		phoneNum.setNullRepresentation("");
-		phoneNum.setRequired(true);
 		leftFormLayout.addComponent(phoneNum);		
 		
 		
@@ -619,6 +611,7 @@ public class ArziFormComponent extends CustomComponent implements
 		country = new ComboBox("Country:");
 		country.setImmediate(true);
 		country.setWidth("300px");
+		country.setId(MedicalArziConstants.ARZI_FORM_COMPONENT_COUNTRY_COMBOBOX_ID);
 		country.addItems(getLookupService().getListOfAllCountries());
 		country.setInputPrompt("Please select your country.");
 		country.setRequired(true);
@@ -628,12 +621,14 @@ public class ArziFormComponent extends CustomComponent implements
 		// state
 		state = new ComboBox("State:");
 		state.setWidth("200px");
+		state.setId(MedicalArziConstants.ARZI_FORM_COMPONENT_STATE_COMBOBOX_ID);
 		state.addValueChangeListener(this);
 		rightFormLayout.addComponent(state);
 		
 		// city
 		city = new ComboBox("City:");
 		city.setWidth("200px");
+		city.setId(MedicalArziConstants.ARZI_FORM_COMPONENT_CITY_COMBOBOX_ID);
 		rightFormLayout.addComponent(city);		
 	}
 	
@@ -642,7 +637,7 @@ public class ArziFormComponent extends CustomComponent implements
 	 */
 	private void buildPrimaryLocationOptions() {
 		// gender
-		primaryLocationOption = new OptionGroup("Is this the patient’s primary home location:");
+		primaryLocationOption = new OptionGroup("Is this the patientï¿½s primary home location:");
 		
 		primaryLocationOption.addItem(PRIMARY_HOME_LOCATION_YES);
 		primaryLocationOption.setItemCaption(PRIMARY_HOME_LOCATION_YES, "Yes");
@@ -665,13 +660,19 @@ public class ArziFormComponent extends CustomComponent implements
 		arziDetailsSection = new Panel("Arzi Details:");
 		arziDetailsSection.setSizeFull();
 		arziDetailsSection.addStyleName("arziContent");
+		
+		arziDetailsLayout = new VerticalLayout();
+		arziDetailsLayout.setImmediate(false);
+		arziDetailsLayout.setSizeFull();		
 
 		// Arzi Details CustomForm
 		arziDetailsForm = new CustomFormComponent();
 		arziDetailsForm.setImmediate(false);
 		arziDetailsForm.setSizeFull();
 		arziDetailsForm.setStyleName("customForm");
-		arziDetailsSection.setContent(arziDetailsForm);
+		
+		arziDetailsLayout.addComponent(arziDetailsForm);
+		arziDetailsSection.setContent(arziDetailsLayout);
 
 		// This is needed so that if the panel has a fixed or percentual size
 		// and its content becomes too big to fit in the content area, the panel
@@ -710,17 +711,6 @@ public class ArziFormComponent extends CustomComponent implements
 		condition.setRequired(true);
 		condition.addValueChangeListener(this);
 		leftFormLayout.addComponent(condition);
-
-		// bodyPart
-		bodyPart = new ComboBox("Body Part:");
-		bodyPart.setContainerDataSource(MedicalArziUtils
-				.getContainer(BodyPart.class));
-		bodyPart.addItems(getLookupService().getListOfAllBodyParts());
-		bodyPart.setInputPrompt("Please select the affected body part.");
-		bodyPart.setItemCaptionMode(ItemCaptionMode.PROPERTY);
-		bodyPart.setItemCaptionPropertyId("bodyPartName");
-		bodyPart.setRequired(true);
-		leftFormLayout.addComponent(bodyPart);
 		
 		// procedure
 		procedure = new ComboBox("Medical Procedure:");
@@ -731,7 +721,20 @@ public class ArziFormComponent extends CustomComponent implements
 		procedure.setItemCaptionMode(ItemCaptionMode.PROPERTY);
 		procedure.setItemCaptionPropertyId("procedureName");
 		procedure.setRequired(true);
+		procedure.addValueChangeListener(this);
 		leftFormLayout.addComponent(procedure);
+
+		// bodyPart
+		bodyPart = new ComboBox("Body Part:");
+		bodyPart.setContainerDataSource(MedicalArziUtils
+				.getContainer(BodyPart.class));
+		bodyPart.addItems(getLookupService().getListOfAllBodyParts());
+		bodyPart.setInputPrompt("Please select the affected body part.");
+		bodyPart.setItemCaptionMode(ItemCaptionMode.PROPERTY);
+		bodyPart.setItemCaptionPropertyId("bodyPartName");
+		bodyPart.setRequired(true);
+		bodyPart.addValueChangeListener(this);
+		leftFormLayout.addComponent(bodyPart);
 		
 		/**
 		 * Add the fields to the right FormLayout.
@@ -756,6 +759,11 @@ public class ArziFormComponent extends CustomComponent implements
 		otherCondition.setNullRepresentation("");
 		rightFormLayout.addComponent(otherCondition);
 		
+		// other condition placeholder
+		otherCondPlaceHolder = new Label("");
+		otherCondPlaceHolder.setVisible(false);
+		rightFormLayout.addComponent(otherCondPlaceHolder);
+		
 		// other procedure
 		otherProcedure = new TextField("Other Procedure:");
 		otherProcedure.setDescription("Please enter your procedure..");
@@ -763,38 +771,34 @@ public class ArziFormComponent extends CustomComponent implements
 		otherProcedure.setNullRepresentation("");
 		rightFormLayout.addComponent(otherProcedure);
 		
+		// other procedure placeholder
+		otherProcPlaceHolder = new Label("");
+		otherProcPlaceHolder.setVisible(false);
+		rightFormLayout.addComponent(otherProcPlaceHolder);		
+		
 		// other body part
 		otherBodyPart = new TextField("Other Body Part:");
 		otherBodyPart.setDescription("Please enter your body part..");
 		otherBodyPart.setWidth("300px");
 		otherBodyPart.setNullRepresentation("");
-		rightFormLayout.addComponent(otherBodyPart);		
-	}
-	
-	/**
-	 * This method is responsible for building the section where the patient can
-	 * provide more details about the condition for the arzi.
-	 */
-	private void buildArziSummarySection() {
-		arziSummarySection = new Panel("Brief Summary of Arzi:");
-		arziSummarySection.setSizeFull();
-		arziSummarySection.addStyleName("arziContent");
+		rightFormLayout.addComponent(otherBodyPart);
 		
-		arziSummaryForm = new FormLayout();
-		arziSummaryForm.setImmediate(false);
-		arziSummaryForm.setSizeFull();
-		arziSummaryForm.setStyleName("customForm");
-		arziSummarySection.setContent(arziSummaryForm);
+		// other body part placeholder
+		otherBdyPrtPlaceHolder = new Label("");
+		otherBdyPrtPlaceHolder.setVisible(false);
+		rightFormLayout.addComponent(otherBdyPrtPlaceHolder);		
 		
-		arziSummary = new TextArea("Summary:");
+		// arziSummaryForm
+		arziSummary = new TextArea("Brief Summary of Arzi:");
 		arziSummary.setImmediate(false);
 		arziSummary.setNullRepresentation("");
 		arziSummary.setWidth(70, Unit.PERCENTAGE);
 		arziSummary.setWordwrap(true);
 		arziSummary.setMaxLength(4000);
-		arziSummary.setRequired(true);
-		arziSummaryForm.addComponent(arziSummary);
-	}	
+		arziSummary.setStyleName("ptntMedHist");
+		arziDetailsLayout.addComponent(arziSummary);
+	}
+
 	
 	/**
 	 * 
@@ -847,14 +851,13 @@ public class ArziFormComponent extends CustomComponent implements
 		leftFormLayout.addComponent(atrialFibrillation);
 		
 		// cancer
-		cancer = new CheckBox("Cancer <i>(Specify Type)</i>", false);
+		cancer = new CheckBox("Cancer", false);
 		cancer.setImmediate(true);
-		cancer.setCaptionAsHtml(true);
 		cancer.addValueChangeListener(this);
 		leftFormLayout.addComponent(cancer);
 		
 		// cancerType
-		cancerType = new TextField("");
+		cancerType = new TextField("Type:");
 		cancerType.setWidth("300px");
 		cancerType.setVisible(false);
 		cancerType.setNullRepresentation("");
@@ -880,19 +883,20 @@ public class ArziFormComponent extends CustomComponent implements
 		rightFormLayout.addComponent(hyperTension);
 		
 		// heartDisease
-		heartDisease = new CheckBox("Heart Disease <i>(Specify Type)</i>", false);
+		heartDisease = new CheckBox("Heart Disease", false);
 		heartDisease.setImmediate(true);
 		heartDisease.setCaptionAsHtml(true);
 		heartDisease.addValueChangeListener(this);
 		rightFormLayout.addComponent(heartDisease);	
 		
 		// heartDiseaseType
-		heartDiseaseType = new TextField("");
+		heartDiseaseType = new TextField("Type:");
 		heartDiseaseType.setWidth("300px");
 		heartDiseaseType.setVisible(false);
 		heartDiseaseType.setNullRepresentation("");
 		rightFormLayout.addComponent(heartDiseaseType);		
 		
+		// other problems
 		otherProblems = new TextArea("Other Problems/Pre-existing conditions (List below):");
 		otherProblems.setImmediate(false);
 		otherProblems.setNullRepresentation("");
@@ -1088,6 +1092,7 @@ public class ArziFormComponent extends CustomComponent implements
 
 	@Override
 	public void valueChange(ValueChangeEvent event) {
+		
 		// If the medical condition, procedure & body part is selected.
 		if (event.getProperty().getValue() instanceof Condition) {
 
@@ -1096,15 +1101,17 @@ public class ArziFormComponent extends CustomComponent implements
 
 			if (selectedCondition.getConditionId().intValue() == MedicalArziConstants.CONDITION_OTHER_ID
 					.intValue()) {
-				
+				// Hide the other condition placeholder
+				otherCondPlaceHolder.setVisible(false);
+				// Display the other condition textfield
 				otherCondition.setVisible(true);
-				
 				otherCondition.setRequired(true);
-
 			} else {
+				// Hide the other condition textfield 
 				otherCondition.setVisible(false);
-				
 				otherCondition.setRequired(false);
+				// Display the other condition placeholder
+				otherCondPlaceHolder.setVisible(true);				
 			}
 			
 		} else if (event.getProperty().getValue() instanceof Procedure) {
@@ -1114,14 +1121,18 @@ public class ArziFormComponent extends CustomComponent implements
 
 			if (selectedProcedure.getProcedureId().intValue() == MedicalArziConstants.PROCEDURE_OTHER_ID
 					.intValue()) {
+				// Hide the other procedure placeholder
+				otherProcPlaceHolder.setVisible(false);
+				// Display the other procedure textfield
 				otherProcedure.setVisible(true);
-				
 				otherProcedure.setRequired(true);
 
 			} else {
+				// Hide the other procedure textfield
 				otherProcedure.setVisible(false);
-				
 				otherProcedure.setRequired(false);
+				// Display the other condition placeholder
+				otherProcPlaceHolder.setVisible(true);				
 			}
 			
 		} else if (event.getProperty().getValue() instanceof BodyPart) {
@@ -1131,15 +1142,18 @@ public class ArziFormComponent extends CustomComponent implements
 
 			if (selectedBodyPart.getBodyPartId().intValue() == MedicalArziConstants.BODY_PART_OTHER_ID
 					.intValue()) {
-				
+				// Hide the other body part placeholder
+				otherBdyPrtPlaceHolder.setVisible(false);
+				// Display the other body part textfield
 				otherBodyPart.setVisible(true);
-				
 				otherBodyPart.setRequired(true);
 
 			} else {
+				// Hide the other body part textfield
 				otherBodyPart.setVisible(false);
-				
 				otherBodyPart.setRequired(false);
+				// Display the other body part placeholder
+				otherBdyPrtPlaceHolder.setVisible(true);
 			}
 		}
 		
@@ -1148,12 +1162,9 @@ public class ArziFormComponent extends CustomComponent implements
 		if (cancer.getValue() != null && cancer.getValue()) {
 			
 			cancerType.setVisible(true);
-			
 			cancerType.setRequired(true);
-			
 		} else {
 			cancerType.setVisible(false);
-			
 			cancerType.setRequired(false);
 		}
 		
@@ -1161,50 +1172,55 @@ public class ArziFormComponent extends CustomComponent implements
 		// user to specify the specific type, if the heart disease indicator is
 		// selected.
 		if (heartDisease.getValue() != null && heartDisease.getValue()) {
-			
 			heartDiseaseType.setVisible(true);
-			
 			heartDiseaseType.setRequired(true);
 			
 		} else {
 			heartDiseaseType.setVisible(false);
-			
 			heartDiseaseType.setRequired(false);
 		}
-		
+
 		// Selected country
-		String selectedCountry = (String) country.getValue();
-		
-		//Selected state
-		String selectedState = (String) state.getValue();
-		
-		// If the country is selected and state is not selected, we need to load
-		// all the states for that country
-		if (StringUtils.isNotBlank(selectedCountry)) {
-			
-			state.removeAllItems();
+		String selectedCountry = null;
+		// If the country and the state dropdowns are selected
+		if (event.getProperty() instanceof ComboBox) {
+			ComboBox comboBox = (ComboBox) event.getProperty();
 
-			state.addItems(getLookupService().getListOfAllStatesForCountry(
-					selectedCountry));
-
-			state.setInputPrompt("Please select your state");
-
-			state.setRequired(true);
-		}
-		
-		// If the country and state are both selected, we need to load all the
-		// cities for that country and state.
-		if (StringUtils.isNotBlank(selectedState)) {
-			
-			city.removeAllItems();
-
-			city.addItems(getLookupService()
-					.getListOfAllCitiesForStateAndCountry(selectedState,
-							selectedCountry));
-
-			city.setInputPrompt("Please select your city");
-
-			city.setRequired(true);
+			if(StringUtils.isNotBlank(comboBox.getId())) {
+				// Country is selected
+				if (comboBox.getId().equals(MedicalArziConstants.ARZI_FORM_COMPONENT_COUNTRY_COMBOBOX_ID)) {
+	
+					selectedCountry = (String) comboBox.getValue();
+	
+					// If the country is selected and state is not selected, we need
+					// to load all the states for that country
+					if (StringUtils.isNotBlank(selectedCountry)) {
+						// Remove the old states and cities if the country is changed.
+						state.removeAllItems();
+						city.removeAllItems();
+						
+						state.addItems(getLookupService().getListOfAllStatesForCountry(selectedCountry));
+						state.setInputPrompt("Please select your state");
+						state.setRequired(true);
+					}
+					
+				} else if (comboBox.getId().equals(MedicalArziConstants.ARZI_FORM_COMPONENT_STATE_COMBOBOX_ID)) {
+					// Selected state
+					String selectedState = (String) comboBox.getValue();
+					
+					selectedCountry = (String) country.getValue();
+	
+					// If the country and state are both selected, we need to load
+					// all the cities for that country and state.
+					if (StringUtils.isNotBlank(selectedState)) {
+						city.removeAllItems();
+						city.addItems(
+								getLookupService().getListOfAllCitiesForStateAndCountry(selectedState, selectedCountry));
+						city.setInputPrompt("Please select your city");
+						city.setRequired(true);
+					}
+				}
+			}
 		}
 		
 	}

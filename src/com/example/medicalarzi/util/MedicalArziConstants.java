@@ -12,7 +12,7 @@ public interface MedicalArziConstants {
 	// Keys
 	final static public String MAP_ENCODE_PASSWORD_KEY = "MUFADDAL_MOULA_53";
 	
-	//Session and Request Param Keys
+	// Session and Request Param Keys
 	final static public String SESS_ATTR_PTNT_ITS_NUM = "patientITSNumber";
 	
 	final static public String SESS_ATTR_PTNT_INFO = "patientInfo";
@@ -24,7 +24,7 @@ public interface MedicalArziConstants {
 	final static public String MAP_PROPERTIES = "com.example.medicalarzi.resources.MAPConf";
 	
 	/**Lookup types & value constants**/
-	// Lookup Types
+	//  Lookup Types
 	final static public String MAP_DAWAT_TITLE = "DAWAT TITLE";
 	
 	final static public String SEARCH_NUM_OF_DAYS = "NUM OF DAYS SEARCH";
@@ -36,7 +36,7 @@ public interface MedicalArziConstants {
 	
 	final static public String MAP_DAWAT_TITLE_BEHEN = "Behen";
 	
-	// Lookup Ids
+	// Database Lookup Ids
 	final static public Long ARZI_DRAFT_STATUS = 1000L;
 	
 	final static public Long ARZI_SUBMITTED_STATUS = 1001L;
@@ -59,7 +59,6 @@ public interface MedicalArziConstants {
 	
 	final static public Integer SEARCH_PERIOD_LAST_30_DAYS_ID = 1011;
 	
-
 	// For sending email.
 	final static public String EMAIL_HOST = "EmailHost";
 
@@ -75,7 +74,7 @@ public interface MedicalArziConstants {
 
 	final static public String FORGOT_PSWD_EMAIL_BODY = "FP_EmailBody";
 	
-	//Component Ids
+	// Component Ids
 	final static public String ARZI_LANDING_VIEW_TABSHEET = "arziLandingView";
 	
 	final static public String HEADER_LOGOUT_BUTTON_ID = "header_logoutBtn";
@@ -93,6 +92,12 @@ public interface MedicalArziConstants {
 	final static public String ARZI_FORM_COMPONENT_VIEW_LAYOUT_ID = "arziFormComponentViewLayout";
 	
 	final static public String ARZI_FORM_COMPONENT_BUTTON_LAYOUT_ID = "arziFormComponentButtonsLayout";
+	
+	final static public String ARZI_FORM_COMPONENT_COUNTRY_COMBOBOX_ID = "arziFormComponentCountryCombobox";
+	
+	final static public String ARZI_FORM_COMPONENT_STATE_COMBOBOX_ID = "arziFormComponentStateCombobox";
+	
+	final static public String ARZI_FORM_COMPONENT_CITY_COMBOBOX_ID = "arziFormComponentCityCombobox";
 	
 	final static public String REVIEW_ARZI_COMPONENT_ID = "reviewArziComponent";
 	
@@ -126,7 +131,7 @@ public interface MedicalArziConstants {
 	
 	final static public String PENDING_TASKS_COMPONENT_VIEW_LAYOUT_ID = "pendingTasksComponentViewLayout";
 	
-	//Hint texts, descriptions or any static texts
+	// Hint texts, descriptions or any static texts
 	final static public String PASSWORD_HINT_TEXT = "Password must be at least 8 characters long and contain at least 1 number.";
 	
 	final static public Integer USER_FRIENDLY_MSG_DELAY_MSEC =  4000;
@@ -137,6 +142,7 @@ public interface MedicalArziConstants {
 
 	final static public Long SEC_ROLE_ID_ADMIN = 1004L;
 	
+	// Database ids
 	final static public Long CONDITION_OTHER_ID = -3L;
 	
 	final static public Long PROCEDURE_OTHER_ID = -3L;
