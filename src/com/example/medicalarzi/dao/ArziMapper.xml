@@ -11,9 +11,9 @@
 	    <result column="arziSummary" property="arziSummary" jdbcType="VARCHAR" />
 	    <result column="drConsultNote" property="doctorConsultNote" jdbcType="VARCHAR" />
 	    <result column="activeInd" property="activeInd" jdbcType="VARCHAR" javaType="BOOLEAN" />
-	    <result column="ADDR_LN_1" property="tempHomeAddress1" jdbcType="VARCHAR" />
-	    <result column="ADDR_LN_2" property="tempHomeAddress2" jdbcType="VARCHAR" />
-	    <result column="ZIP_CD" property="tempZip" jdbcType="VARCHAR" />	    
+	    <result column="addressLn1" property="tempHomeAddress1" jdbcType="VARCHAR" />
+	    <result column="addressLn2" property="tempHomeAddress2" jdbcType="VARCHAR" />
+	    <result column="zipCd" property="tempZip" jdbcType="VARCHAR" />	    
 	    <result column="hdrCreateUserId" property="createdBy" jdbcType="VARCHAR" />
 	    <result column="hdrCreateTS" property="createdDate" jdbcType="TIMESTAMP" />
 	    <result column="hdrLastUpdUserId" property="updatedBy" jdbcType="VARCHAR" />

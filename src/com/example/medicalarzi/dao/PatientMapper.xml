@@ -42,7 +42,7 @@
   	</resultMap>
   	
   	<resultMap id="medicalHistoryResultMap" type="MedicalHistory" >
-  		<id column="ptntItsNbr" property="itsNumber" jdbcType="INTEGER" />
+  		<result column="ptntItsNbr" property="itsNumber" jdbcType="INTEGER" />
   		<result column="primaryDrName" property="primaryDrName" jdbcType="TIMESTAMP" />
   		<result column="primaryDrPhone" property="primaryDrPhone" jdbcType="VARCHAR" />
   		<result column="asthmaInd" property="asthmaInd" jdbcType="VARCHAR" javaType="BOOLEAN" />
@@ -286,7 +286,7 @@
 	<select id="retrievePtntMedicalHistory" resultMap="medicalHistoryResultMap">
 		select
 			<include refid="medHistColumnList" />
-		from F_MED_HIST
-		where ITS_NBR = #{itsNumber,jdbcType=INTEGER}
+		from F_MED_HIST mhst
+		where mhst.ITS_NBR = #{itsNumber,jdbcType=INTEGER}
 	</select>
 </mapper>

@@ -20,7 +20,7 @@ public class MedicalHistory implements Serializable {
 	 */
 	private static final long serialVersionUID = 7064376663385866662L;
 
-	private String itsNumber;
+	private Long itsNumber;
 
 	private String primaryDrName;
 
@@ -63,11 +63,11 @@ public class MedicalHistory implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public String getItsNumber() {
+	public Long getItsNumber() {
 		return itsNumber;
 	}
 
-	public void setItsNumber(String itsNumber) {
+	public void setItsNumber(Long itsNumber) {
 		this.itsNumber = itsNumber;
 	}
 

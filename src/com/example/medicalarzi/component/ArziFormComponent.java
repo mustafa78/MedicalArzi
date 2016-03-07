@@ -594,7 +594,7 @@ public class ArziFormComponent extends CustomComponent implements
 		// phoneNum
 		phoneNum = new TextField("Phone:");
 		phoneNum.setWidth("100px");
-		phoneNum.setMaxLength(10);
+		phoneNum.setMaxLength(15);
 		phoneNum.setNullRepresentation("");
 		leftFormLayout.addComponent(phoneNum);		
 		
@@ -637,7 +637,7 @@ public class ArziFormComponent extends CustomComponent implements
 	 */
 	private void buildPrimaryLocationOptions() {
 		// gender
-		primaryLocationOption = new OptionGroup("Is this the patient�s primary home location:");
+		primaryLocationOption = new OptionGroup("Is this the patient's primary home location:");
 		
 		primaryLocationOption.addItem(PRIMARY_HOME_LOCATION_YES);
 		primaryLocationOption.setItemCaption(PRIMARY_HOME_LOCATION_YES, "Yes");
@@ -757,11 +757,12 @@ public class ArziFormComponent extends CustomComponent implements
 		otherCondition.setDescription("Please enter your condition..");
 		otherCondition.setWidth("300px");
 		otherCondition.setNullRepresentation("");
+		otherCondition.setVisible(false);
 		rightFormLayout.addComponent(otherCondition);
 		
 		// other condition placeholder
 		otherCondPlaceHolder = new Label("");
-		otherCondPlaceHolder.setVisible(false);
+		otherCondPlaceHolder.setVisible(true);
 		rightFormLayout.addComponent(otherCondPlaceHolder);
 		
 		// other procedure
@@ -769,11 +770,12 @@ public class ArziFormComponent extends CustomComponent implements
 		otherProcedure.setDescription("Please enter your procedure..");
 		otherProcedure.setWidth("300px");
 		otherProcedure.setNullRepresentation("");
+		otherProcedure.setVisible(false);
 		rightFormLayout.addComponent(otherProcedure);
 		
 		// other procedure placeholder
 		otherProcPlaceHolder = new Label("");
-		otherProcPlaceHolder.setVisible(false);
+		otherProcPlaceHolder.setVisible(true);
 		rightFormLayout.addComponent(otherProcPlaceHolder);		
 		
 		// other body part
@@ -781,21 +783,22 @@ public class ArziFormComponent extends CustomComponent implements
 		otherBodyPart.setDescription("Please enter your body part..");
 		otherBodyPart.setWidth("300px");
 		otherBodyPart.setNullRepresentation("");
+		otherBodyPart.setVisible(false);
 		rightFormLayout.addComponent(otherBodyPart);
 		
 		// other body part placeholder
 		otherBdyPrtPlaceHolder = new Label("");
-		otherBdyPrtPlaceHolder.setVisible(false);
+		otherBdyPrtPlaceHolder.setVisible(true);
 		rightFormLayout.addComponent(otherBdyPrtPlaceHolder);		
 		
 		// arziSummaryForm
-		arziSummary = new TextArea("Brief Summary of Arzi:");
+		arziSummary = new TextArea("Summary of Arzi:");
 		arziSummary.setImmediate(false);
 		arziSummary.setNullRepresentation("");
-		arziSummary.setWidth(70, Unit.PERCENTAGE);
+		arziSummary.setWidth(67, Unit.PERCENTAGE);
 		arziSummary.setWordwrap(true);
 		arziSummary.setMaxLength(4000);
-		arziSummary.setStyleName("ptntMedHist");
+		arziSummary.setStyleName("arziDetails-arziSmry");
 		arziDetailsLayout.addComponent(arziSummary);
 	}
 
@@ -903,7 +906,6 @@ public class ArziFormComponent extends CustomComponent implements
 		otherProblems.setWidth(70, Unit.PERCENTAGE);
 		otherProblems.setWordwrap(true);
 		otherProblems.setMaxLength(4000);
-		otherProblems.setRequired(true);
 		otherProblems.setStyleName("ptntMedHist");
 		ptntMedHistLayout.addComponent(otherProblems);		
 	}
@@ -956,6 +958,7 @@ public class ArziFormComponent extends CustomComponent implements
 				arziFieldsBinder.commit();
 
 				Arzi arziInfo = arziFieldsBinder.getItemDataSource().getBean();
+				arziInfo.setItsNumber(ptntInfo.getItsNumber());
 				
 				medicalHistoryFieldsBinder.commit();
 
@@ -1029,17 +1032,18 @@ public class ArziFormComponent extends CustomComponent implements
 				
 				// Check if the medical history already exists for the patient.
 				// If the medical history does not exist create a new record in
-				// teh F_MED_HIST table or else update the medical history for
+				// the F_MED_HIST table or else update the medical history for
 				// the patient.
 				MedicalHistory savedMedHistory = getPatientService()
 						.retreivePatientsMedicalHistory(ptntInfo.getItsNumber());
 
 				if (savedMedHistory == null) {
+					medHistInfo.setItsNumber(ptntInfo.getItsNumber());
 					getPatientService().savePatientsMedicalHistory(medHistInfo);
 					
 				} else {
 					getPatientService().updatePatientsMedicalHistory(
-							medHistInfo);
+							savedMedHistory);
 				}
 
 				logger.debug("Inserting a new arzi for patient with ITS number-> \""

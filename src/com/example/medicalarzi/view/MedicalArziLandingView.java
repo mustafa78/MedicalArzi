@@ -161,11 +161,11 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 				String.valueOf(patient.getItsNumber()));
 
 		// Select the default condition as Other
-		setDefaultCondition();
+		//setDefaultCondition();
 		// Select the default procedure as Other
-		setDefaultProcedure();
+		//setDefaultProcedure();
 		// Select the default body part as Other
-		setDefaultBodyPart();
+		//setDefaultBodyPart();
 		
 
 		makeFieldsReadOnlyForNewArzi(true);
