@@ -34,6 +34,7 @@ import com.vaadin.data.fieldgroup.PropertyId;
 import com.vaadin.navigator.View;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.Position;
+import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -63,11 +64,15 @@ public class ArziFormComponent extends CustomComponent implements
 
 	private static final long serialVersionUID = -7784387402793445565L;
 
-	public static Logger logger = LogManager.getLogger(ArziFormComponent.class);
+	private static Logger logger = LogManager.getLogger(ArziFormComponent.class);
 	
-	public static final Integer PRIMARY_HOME_LOCATION_YES = 123;
+	private static final Integer PRIMARY_HOME_LOCATION_YES = 111;
 	
-	public static final Integer PRIMARY_HOME_LOCATION_NO = 345;
+	private static final Integer PRIMARY_HOME_LOCATION_NO = 222;
+	
+	private static final Integer DIABETES_TYPE_1 = 100;
+	
+	private static final Integer DIABETES_TYPE_2 = 200;
 
 	// Main View Layout
 	private VerticalLayout viewLayout;
@@ -133,6 +138,7 @@ public class ArziFormComponent extends CustomComponent implements
 	
 	@PropertyId("diabetesInd")
 	private CheckBox diabetes;
+	private OptionGroup diabetesOption;
 	
 	@PropertyId("hyperTensionInd")
 	private CheckBox hyperTension;
@@ -199,7 +205,7 @@ public class ArziFormComponent extends CustomComponent implements
 	
 	private TextField phoneNum;
 	
-	// permenant address y/n
+	// permanent address y/n
 	private OptionGroup primaryLocationOption;
 	
 	/*******************
@@ -633,7 +639,10 @@ public class ArziFormComponent extends CustomComponent implements
 	}
 	
 	/**
-	 * 
+	 * This method is responsible for building the radio button option where the
+	 * patient can select if the entered address is the primary location for the
+	 * patient or the patient is located somewhere else when the arzi is being
+	 * submitted.
 	 */
 	private void buildPrimaryLocationOptions() {
 		// gender
@@ -647,7 +656,7 @@ public class ArziFormComponent extends CustomComponent implements
     
 		primaryLocationOption.setRequired(true);
 		primaryLocationOption.setStyleName("horizontal");
-		primaryLocationOption.setStyleName("primLoc-captiontxt", true);
+		primaryLocationOption.setStyleName("primLoc", true);
 		primaryLocationOption.addValueChangeListener(this);
 	}	
 
@@ -709,6 +718,7 @@ public class ArziFormComponent extends CustomComponent implements
 		condition.setItemCaptionMode(ItemCaptionMode.PROPERTY);
 		condition.setItemCaptionPropertyId("conditionName");
 		condition.setRequired(true);
+		condition.setFilteringMode(FilteringMode.CONTAINS);
 		condition.addValueChangeListener(this);
 		leftFormLayout.addComponent(condition);
 		
@@ -721,6 +731,7 @@ public class ArziFormComponent extends CustomComponent implements
 		procedure.setItemCaptionMode(ItemCaptionMode.PROPERTY);
 		procedure.setItemCaptionPropertyId("procedureName");
 		procedure.setRequired(true);
+		procedure.setFilteringMode(FilteringMode.CONTAINS);
 		procedure.addValueChangeListener(this);
 		leftFormLayout.addComponent(procedure);
 
@@ -733,6 +744,7 @@ public class ArziFormComponent extends CustomComponent implements
 		bodyPart.setItemCaptionMode(ItemCaptionMode.PROPERTY);
 		bodyPart.setItemCaptionPropertyId("bodyPartName");
 		bodyPart.setRequired(true);
+		bodyPart.setFilteringMode(FilteringMode.CONTAINS);
 		bodyPart.addValueChangeListener(this);
 		leftFormLayout.addComponent(bodyPart);
 		
@@ -839,65 +851,85 @@ public class ArziFormComponent extends CustomComponent implements
 				MedicalArziConstants.CUSTOM_FORM_LEFTFORM_LAYOUT_ID);
 		
 		// asthma
-		asthma = new CheckBox("Asthma");
+		asthma = new CheckBox("Asthma", false);
 		asthma.setImmediate(false);
 		leftFormLayout.addComponent(asthma);
 		
 		// cholesterol
-		cholesterol = new CheckBox("High Cholesterol");
+		cholesterol = new CheckBox("High Cholesterol", false);
 		cholesterol.setImmediate(false);
 		leftFormLayout.addComponent(cholesterol);
 		
 		// atrialFibrillation
-		atrialFibrillation = new CheckBox("Atrial Fibrillation (Irregular Heartbeat");
+		atrialFibrillation = new CheckBox("Atrial Fibrillation (Irregular Heartbeat)", false);
 		atrialFibrillation.setImmediate(false);
 		leftFormLayout.addComponent(atrialFibrillation);
 		
+		// cancerLayout
+		HorizontalLayout cancerLayout = new HorizontalLayout();
 		// cancer
 		cancer = new CheckBox("Cancer", false);
+		cancer.setId(MedicalArziConstants.ARZI_FORM_COMPONENT_MED_HIST_CANCER_ID);
 		cancer.setImmediate(true);
 		cancer.addValueChangeListener(this);
-		leftFormLayout.addComponent(cancer);
+		cancerLayout.addComponent(cancer);
 		
 		// cancerType
-		cancerType = new TextField("Type:");
+		cancerType = new TextField("<i>(Specify Type)</i>:");
+		cancerType.setCaptionAsHtml(true);
 		cancerType.setWidth("300px");
 		cancerType.setVisible(false);
 		cancerType.setNullRepresentation("");
-		leftFormLayout.addComponent(cancerType);
+		cancerType.setStyleName("cancerType");
+		cancerLayout.addComponent(cancerType);
+		leftFormLayout.addComponent(cancerLayout);
 		
 		FormLayout rightFormLayout = (FormLayout) MedicalArziUtils.findById(
 				ptntMedHistForm,
 				MedicalArziConstants.CUSTOM_FORM_RIGHTFORM_LAYOUT_ID);
 		
 		// diabetes
-		diabetes = new CheckBox("Diabetes Mellitus");
-		diabetes.setImmediate(false);
-		rightFormLayout.addComponent(diabetes);
+		HorizontalLayout diabetesLayout = new HorizontalLayout();
+		diabetes = new CheckBox("Diabetes Mellitus", false);
+		diabetes.setId(MedicalArziConstants.ARZI_FORM_COMPONENT_MED_HIST_DIABETES_ID);
+		diabetes.setImmediate(true);
+		diabetes.addValueChangeListener(this);
+		// Add diabetes checkbox to the layout
+		diabetesLayout.addComponent(diabetes);
+		// diabetesOption
+		buildDiabetesOptions();
+		diabetesLayout.addComponent(diabetesOption);
+		// Add the layout to the right form
+		rightFormLayout.addComponent(diabetesLayout);
 		
 		// thyroidDisorder
-		thyroidDisorder = new CheckBox("Thyroid Disorder");
+		thyroidDisorder = new CheckBox("Thyroid Disorder", false);
 		thyroidDisorder.setImmediate(false);
 		rightFormLayout.addComponent(thyroidDisorder);
 		
 		// hyperTension
-		hyperTension = new CheckBox("Hypertension (High Blood Pressure)");
+		hyperTension = new CheckBox("Hypertension (High Blood Pressure)", false);
 		hyperTension.setImmediate(false);
 		rightFormLayout.addComponent(hyperTension);
 		
+		// heartDiseaseLayout
+		HorizontalLayout heartDiseaseLayout = new HorizontalLayout();
 		// heartDisease
 		heartDisease = new CheckBox("Heart Disease", false);
+		heartDisease.setId(MedicalArziConstants.ARZI_FORM_COMPONENT_MED_HIST_HEART_DISEASE_ID);
 		heartDisease.setImmediate(true);
-		heartDisease.setCaptionAsHtml(true);
 		heartDisease.addValueChangeListener(this);
-		rightFormLayout.addComponent(heartDisease);	
+		heartDiseaseLayout.addComponent(heartDisease);	
 		
 		// heartDiseaseType
-		heartDiseaseType = new TextField("Type:");
+		heartDiseaseType = new TextField("<i>(Specify Type)</i>");
+		heartDiseaseType.setCaptionAsHtml(true);
 		heartDiseaseType.setWidth("300px");
 		heartDiseaseType.setVisible(false);
 		heartDiseaseType.setNullRepresentation("");
-		rightFormLayout.addComponent(heartDiseaseType);		
+		heartDiseaseType.setStyleName("heartDiseaseType");
+		heartDiseaseLayout.addComponent(heartDiseaseType);	
+		rightFormLayout.addComponent(heartDiseaseLayout);		
 		
 		// other problems
 		otherProblems = new TextArea("Other Problems/Pre-existing conditions (List below):");
@@ -909,6 +941,27 @@ public class ArziFormComponent extends CustomComponent implements
 		otherProblems.setStyleName("ptntMedHist");
 		ptntMedHistLayout.addComponent(otherProblems);		
 	}
+	
+	/**
+	 * This method is responsible for building the 2 types of diabetes options
+	 * for the patient to select if the patient has diabetes as part of their
+	 * medical history.
+	 */
+	private void buildDiabetesOptions() {
+		// diabetesOptions
+		diabetesOption = new OptionGroup("<i>(Specify Type)</i>");
+		diabetesOption.setCaptionAsHtml(true);
+		
+		diabetesOption.addItem(DIABETES_TYPE_1);
+		diabetesOption.setItemCaption(DIABETES_TYPE_1, "Type 1");
+		
+		diabetesOption.addItem(DIABETES_TYPE_2);
+		diabetesOption.setItemCaption(DIABETES_TYPE_2, "Type 2");
+    
+		diabetesOption.setStyleName("horizontal");
+		diabetesOption.setStyleName("diabetesType", true);
+		diabetesOption.setVisible(false);
+	}	
 
 	/**
 	 * 
@@ -1161,27 +1214,48 @@ public class ArziFormComponent extends CustomComponent implements
 			}
 		}
 		
-		// Make the cancer type textfield visible and required for the user to
-		// specify the specific type, if the cancer indicator is selected.
-		if (cancer.getValue() != null && cancer.getValue()) {
-			
-			cancerType.setVisible(true);
-			cancerType.setRequired(true);
-		} else {
-			cancerType.setVisible(false);
-			cancerType.setRequired(false);
-		}
-		
-		// Make the heart disease type textfield visible and required for the
-		// user to specify the specific type, if the heart disease indicator is
-		// selected.
-		if (heartDisease.getValue() != null && heartDisease.getValue()) {
-			heartDiseaseType.setVisible(true);
-			heartDiseaseType.setRequired(true);
-			
-		} else {
-			heartDiseaseType.setVisible(false);
-			heartDiseaseType.setRequired(false);
+		// If the medical history conditions are selected
+		if (event.getProperty() instanceof CheckBox) {
+			CheckBox checkBox = (CheckBox) event.getProperty();
+			if(StringUtils.isNotBlank(checkBox.getId())) {
+				// Make the cancer type textfield visible and required for the patient to
+				// specify the specific type, if the cancer indicator is selected.			
+				if (checkBox.getId().equals(MedicalArziConstants.ARZI_FORM_COMPONENT_MED_HIST_CANCER_ID)) {
+					if (checkBox.getValue() != null && checkBox.getValue()) {
+						cancerType.setVisible(true);
+						cancerType.setRequired(true);
+					} else {
+						cancerType.setVisible(false);
+						cancerType.setRequired(false);
+					}
+				}
+				
+				// Make the heart disease type textfield visible and required for the
+				// patient to specify the specific type, if the heart disease indicator is
+				// selected.
+				if (checkBox.getId().equals(MedicalArziConstants.ARZI_FORM_COMPONENT_MED_HIST_HEART_DISEASE_ID)) {
+					if (checkBox.getValue() != null && checkBox.getValue()) {
+						heartDiseaseType.setVisible(true);
+						heartDiseaseType.setRequired(true);
+
+					} else {
+						heartDiseaseType.setVisible(false);
+						heartDiseaseType.setRequired(false);
+					}
+				}
+				
+				// Make sure the diabetesOptions are visible and required for
+				// the patient to select, if the diabetes indicator is selected.
+				if (checkBox.getId().equals(MedicalArziConstants.ARZI_FORM_COMPONENT_MED_HIST_DIABETES_ID)) {
+					if (checkBox.getValue() != null && checkBox.getValue()) {
+						diabetesOption.setVisible(true);
+						diabetesOption.setRequired(true);
+					} else {
+						diabetesOption.setVisible(false);
+						diabetesOption.setRequired(false);
+					}
+				}
+			}
 		}
 
 		// Selected country

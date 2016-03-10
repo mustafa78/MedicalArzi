@@ -37,7 +37,7 @@ $v-error-indicator-color: #ed473b;
 		background-color: #DAF1F2;
 	}
 
-	.v-caption, .v-captiontext, .v-checkbox {
+	.v-caption, .v-captiontext, .v-checkbox, .v-radiobutton {
 		font-family: Verdana;
 		font-size: 12px;
 		font-weight: bold;
@@ -242,19 +242,18 @@ $v-error-indicator-color: #ed473b;
 		color: #6E646F;
 	}
 	
-	.v-caption-primLoc-captiontxt {
+	/*for the primary location y/n section of the new arzi*/
+	.v-caption-primLoc {
 		margin-left: 15px;
 	}
 	
-	.primLoc-captiontxt .v-select-option {
+	.primLoc .v-select-option {
 		margin-left: 15px;
 		margin-top: 15px;
 		margin-bottom: 10px;
-		font-family: verdana;
-		font-weight: bold;
-		font-size: 12px;
 	}
 	
+	/*for the arzi summary textarea on the new arzi*/
 	.arziDetails-arziSmry {
 		margin-left: 165px;
 		margin-bottom: 10px;
@@ -262,5 +261,25 @@ $v-error-indicator-color: #ed473b;
 	
 	.v-caption-arziDetails-arziSmry .v-captiontext {
 		margin-left: 25px;
+	}
+	
+	/*for the diabetes, cancer and heart disease option on the medical history section of the new arzi*/
+	.diabetesType {
+		margin-left: -120px;
+		margin-top: 10px;
+	}
+	
+	.cancerType {
+		margin-left: -46px;
+		margin-top: 10px;
+	}
+	
+	.heartDiseaseType {
+		margin-left: -94px;
+		margin-top: 10px;
+	}	
+	
+	.v-caption-diabetesType .v-captiontext, .v-caption-cancerType .v-captiontext, .v-caption-heartDiseaseType .v-captiontext {
+		margin-left: 10px;	
 	}
 }

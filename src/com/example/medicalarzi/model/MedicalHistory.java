@@ -33,6 +33,8 @@ public class MedicalHistory implements Serializable {
 	private Boolean atrialFibrillationInd;
 
 	private Boolean diabetesInd;
+	
+	private Boolean diabetesType;
 
 	private Boolean hyperTensionInd;
 
@@ -121,6 +123,14 @@ public class MedicalHistory implements Serializable {
 
 	public Boolean getHyperTensionInd() {
 		return hyperTensionInd;
+	}
+
+	public Boolean getDiabetesType() {
+		return diabetesType;
+	}
+
+	public void setDiabetesType(Boolean diabetesType) {
+		this.diabetesType = diabetesType;
 	}
 
 	public void setHyperTensionInd(Boolean hyperTensionInd) {

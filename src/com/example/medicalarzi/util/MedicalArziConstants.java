@@ -99,6 +99,12 @@ public interface MedicalArziConstants {
 	
 	final static public String ARZI_FORM_COMPONENT_CITY_COMBOBOX_ID = "arziFormComponentCityCombobox";
 	
+	final static public String ARZI_FORM_COMPONENT_MED_HIST_DIABETES_ID = "arziFormComponentMedHistDiabetes";
+	
+	final static public String ARZI_FORM_COMPONENT_MED_HIST_CANCER_ID = "arziFormComponentMedHistCancer";
+	
+	final static public String ARZI_FORM_COMPONENT_MED_HIST_HEART_DISEASE_ID = "arziFormComponentMedHistHeartDisease";
+	
 	final static public String REVIEW_ARZI_COMPONENT_ID = "reviewArziComponent";
 	
 	final static public String REVIEW_ARZI_COMPONENT_VIEW_LAYOUT_ID = "reviewArziComponentViewLayout";
