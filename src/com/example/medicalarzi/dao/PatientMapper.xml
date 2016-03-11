@@ -232,11 +232,11 @@
 	        	#{heartDiseaseType,jdbcType=VARCHAR},
 	      	</if>
 	      	<if test="itsNumber != null" >
-	        	#{itsNumber,jdbcType=VARCHAR,javaType=INTEGER},
+	        	#{itsNumber,jdbcType=INTEGER},
 	      	</if>
 	      	now(),
 	      	<if test="itsNumber != null" >
-	        	#{itsNumber,jdbcType=VARCHAR,javaType=INTEGER},
+	        	#{itsNumber,jdbcType=INTEGER},
 	      	</if>
 	      	now()
 	    </trim>			 

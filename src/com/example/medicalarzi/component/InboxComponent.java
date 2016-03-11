@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,35 +28,30 @@ import com.example.medicalarzi.service.PatientService;
 import com.example.medicalarzi.service.ServiceLocator;
 import com.example.medicalarzi.util.MedicalArziConstants;
 import com.example.medicalarzi.util.MedicalArziUtils;
+import com.example.medicalarzi.view.MedicalArziLandingView;
 import com.vaadin.data.Container;
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
-import com.vaadin.data.fieldgroup.PropertyId;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.event.SelectionEvent;
-import com.vaadin.event.SelectionEvent.SelectionListener;
+import com.vaadin.event.ItemClickEvent;
+import com.vaadin.event.ItemClickEvent.ItemClickListener;
+import com.vaadin.navigator.View;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.Position;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.Field;
-import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Grid;
-import com.vaadin.ui.Grid.HeaderCell;
-import com.vaadin.ui.Grid.HeaderRow;
 import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification.Type;
-import com.vaadin.ui.TextField;
+import com.vaadin.ui.TabSheet.Tab;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.VerticalSplitPanel;
 import com.vaadin.ui.renderers.DateRenderer;
 import com.vaadin.ui.themes.Reindeer;
 
@@ -65,8 +59,8 @@ import com.vaadin.ui.themes.Reindeer;
  * @author mkanchwa
  *
  */
-public class InboxComponent extends CustomComponent implements
-		SelectionListener, ClickListener, ValueChangeListener {
+public class InboxComponent extends CustomComponent implements ClickListener,
+		ItemClickListener {
 
 	private static final long serialVersionUID = 2521689363206700694L;
 	
@@ -76,14 +70,8 @@ public class InboxComponent extends CustomComponent implements
 	
 	// Inbox
 	private VerticalLayout inboxViewLayout;
-	
-	private VerticalSplitPanel splitPanel;
 
 	private Grid arziGrid;
-	
-	private VerticalLayout editArziFormLayout;
-	
-	private CustomFormComponent arziForm;
 	
 	// Buttons layout
 	private HorizontalLayout buttonsLayout;
@@ -93,29 +81,12 @@ public class InboxComponent extends CustomComponent implements
 	private Button saveBtn;
 	
 	private Button deleteBtn;
-
-	@PropertyId("arziType")
-	private ComboBox arziType;
-
-	@PropertyId("bodyPart")
-	private ComboBox bodyPart;
-
-	@PropertyId("procedure")
-	private ComboBox procedure;
-
-	@PropertyId("condition")
-	private ComboBox condition;
-	
-	@PropertyId("otherCondition")
-	private TextField otherCondition;
-	
-	@PropertyId("conditionStartDate.gregorianCalDate")
-	private ArziDateField conditionStartDate;
 	
 	// Binding Fields
 	private BeanFieldGroup<Arzi> arziFieldsBinder;
 	
 	private BeanItemContainer<Arzi> arziContainer;
+
 	
 	/**
 	 * 
@@ -129,9 +100,6 @@ public class InboxComponent extends CustomComponent implements
 		// Build the inbox view. This is the mainLayout for this component
 		buildInboxViewLayout();
 		
-		// Bind the member fields to the model
-		bindFieldsToModel();
-
 		setCompositionRoot(inboxViewLayout);
 	}
 	
@@ -154,31 +122,6 @@ public class InboxComponent extends CustomComponent implements
 	}
 	
 	/**
-	 * This method is responsible for binding the member fields to the
-	 * ArziSearchCriteria model.
-	 */
-	private void bindFieldsToModel() {
-		logger.debug("Binding the patient and the arzi fields to their respective models.");
-
-		/* Bind the arzi fields. */
-		Arzi arziBinderObj = new Arzi();
-		/* Bind the search criteria fields */
-		arziFieldsBinder = new BeanFieldGroup<Arzi>(
-				Arzi.class);
-		// Bind all the member fields whose type extends Field to the property
-		// id of the item.
-		// The mapping is done based on the @PropertyId annotation
-		arziFieldsBinder.bindMemberFields(this);
-		// Add bean item that is bound.
-		arziFieldsBinder.setItemDataSource(arziBinderObj);
-		// Set the buffered mode on, if using the bean validation JSR-3.0 with
-		// vaadin. Does not work when fields are immediately updated with the
-		// bean.
-		arziFieldsBinder.setBuffered(true);
-	}	
-	
-	
-	/**
 	 * This method will build the grid layout which will list all the arzis
 	 * which are saved/submitted.
 	 * 
@@ -195,108 +138,86 @@ public class InboxComponent extends CustomComponent implements
 		inboxViewLayout.setSpacing(true);	
 
 		Label inboxDescription = new Label();
-		inboxDescription.setValue("My Arzis: (Select to edit)");
+		inboxDescription.setCaption("My Arzis: <i>(Double click to view)</i>");
+		inboxDescription.setCaptionAsHtml(true);
 		inboxDescription.setStyleName("v-captiontext");
 		inboxViewLayout.addComponent(inboxDescription);
 		inboxViewLayout.setExpandRatio(inboxDescription, 0.1f);
 
-		buildSplitPanel();
-		inboxViewLayout.addComponent(splitPanel);
-		inboxViewLayout.setExpandRatio(splitPanel, 4.0f);
+		buildArziGrid();
+		inboxViewLayout.addComponent(arziGrid);
+		inboxViewLayout.setExpandRatio(arziGrid, 2.0f);
 	}	
 	
-	/**
-	 * This method is responsible for building the veritical split panel and
-	 * adding the grid in the top half and the vertical layout in the bottom
-	 * half (which contains the form elements and the buttons)
-	 */
-	private void buildSplitPanel() {
-		splitPanel = new VerticalSplitPanel();
-		splitPanel.setLocked(true);
-		splitPanel.setSizeFull();
-		splitPanel.setSplitPosition(50, Unit.PERCENTAGE);
-		// Use a custom style
-		splitPanel.addStyleName("invisiblesplitter");
-		
-		buildArziGrid();
-		splitPanel.addComponent(arziGrid);
-		
-		buildEditArziFormLayout();
-		splitPanel.addComponent(editArziFormLayout);
-	}
 	
 	/**
-	 * This method is responsible for building the vertical layout which
-	 * contains the form elements for editing and buttons layout which contains
-	 * the Save, Submit and Delete arzis.
+	 * This method builds the arzi grid on the Inbox tab with the list of arzis
+	 * for the logged in user. The user is also able to edit his/her arzi if it
+	 * is not yet submitted and sitting in the Draft mode. Once an arzi is
+	 * submitted, the user will not be able to edit that arzi.
 	 */
-	private void buildEditArziFormLayout() {
-		// editArziFormLayout
-		editArziFormLayout = new VerticalLayout();
-		editArziFormLayout.setSizeFull();
-		editArziFormLayout.setEnabled(false);
-		editArziFormLayout.setMargin(true);
-		editArziFormLayout.setSpacing(true);	
+	@SuppressWarnings("unchecked")
+	private void buildArziGrid() {
+		arziGrid = new Grid();
+		arziGrid.setSizeFull();
 
-		buildArziFormSection();
-		editArziFormLayout.addComponent(arziForm);
+		// Set the selection mode.
+		arziGrid.setSelectionMode(SelectionMode.SINGLE);
 		
-		buildButtonsLayout();
-		editArziFormLayout.addComponent(buttonsLayout);
-		editArziFormLayout.setComponentAlignment(buttonsLayout,
-				Alignment.MIDDLE_CENTER);
+		// Initialize the container
+		arziContainer = (BeanItemContainer<Arzi>) MedicalArziUtils
+				.getContainer(Arzi.class);
+		
+		// Set the container as the grid datasource
+		arziGrid.setContainerDataSource(arziContainer);
+		
+		// Retrieve all the arzis for the patient based on the ITS number
+		// Get the patient's full name from the session
+		patient = (Patient) MedicalArziUtils.getSessionAttribute(
+				MedicalArziConstants.SESS_ATTR_PTNT_INFO);
+		
+		refreshGridWithFreshData();
+
+		// Add nested properties to the header
+		arziContainer.addNestedContainerBean("requestSubmitDate");
+		arziContainer.addNestedContainerBean("currentStatus");
+
+		// Customize the columns
+		customizeArziGridColumns();
+		
+		//Add the event listener on the grid on selecting a row.
+		//arziGrid.addSelectionListener(this);
+		arziGrid.addItemClickListener(this);
 	}
 	
+	
 	/**
-	 * This method is responsible for building the form elements section which
-	 * contains the arzi elements that could be edited.
-	 * 
+	 * This method is responsible for customizing all the grid columns like
+	 * setting the caption and grouping the similar columns together etc.
 	 */
-	private void buildArziFormSection() {
-		arziForm = new CustomFormComponent();
-		arziForm.setSizeFull();
-		arziForm.setStyleName("customForm");
+	private void customizeArziGridColumns() {
 		
+		arziGrid.setColumns("arziId", "requestSubmitDate.gregorianCalDate",
+				"arziSummary", "currentStatus.statusDesc");
 		
-		/**
-		 * Add the fields to the left FormLayout.
-		 * 
-		 */
-		FormLayout leftFormLayout = (FormLayout) MedicalArziUtils.findById(
-				arziForm,
-				MedicalArziConstants.CUSTOM_FORM_LEFTFORM_LAYOUT_ID);
+		// Column reordering allowed
+		arziGrid.setColumnReorderingAllowed(true);
 		
-		arziType = (ComboBox) getField(ArziType.class);
-		leftFormLayout.addComponent(arziType);
+		// Sets the converter on the ITS number to remove the grouping used.
+		arziGrid.getColumn("arziId").setHeaderCaption("ID").setMaximumWidth(70)
+				.setConverter(MedicalArziUtils.itsNumberConverter());
 		
-		condition = (ComboBox) getField(Condition.class);
-		condition.addValueChangeListener(this);
-		leftFormLayout.addComponent(condition);
-		
-		otherCondition = (TextField) getField(String.class);
-		otherCondition.setWidth("300px");
-		leftFormLayout.addComponent(otherCondition);
-		
-		/**
-		 * Add the fields to the right FormLayout.
-		 * 
-		 */
-		FormLayout rightFormLayout = (FormLayout) MedicalArziUtils.findById(
-				arziForm,
-				MedicalArziConstants.CUSTOM_FORM_RIGHTFORM_LAYOUT_ID);
-		
-		bodyPart = (ComboBox) getField(BodyPart.class);
-		rightFormLayout.addComponent(bodyPart);
-		
-		conditionStartDate = new ArziDateField("Condition Start Date:");
-		conditionStartDate.setImmediate(true);
-		conditionStartDate
-				.setDescription("Please enter the date in the dd/MM/yyy format.");
-		conditionStartDate.setRequired(true);
-		rightFormLayout.addComponent(conditionStartDate);
-		
-		procedure = (ComboBox) getField(Procedure.class);
-		rightFormLayout.addComponent(procedure);
+		arziGrid.getColumn("requestSubmitDate.gregorianCalDate")
+				.setHeaderCaption("Saved/Submit Date")
+				.setMaximumWidth(150)
+				.setRenderer(
+						new DateRenderer("%1$tb %1$td, %1$tY", Locale.ENGLISH));	
+
+		arziGrid.getColumn("currentStatus.statusDesc")
+				.setHeaderCaption("Status").setMaximumWidth(110);
+
+
+		//groupArziGridColumns();
 	}
 	
 	/**
@@ -335,89 +256,6 @@ public class InboxComponent extends CustomComponent implements
 		buttonsLayout.setSpacing(true);
 		buttonsLayout.setStyleName("ptntRegistrationBtn");
 	}	
-	
-	/**
-	 * This method builds the arzi grid on the Inbox tab with the list of arzis
-	 * for the logged in user. The user is also able to edit his/her arzi if it
-	 * is not yet submitted and sitting in the Draft mode. Once an arzi is
-	 * submitted, the user will not be able to edit that arzi.
-	 */
-	@SuppressWarnings("unchecked")
-	private void buildArziGrid() {
-		arziGrid = new Grid();
-		arziGrid.setSizeFull();
-
-		// Set the selection mode.
-		arziGrid.setSelectionMode(SelectionMode.SINGLE);
-		
-		// Initialize the container
-		arziContainer = (BeanItemContainer<Arzi>) MedicalArziUtils
-				.getContainer(Arzi.class);
-		
-		// Set the container as the grid datasource
-		arziGrid.setContainerDataSource(arziContainer);
-
-		
-		// Retrieve all the arzis for the patient based on the ITS number
-		// Get the patient's full name from the session
-		patient = (Patient) MedicalArziUtils.getSessionAttribute(
-				MedicalArziConstants.SESS_ATTR_PTNT_INFO);
-		
-		refreshGridWithFreshData();
-
-		// Add nested properties to the header
-		arziContainer.addNestedContainerBean("currentStatus");
-		arziContainer.addNestedContainerBean("arziType");
-		arziContainer.addNestedContainerBean("condition");
-		arziContainer.addNestedContainerBean("procedure");
-		arziContainer.addNestedContainerBean("bodyPart");
-		arziContainer.addNestedContainerBean("conditionStartDate");
-
-		// Customize the columns
-		customizeArziGridColumns();
-		
-		//Add the event listener on the grid on selecting a row.
-		arziGrid.addSelectionListener(this);
-		//arziGrid.addItemClickListener(this);
-	}
-	
-	
-	/**
-	 * This method is responsible for customizing all the grid columns like
-	 * setting the caption and grouping the similar columns together etc.
-	 */
-	private void customizeArziGridColumns() {
-		
-		arziGrid.setColumns("arziId", "currentStatus.statusDesc",
-				"arziType.arziTypeName", "bodyPart.bodyPartName",
-				"condition.conditionName", "otherCondition",
-				"conditionStartDate.gregorianCalDate",
-				"procedure.procedureName");
-		
-		// Column reordering allowed
-		arziGrid.setColumnReorderingAllowed(true);
-		
-		// Sets the converter on the ITS number to remove the grouping used.
-		arziGrid.getColumn("arziId").setHeaderCaption("ID").setMaximumWidth(70)
-				.setConverter(MedicalArziUtils.itsNumberConverter());
-
-		arziGrid.getColumn("arziType.arziTypeName").setMaximumWidth(160)
-				.setHeaderCaption("Type");
-
-		arziGrid.getColumn("currentStatus.statusDesc")
-				.setHeaderCaption("Status").setMaximumWidth(110);
-
-		arziGrid.getColumn("bodyPart.bodyPartName").setHeaderCaption(
-				"Body Part");
-
-		arziGrid.getColumn("conditionStartDate.gregorianCalDate")
-				.setHeaderCaption("Condition Start Date")
-				.setMaximumWidth(150)
-				.setRenderer(
-						new DateRenderer("%1$tb %1$td, %1$tY", Locale.ENGLISH));
-
-		groupArziGridColumns();
-	}
 	
 
 	/**
@@ -513,7 +351,6 @@ public class InboxComponent extends CustomComponent implements
 								getLookupService().getListOfAllBodyParts(),
 								"bodyPartName", bdyPrtContainer, null, true, "Body Part is required!"));
 		
-		groupArziGridColumns();
 		
 		// Adding the commit handler to the field group
 		MedicalArziCommitHandler maCommitHdlr = new MedicalArziCommitHandler();
@@ -521,42 +358,7 @@ public class InboxComponent extends CustomComponent implements
 		arziGrid.getEditorFieldGroup().addCommitHandler(maCommitHdlr);
 	}
 
-	/**
-	 * This method is responsible for the logical grouping of the arzi grid
-	 * columns. Basically, the Patient information section and Medical
-	 * Information section on the Inbox grid
-	 * 
-	 */
-	private void groupArziGridColumns() {
-		// This call prepends the header row to the existing grid
-		HeaderRow ptntMedicalInfoHeader = arziGrid.prependHeaderRow();
-		
-		// 
-		HeaderCell arziId = ptntMedicalInfoHeader.getCell("arziId");
-		HeaderCell arziType = ptntMedicalInfoHeader.getCell("arziType.arziTypeName");
-		HeaderCell currentStatus = ptntMedicalInfoHeader.getCell("currentStatus.statusDesc");
-		
-		// Now join all of these cells to form a logical block
-		HeaderCell ptntArziInfoHeaderCell = ptntMedicalInfoHeader.join(arziId,
-				currentStatus, arziType);
-		
-		ptntArziInfoHeaderCell.setHtml("<b>Arzi</b>");
-		
-		// Get hold of the columnID, mind you in my case this is a nestedID
-		HeaderCell condition = ptntMedicalInfoHeader.getCell("condition.conditionName");
-		HeaderCell otherCondition = ptntMedicalInfoHeader.getCell("otherCondition");
-		HeaderCell conditionStartDt = ptntMedicalInfoHeader
-				.getCell("conditionStartDate.gregorianCalDate");
-		HeaderCell procedure = ptntMedicalInfoHeader.getCell("procedure.procedureName");
-		HeaderCell bodyPart = ptntMedicalInfoHeader.getCell("bodyPart.bodyPartName");
 
-		// Now join all of these cells to form a logical block
-		HeaderCell ptntMedicalInfoHeaderCell = ptntMedicalInfoHeader.join(
-				condition, otherCondition, conditionStartDt, procedure,
-				bodyPart);
-
-		ptntMedicalInfoHeaderCell.setHtml("<b>Medical Information</b>");
-	}
 	
 	/**
 	 * This method creates the field group for the arzi grid items and binds it to the
@@ -575,6 +377,111 @@ public class InboxComponent extends CustomComponent implements
 	}	
 
 
+
+
+	/**
+	 * This method is responsible for fetching the arzis for the user from the
+	 * database and updating the datasource container for the arzi grid with the
+	 * latest set of data.
+	 * 
+	 */
+	public void refreshGridWithFreshData() {
+		// Retrieve the list of arzis again and refresh the container
+		// with the new set of data.
+		List<Arzi> arziList = getPatientService().retrieveAllArzisForPatient(patient
+				.getItsNumber());
+		/**
+		 * Update the Grid with fresh data. Two step process of replacing bean
+		 * items. (1) First remove all BeanItem objects with
+		 * Container::removeAllItems method. (2) Then add replacement BeanItem
+		 * objects with the BeanItemContainer::addAll method.
+		 */
+		arziContainer.removeAllItems();
+		
+		arziContainer.addAll(arziList);
+	}
+	
+	/**
+	 * This method is responsible for populating the fields on the
+	 * ArziFormComponent with the arzi and patient information fetched from the
+	 * selected result row.
+	 * 
+	 * @param selectedArzi
+	 * 
+	 * @return com.example.medicalarzi.component.ArziFormComponent
+	 */
+	private ArziFormComponent populateTheFormWithSelectedArziData(
+			Arzi selectedArzi) {
+		ArziFormComponent ediArziComponent = new ArziFormComponent(patient,
+				selectedArzi);
+
+		ediArziComponent.getItsNumber().setValue(
+				String.valueOf(patient.getItsNumber()));
+		
+		return ediArziComponent;
+	}
+	
+	/**
+	 * 
+	 * @param arziComponent
+	 */
+	private void makeFieldsReadOnly(ArziFormComponent arziComponent) {
+		
+		// Patient's profile information set to read only.
+		arziComponent.getItsNumber().setReadOnly(true);
+		arziComponent.getGender().setReadOnly(true);
+		arziComponent.getDob().setReadOnly(true);
+		arziComponent.getJamaat().setReadOnly(true);
+		
+		// Patient's address
+		arziComponent.getAddressLn1().setReadOnly(true);
+		arziComponent.getAddressLn2().setReadOnly(true);
+		arziComponent.getCountry().setReadOnly(true);
+		arziComponent.getCity().setReadOnly(true);
+		arziComponent.getCountryState().setReadOnly(true);
+		arziComponent.getZip().setReadOnly(true);
+		arziComponent.getPhoneNum().setReadOnly(true);
+		arziComponent.getPrimaryLocationOption().setReadOnly(true);
+
+		// Patient's arzi information set to read only.
+		arziComponent.getArziType().setReadOnly(true);
+		arziComponent.getBodyPart().setReadOnly(true);
+		if (arziComponent.getOtherBodyPart() != null) {
+			arziComponent.getOtherBodyPart().setReadOnly(true);
+		}
+		arziComponent.getProcedure().setReadOnly(true);
+		if (arziComponent.getOtherProcedure() != null) {
+			arziComponent.getOtherProcedure().setReadOnly(true);
+		}
+		arziComponent.getCondition().setReadOnly(true);
+		arziComponent.getConditionStartDate().setReadOnly(true);
+		if (arziComponent.getOtherCondition() != null) {
+			arziComponent.getOtherCondition().setReadOnly(true);
+		}
+		arziComponent.getArziSummary().setReadOnly(true);
+
+		// Patient's Medical History
+		arziComponent.getAsthma().setReadOnly(true);
+		arziComponent.getAtrialFibrillation().setReadOnly(true);
+		arziComponent.getCholesterol().setReadOnly(true);
+		arziComponent.getHyperTension().setReadOnly(true);
+		arziComponent.getThyroidDisorder().setReadOnly(true);
+		arziComponent.getCancer().setReadOnly(true);
+		if (arziComponent.getCancerType() != null) {
+			arziComponent.getCancerType().setReadOnly(true);
+		}
+		arziComponent.getHeartDisease().setReadOnly(true);
+		if (arziComponent.getHeartDiseaseType() != null) {
+			arziComponent.getHeartDiseaseType().setReadOnly(true);
+		}
+		arziComponent.getDiabetes().setReadOnly(true);
+		if (arziComponent.getDiabetesOption() != null) {
+			arziComponent.getDiabetesOption().setReadOnly(true);
+		}
+		arziComponent.getOtherProblems().setReadOnly(true);
+	}	
+	
+
 	/**
 	 * This is the itemClick listener which listens to the click event on any of
 	 * the grid items (row). Override this when the SelectionListener is added
@@ -582,44 +489,88 @@ public class InboxComponent extends CustomComponent implements
 	 * 
 	 * @param event
 	 */	
+	
 	@Override
-	public void select(SelectionEvent event) {
-
-		Arzi selectedArzi = (Arzi) arziGrid.getSelectedRow();
-
-		if (selectedArzi != null) {
+	public void itemClick(ItemClickEvent event) {
+		// Open the arzi for editing on double click event.
+		if (event.isDoubleClick()) {
+			Arzi selectedArzi = (Arzi) event.getItemId();
 			
-			arziType.select(selectedArzi.getArziType());
+			if (selectedArzi != null) {
 
-			condition.select(selectedArzi.getCondition());
-			
-			conditionStartDate.setValue(selectedArzi
-					.getConditionStartDate().getGregorianCalDate());
+				View currentView = UI.getCurrent().getNavigator()
+						.getCurrentView();
 
-			procedure.select(selectedArzi.getProcedure());
+				if (currentView instanceof MedicalArziLandingView) {
+					MedicalArziLandingView landingView = (MedicalArziLandingView) currentView;
 
-			bodyPart.select(selectedArzi.getBodyPart());
+					ArziFormComponent arziComponent = populateTheFormWithSelectedArziData(selectedArzi);
 
-			if (StringUtils.isNotBlank(selectedArzi.getOtherCondition())) {
-				otherCondition.setValue(selectedArzi.getOtherCondition());
-			}			
-			// The form should not be editable if the arzi is in the 'Submitted'
-			// status
-			if (selectedArzi.getCurrentStatus().getStatusId().intValue() == MedicalArziConstants.ARZI_DRAFT_STATUS
-					.intValue()) {
-				// Set the form elements with the data of the selected arzi.
-				editArziFormLayout.setEnabled(true);
+					String arziCaption = null;
+					String arziTabComponentId = null;
+					
+					if (selectedArzi.getCurrentStatus().getStatusId()
+							.equals(MedicalArziConstants.ARZI_DRAFT_STATUS)) {
 
-			} else {
-				editArziFormLayout.setEnabled(false);
+						arziCaption = MedicalArziConstants.EDIT_ARZI_TAB_CAPTION
+								+ " # " + selectedArzi.getArziId();
+						arziTabComponentId = MedicalArziConstants.EDIT_ARZI_TAB_COMPONENT_ID
+								+ "_" + selectedArzi.getArziId();
+					} else if (selectedArzi.getCurrentStatus().getStatusId()
+							.equals(MedicalArziConstants.ARZI_SUBMITTED_STATUS)) {
+
+						arziCaption = MedicalArziConstants.VIEW_ARZI_TAB_CAPTION
+								+ " # " + selectedArzi.getArziId();
+
+						arziTabComponentId = MedicalArziConstants.VIEW_ARZI_TAB_COMPONENT_ID
+								+ "_" + selectedArzi.getArziId();
+
+						makeFieldsReadOnly(arziComponent);
+					}
+
+					// Find the component based on the id inside the tab for
+					// the arzi which is being reviewed.
+					Component arziTabComponent = MedicalArziUtils.findById(
+							landingView.getTabSheet(), arziTabComponentId);
+
+					// If the tab for the arzi id to be edited is not
+					// added, add the tab for that arzi. Else just take the
+					// user to the requested edit arzi tab.
+					Tab arziTab = null;
+					if (arziTabComponent == null) {
+
+						// Set the unique id to track if the arzi to be
+						// reviewed is already open.
+						arziComponent.setId(arziTabComponentId);
+
+						// Add the new tab for the arzi to be edited and
+						// make it closable.
+						arziTab = landingView.getTabSheet().addTab(
+								arziComponent, arziCaption);
+
+						arziTab.setClosable(true);
+
+						landingView.getTabSheet().setSelectedTab(arziTab);
+
+					} else {
+						// Get the tab for the component and select it.
+						arziTab = landingView.getTabSheet().getTab(
+								arziTabComponent);
+
+						landingView.getTabSheet().setSelectedTab(arziTab);
+					}
+
+					logger.debug("The patient with ITS number:-> "
+							+ patient.getItsNumber() + " selected arzi : "
+							+ selectedArzi + " for editing");
+				}			
+
 			}
-
+			
 		}
-
-		logger.debug("The patient with ITS number:-> " + patient.getItsNumber()
-				+ " selected arzi : " + selectedArzi + " for editing");
+		
 	}
-
+	
 	@Override
 	public void buttonClick(ClickEvent event) {
 		
@@ -717,103 +668,7 @@ public class InboxComponent extends CustomComponent implements
 					"userFriendlyMsg",
 					MedicalArziConstants.USER_FRIENDLY_MSG_DELAY_MSEC);
 		}
-	}
+	}	
 
-	/**
-	 * This method is responsible for fetching the arzis for the user from the
-	 * database and updating the datasource container for the arzi grid with the
-	 * latest set of data.
-	 * 
-	 */
-	public void refreshGridWithFreshData() {
-		// Retrieve the list of arzis again and refresh the container
-		// with the new set of data.
-		List<Arzi> arziList = getPatientService().retrieveAllArzisForPatient(patient
-				.getItsNumber());
-		/**
-		 * Update the Grid with fresh data. Two step process of replacing bean
-		 * items. (1) First remove all BeanItem objects with
-		 * Container::removeAllItems method. (2) Then add replacement BeanItem
-		 * objects with the BeanItemContainer::addAll method.
-		 */
-		arziContainer.removeAllItems();
-		
-		arziContainer.addAll(arziList);
-	}
-	
-	
-	/**
-	 * This method is responsible for returning the right field based on the
-	 * dynamic class.
-	 * 
-	 * @param objClass
-	 * 
-	 * @return com.vaadin.ui.Field<?>
-	 */
-	private Field<?> getField(Class<?> objClass) {
-		Field<?> field = null;
-
-		if (objClass == BodyPart.class) {
-			Container bdyPrtContainer = MedicalArziUtils
-					.getContainer(BodyPart.class);
-			
-			field = MedicalArziUtils
-					.getComboBox("Body Part:", "Please select a body part...",
-							getLookupService().getListOfAllBodyParts(),
-							"bodyPartName", bdyPrtContainer, null, true,
-							"Body Part is required!");
-
-		} else if (objClass == Condition.class) {
-			Container condContainer = MedicalArziUtils
-					.getContainer(Condition.class);
-
-			field = MedicalArziUtils.getComboBox("Medical Condition:",
-					"Please select a condition...", getLookupService()
-							.getListOfAllMedicalConditions(), "conditionName",
-					condContainer, null, true, "Condition is required!");
-
-		} else if (objClass == Procedure.class) {
-			Container procContainer = MedicalArziUtils
-					.getContainer(Procedure.class);
-
-			field = MedicalArziUtils.getComboBox("Medical Procedure",
-					"Please select a procedure...", getLookupService()
-							.getListOfAllMedicalProcedures(), "procedureName",
-					procContainer, null, true, "Procedure is required!");
-
-		} else if (objClass == ArziType.class) {
-			Container arziTypeContainer = MedicalArziUtils
-					.getContainer(ArziType.class);
-
-			field = MedicalArziUtils.getComboBox("Arzi Type:", "Please select a type...",
-					getLookupService().getListOfAllArziTypes(), "arziTypeName",
-					arziTypeContainer, null, true, "Type is required!");
-		} else if (objClass == String.class) {
-			field = MedicalArziUtils.getTextFieldEditor("Other Condition:", true, false, null);
-		}
-
-		return field;
-	}
-
-	@Override
-	public void valueChange(ValueChangeEvent event) {
-
-		// Select/Deselect the other condition box based on the the value
-		// selection in the condition combobox.
-		if (event.getProperty().getValue() instanceof Condition) {
-
-			Condition selectedCondition = (Condition) event.getProperty()
-					.getValue();
-
-			if (selectedCondition.getConditionId().intValue() == MedicalArziConstants.CONDITION_OTHER_ID
-					.intValue()) {
-				otherCondition.setVisible(true);
-				otherCondition.setRequired(true);
-			} else {
-				otherCondition.setVisible(false);
-				otherCondition.setRequired(false);
-			}
-		}
-	}
 
 }

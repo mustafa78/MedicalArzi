@@ -166,7 +166,6 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		//setDefaultProcedure();
 		// Select the default body part as Other
 		//setDefaultBodyPart();
-		
 
 		makeFieldsReadOnlyForNewArzi(true);
 

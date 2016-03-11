@@ -131,6 +131,14 @@ public interface MedicalArziConstants {
 	
 	final static public String REVIEW_ARZI_TAB_COMPONENT_ID = "Review_Arzi_Component";
 	
+	final static public String EDIT_ARZI_TAB_CAPTION = "Edit Arzi";
+	
+	final static public String EDIT_ARZI_TAB_COMPONENT_ID = "Edit_Arzi_Component";
+	
+	final static public String VIEW_ARZI_TAB_CAPTION = "View Arzi";
+	
+	final static public String VIEW_ARZI_TAB_COMPONENT_ID = "View_Arzi_Component";		
+	
 	final static public String PENDING_TASKS_TAB_CAPTION = "Pending Tasks";
 	
 	final static public String PENDING_TASKS_TAB_COMPONENT_ID = "pendingTaskComponent";

@@ -324,6 +324,22 @@ public class ArziFormComponent extends CustomComponent implements
 		return addressLn2;
 	}
 
+	public ComboBox getCity() {
+		return city;
+	}
+
+	/*
+	 * getState() is a Vaadin framework level method and that is the reason we
+	 * need to change this getter to getCountryState()
+	 */
+	public ComboBox getCountryState() {
+		return state;
+	}
+
+	public ComboBox getCountry() {
+		return country;
+	}
+
 	public ComboBox getArziType() {
 		return arziType;
 	}
@@ -344,8 +360,80 @@ public class ArziFormComponent extends CustomComponent implements
 		return otherCondition;
 	}
 
+	public TextField getOtherBodyPart() {
+		return otherBodyPart;
+	}
+
+	public TextArea getOtherProblems() {
+		return otherProblems;
+	}
+
+	public TextField getOtherProcedure() {
+		return otherProcedure;
+	}
+
 	public ComboBox getJamaat() {
 		return jamaat;
+	}
+
+	public TextArea getArziSummary() {
+		return arziSummary;
+	}
+
+	public CheckBox getAsthma() {
+		return asthma;
+	}
+
+	public CheckBox getAtrialFibrillation() {
+		return atrialFibrillation;
+	}
+	
+	public CheckBox getCholesterol() {
+		return cholesterol;
+	}
+
+	public CheckBox getHyperTension() {
+		return hyperTension;
+	}
+
+	public CheckBox getThyroidDisorder() {
+		return thyroidDisorder;
+	}
+	
+	public CheckBox getDiabetes() {
+		return diabetes;
+	}
+
+	public OptionGroup getDiabetesOption() {
+		return diabetesOption;
+	}
+
+	public CheckBox getCancer() {
+		return cancer;
+	}
+
+	public CheckBox getHeartDisease() {
+		return heartDisease;
+	}
+
+	public TextField getCancerType() {
+		return cancerType;
+	}
+
+	public TextField getHeartDiseaseType() {
+		return heartDiseaseType;
+	}
+
+	public TextField getFullName() {
+		return fullName;
+	}
+
+	public TextField getPhoneNum() {
+		return phoneNum;
+	}
+
+	public OptionGroup getPrimaryLocationOption() {
+		return primaryLocationOption;
 	}
 
 	public ComboBox getCondition() {
@@ -522,6 +610,7 @@ public class ArziFormComponent extends CustomComponent implements
 
 		// gender
 		gender = new TextField("Gender:");
+		gender.setReadOnly(true);
 		gender.setWidth("300px");
 		gender.setConverter(new StringToLookupConverter());
 		leftFormLayout.addComponent(gender);
@@ -554,6 +643,7 @@ public class ArziFormComponent extends CustomComponent implements
 
 		dob = new ArziDateField("Date of Birth:");
 		dob.setImmediate(true);
+		dob.setReadOnly(true);
 		dob.setDescription("Please enter the date in the dd/MM/yyy format.");
 		rightFormLayout.addComponent(dob);		
 	}
