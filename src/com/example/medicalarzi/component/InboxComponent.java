@@ -3,7 +3,6 @@
  */
 package com.example.medicalarzi.component;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -19,10 +18,8 @@ import com.example.medicalarzi.model.Arzi;
 import com.example.medicalarzi.model.ArziType;
 import com.example.medicalarzi.model.BodyPart;
 import com.example.medicalarzi.model.Condition;
-import com.example.medicalarzi.model.GregHijDate;
 import com.example.medicalarzi.model.Patient;
 import com.example.medicalarzi.model.Procedure;
-import com.example.medicalarzi.model.Status;
 import com.example.medicalarzi.service.LookupService;
 import com.example.medicalarzi.service.PatientService;
 import com.example.medicalarzi.service.ServiceLocator;
@@ -31,36 +28,25 @@ import com.example.medicalarzi.util.MedicalArziUtils;
 import com.example.medicalarzi.view.MedicalArziLandingView;
 import com.vaadin.data.Container;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
-import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.navigator.View;
-import com.vaadin.server.ThemeResource;
-import com.vaadin.shared.Position;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.SelectionMode;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.renderers.DateRenderer;
-import com.vaadin.ui.themes.Reindeer;
 
 /**
  * @author mkanchwa
  *
  */
-public class InboxComponent extends CustomComponent implements ClickListener,
-		ItemClickListener {
+public class InboxComponent extends CustomComponent implements ItemClickListener {
 
 	private static final long serialVersionUID = 2521689363206700694L;
 	
@@ -70,21 +56,11 @@ public class InboxComponent extends CustomComponent implements ClickListener,
 	
 	// Inbox
 	private VerticalLayout inboxViewLayout;
-
+	
+	// arziGrid
 	private Grid arziGrid;
 	
-	// Buttons layout
-	private HorizontalLayout buttonsLayout;
-
-	private Button submitBtn;
-
-	private Button saveBtn;
-	
-	private Button deleteBtn;
-	
-	// Binding Fields
-	private BeanFieldGroup<Arzi> arziFieldsBinder;
-	
+	// arziContainer for the grid	
 	private BeanItemContainer<Arzi> arziContainer;
 
 	
@@ -186,7 +162,6 @@ public class InboxComponent extends CustomComponent implements ClickListener,
 		customizeArziGridColumns();
 		
 		//Add the event listener on the grid on selecting a row.
-		//arziGrid.addSelectionListener(this);
 		arziGrid.addItemClickListener(this);
 	}
 	
@@ -214,49 +189,8 @@ public class InboxComponent extends CustomComponent implements ClickListener,
 						new DateRenderer("%1$tb %1$td, %1$tY", Locale.ENGLISH));	
 
 		arziGrid.getColumn("currentStatus.statusDesc")
-				.setHeaderCaption("Status").setMaximumWidth(110);
-
-
-		//groupArziGridColumns();
+				.setHeaderCaption("Status").setMaximumWidth(160);
 	}
-	
-	/**
-	 * This method is responsible for building the horizontal buttons layout
-	 * which conatins the Save, Submit and Delete arzi buttons.
-	 * 
-	 */
-	private void buildButtonsLayout() {
-
-		buttonsLayout = new HorizontalLayout();
-		
-		// cancelBtn
-		deleteBtn = new Button(new ThemeResource("img/delete-arzi.png"));
-		deleteBtn.addClickListener(this);
-		deleteBtn.setStyleName(Reindeer.BUTTON_LINK);
-		buttonsLayout.addComponent(deleteBtn);
-		buttonsLayout.setExpandRatio(deleteBtn, 1.0f);
-		buttonsLayout.setComponentAlignment(deleteBtn, Alignment.MIDDLE_RIGHT);		
-
-		// saveBtn
-		saveBtn = new Button(new ThemeResource("img/save-arzi.png"));
-		saveBtn.addClickListener(this);
-		saveBtn.setStyleName(Reindeer.BUTTON_LINK);
-		buttonsLayout.addComponent(saveBtn);
-		buttonsLayout.setExpandRatio(saveBtn, 0.2f);
-		buttonsLayout.setComponentAlignment(saveBtn, Alignment.MIDDLE_CENTER);
-
-		// submitBtn
-		submitBtn = new Button(new ThemeResource("img/submit-arzi.png"));
-		submitBtn.addClickListener(this);
-		submitBtn.setStyleName(Reindeer.BUTTON_LINK);
-		buttonsLayout.addComponent(submitBtn);
-		buttonsLayout.setExpandRatio(submitBtn, 1.0f);
-		buttonsLayout.setComponentAlignment(submitBtn, Alignment.MIDDLE_LEFT);
-
-		buttonsLayout.setSpacing(true);
-		buttonsLayout.setStyleName("ptntRegistrationBtn");
-	}	
-	
 
 	/**
 	 * This method is responsible for customizing all the grid columns for the
@@ -377,8 +311,6 @@ public class InboxComponent extends CustomComponent implements ClickListener,
 	}	
 
 
-
-
 	/**
 	 * This method is responsible for fetching the arzis for the user from the
 	 * database and updating the datasource container for the arzi grid with the
@@ -403,8 +335,8 @@ public class InboxComponent extends CustomComponent implements ClickListener,
 	
 	/**
 	 * This method is responsible for populating the fields on the
-	 * ArziFormComponent with the arzi and patient information fetched from the
-	 * selected result row.
+	 * ArziFormComponent with the arzi information fetched from the
+	 * selected arzi row.
 	 * 
 	 * @param selectedArzi
 	 * 
@@ -412,20 +344,34 @@ public class InboxComponent extends CustomComponent implements ClickListener,
 	 */
 	private ArziFormComponent populateTheFormWithSelectedArziData(
 			Arzi selectedArzi) {
-		ArziFormComponent ediArziComponent = new ArziFormComponent(patient,
+		ArziFormComponent editArziComponent = new ArziFormComponent(patient,
 				selectedArzi);
 
-		ediArziComponent.getItsNumber().setValue(
+		editArziComponent.getItsNumber().setValue(
 				String.valueOf(patient.getItsNumber()));
 		
-		return ediArziComponent;
+		return editArziComponent;
 	}
 	
 	/**
+	 * This method just sets the fields which cannot be allowed to be edited by
+	 * the users as read only. 
+	 * 
+	 * @param boolean
+	 */
+	public void makeNonEditableFieldsReadOnly(ArziFormComponent arziComponent) {
+		arziComponent.getItsNumber().setReadOnly(true);
+		arziComponent.getGender().setReadOnly(true);
+		arziComponent.getDob().setReadOnly(true);
+	}
+	
+	/**
+	 * This method is responsible for making all the fields on the arzi
+	 * component read only.
 	 * 
 	 * @param arziComponent
 	 */
-	private void makeFieldsReadOnly(ArziFormComponent arziComponent) {
+	private void makeAllFieldsReadOnly(ArziFormComponent arziComponent) {
 		
 		// Patient's profile information set to read only.
 		arziComponent.getItsNumber().setReadOnly(true);
@@ -495,43 +441,57 @@ public class InboxComponent extends CustomComponent implements ClickListener,
 		// Open the arzi for editing on double click event.
 		if (event.isDoubleClick()) {
 			Arzi selectedArzi = (Arzi) event.getItemId();
-			
+
 			if (selectedArzi != null) {
 
-				View currentView = UI.getCurrent().getNavigator()
-						.getCurrentView();
+				View currentView = UI.getCurrent().getNavigator().getCurrentView();
 
 				if (currentView instanceof MedicalArziLandingView) {
+					
 					MedicalArziLandingView landingView = (MedicalArziLandingView) currentView;
 
 					ArziFormComponent arziComponent = populateTheFormWithSelectedArziData(selectedArzi);
 
 					String arziCaption = null;
 					String arziTabComponentId = null;
-					
-					if (selectedArzi.getCurrentStatus().getStatusId()
-							.equals(MedicalArziConstants.ARZI_DRAFT_STATUS)) {
+					// Set the appropriate caption based on whether the arzi is
+					// editable. If the arzi is editable, "Edit Arzi" caption is
+					// set else "View Arzi" caption is set
+					if (selectedArzi.getCurrentStatus().getStatusId().equals(MedicalArziConstants.ARZI_DRAFT_STATUS)) {
 
-						arziCaption = MedicalArziConstants.EDIT_ARZI_TAB_CAPTION
-								+ " # " + selectedArzi.getArziId();
-						arziTabComponentId = MedicalArziConstants.EDIT_ARZI_TAB_COMPONENT_ID
-								+ "_" + selectedArzi.getArziId();
-					} else if (selectedArzi.getCurrentStatus().getStatusId()
-							.equals(MedicalArziConstants.ARZI_SUBMITTED_STATUS)) {
+						arziCaption = MedicalArziConstants.EDIT_ARZI_TAB_CAPTION + " # " + selectedArzi.getArziId();
+						
+						arziTabComponentId = MedicalArziConstants.EDIT_ARZI_TAB_COMPONENT_ID + "_"
+								+ selectedArzi.getArziId();
+						
+						// Find the "Delete Arzi" button and make it visible
+						// when editing an existing arzi.
+						Component arziComponentDeletBtn = MedicalArziUtils.findById(arziComponent,
+								MedicalArziConstants.ARZI_FORM_COMPONENT_DELETE_BUTTON_ID);
+						arziComponentDeletBtn.setVisible(true);
+						
+						makeNonEditableFieldsReadOnly(arziComponent);
 
-						arziCaption = MedicalArziConstants.VIEW_ARZI_TAB_CAPTION
-								+ " # " + selectedArzi.getArziId();
+					} else {
 
-						arziTabComponentId = MedicalArziConstants.VIEW_ARZI_TAB_COMPONENT_ID
-								+ "_" + selectedArzi.getArziId();
+						arziCaption = MedicalArziConstants.VIEW_ARZI_TAB_CAPTION + " # " + selectedArzi.getArziId();
 
-						makeFieldsReadOnly(arziComponent);
+						arziTabComponentId = MedicalArziConstants.VIEW_ARZI_TAB_COMPONENT_ID + "_"
+								+ selectedArzi.getArziId();
+						
+						// Find the "Buttons" button and hide it when viewing
+						// (non editable) an existing arzi.
+						Component arziComponentBtnslayout = MedicalArziUtils.findById(arziComponent,
+								MedicalArziConstants.ARZI_FORM_COMPONENT_BUTTON_LAYOUT_ID);
+						arziComponentBtnslayout.setVisible(false);
+
+						makeAllFieldsReadOnly(arziComponent);
 					}
 
 					// Find the component based on the id inside the tab for
 					// the arzi which is being reviewed.
-					Component arziTabComponent = MedicalArziUtils.findById(
-							landingView.getTabSheet(), arziTabComponentId);
+					Component arziTabComponent = MedicalArziUtils.findById(landingView.getTabSheet(),
+							arziTabComponentId);
 
 					// If the tab for the arzi id to be edited is not
 					// added, add the tab for that arzi. Else just take the
@@ -545,8 +505,7 @@ public class InboxComponent extends CustomComponent implements ClickListener,
 
 						// Add the new tab for the arzi to be edited and
 						// make it closable.
-						arziTab = landingView.getTabSheet().addTab(
-								arziComponent, arziCaption);
+						arziTab = landingView.getTabSheet().addTab(arziComponent, arziCaption);
 
 						arziTab.setClosable(true);
 
@@ -554,121 +513,20 @@ public class InboxComponent extends CustomComponent implements ClickListener,
 
 					} else {
 						// Get the tab for the component and select it.
-						arziTab = landingView.getTabSheet().getTab(
-								arziTabComponent);
+						arziTab = landingView.getTabSheet().getTab(arziTabComponent);
 
 						landingView.getTabSheet().setSelectedTab(arziTab);
 					}
 
-					logger.debug("The patient with ITS number:-> "
-							+ patient.getItsNumber() + " selected arzi : "
+					logger.debug("The patient with ITS number:-> " + patient.getItsNumber() + " selected arzi : "
 							+ selectedArzi + " for editing");
-				}			
-
-			}
-			
-		}
-		
-	}
-	
-	@Override
-	public void buttonClick(ClickEvent event) {
-		
-		Arzi selectedArzi = (Arzi) arziGrid.getSelectedRow();
-		
-		String successMsg = "";
-		
-		if (event.getButton().equals(saveBtn)
-				|| event.getButton().equals(submitBtn)) {
-			try {
-				// FieldGroup buffered mode is on, so commit() is required.
-				// Throws CommitException
-				arziFieldsBinder.commit();
-
-				Arzi arzi = arziFieldsBinder.getItemDataSource().getBean();
-				
-				// Sets the arziId because the arziId is need for the update.
-				arzi.setArziId(selectedArzi.getArziId());
-
-				GregHijDate ghReqSubmitDt = getLookupService()
-						.getRequestedGregorianHijriCalendar(new Date());
-
-				arzi.setRequestSubmitDate(ghReqSubmitDt);
-				arzi.setCurrentStatusDate(ghReqSubmitDt);
-
-				// Get the entire data for the GregHijDate based on the
-				// gregorian date.
-				arzi.setConditionStartDate(getLookupService()
-						.getRequestedGregorianHijriCalendar(
-								arzi.getConditionStartDate()
-										.getGregorianCalDate()));
-
-				Status arziStatus = new Status();
-				
-				// Set the status to "Draft' when Save Btn is clicked and
-				// 'Submitted' when Submit Btn is clicked.
-				if (event.getButton().equals(saveBtn)) {
-					arziStatus
-							.setStatusId(MedicalArziConstants.ARZI_DRAFT_STATUS);
-					
-					successMsg = "The arzi \"" + arzi.getArziId() + "\" for \""
-							+ MedicalArziUtils.constructPtntFullName(patient)
-							+ "\" is successfully saved.";
-				} else {
-					arziStatus
-							.setStatusId(MedicalArziConstants.ARZI_SUBMITTED_STATUS);
-					
-					successMsg = "The arzi \"" + arzi.getArziId() + "\" for \""
-							+ MedicalArziUtils.constructPtntFullName(patient)
-							+ "\" is successfully submitted.";
 				}
 
-				arzi.setCurrentStatus(arziStatus);
-
-				logger.debug("Updating the arzi with arzi id \""
-						+ arzi.getArziId()
-						+ "\" for patient with ITS number-> \""
-						+ patient.getItsNumber() + "\"");
-
-				// Update the arzi based on the arzi id.
-				getPatientService().updateAnExistingArzi(arzi);
-				
-				refreshGridWithFreshData();
-				
-				MedicalArziUtils.createAndShowNotification(null, successMsg,
-						Type.HUMANIZED_MESSAGE, Position.TOP_LEFT,
-						"userFriendlyMsg",
-						MedicalArziConstants.USER_FRIENDLY_MSG_DELAY_MSEC);
-				
-			} catch (CommitException ce) {
-				logger.error(ce);
-
-				String errorDescription = "Fields marked with asterisk (*) are required. "
-						+ "Please enter the required values and fix the errors before proceeding further.";
-
-				// Create an error notification if the required fields are not
-				// entered correctly.
-				MedicalArziUtils.createAndShowNotification(null,
-						errorDescription, Type.ERROR_MESSAGE,
-						Position.TOP_LEFT, "errorMsg", -1);
 			}
 
-		} else if (event.getButton().equals(deleteBtn)) {
-			// Deactivate the arzi
-			getPatientService().deactivateAnArziById(selectedArzi.getArziId());
-
-			successMsg = "The arzi \"" + selectedArzi.getArziId() + "\" for \""
-					+ MedicalArziUtils.constructPtntFullName(patient)
-					+ "\" is successfully deleted.";
-
-			refreshGridWithFreshData();
-			
-			MedicalArziUtils.createAndShowNotification(null, successMsg,
-					Type.HUMANIZED_MESSAGE, Position.TOP_LEFT,
-					"userFriendlyMsg",
-					MedicalArziConstants.USER_FRIENDLY_MSG_DELAY_MSEC);
 		}
-	}	
+
+	}
 
 
 }

@@ -16,6 +16,7 @@ import com.example.medicalarzi.model.BodyPart;
 import com.example.medicalarzi.model.Condition;
 import com.example.medicalarzi.model.GregHijDate;
 import com.example.medicalarzi.model.Jamaat;
+import com.example.medicalarzi.model.Location;
 import com.example.medicalarzi.model.MedicalHistory;
 import com.example.medicalarzi.model.Patient;
 import com.example.medicalarzi.model.Procedure;
@@ -70,9 +71,9 @@ public class ArziFormComponent extends CustomComponent implements
 	
 	private static final Integer PRIMARY_HOME_LOCATION_NO = 222;
 	
-	private static final Integer DIABETES_TYPE_1 = 100;
+	private static final Integer DIABETES_TYPE_1 = 1;
 	
-	private static final Integer DIABETES_TYPE_2 = 200;
+	private static final Integer DIABETES_TYPE_2 = 2;
 
 	// Main View Layout
 	private VerticalLayout viewLayout;
@@ -203,6 +204,7 @@ public class ArziFormComponent extends CustomComponent implements
 	@PropertyId("zip")
 	private TextField zip;
 	
+	@PropertyId("phoneNum")
 	private TextField phoneNum;
 	
 	// permanent address y/n
@@ -216,6 +218,8 @@ public class ArziFormComponent extends CustomComponent implements
 	private Button submitBtn;
 
 	private Button saveBtn;	
+	
+	private Button deleteBtn;
 
 	// Binding Fields
 	private BeanFieldGroup<Patient> ptntFieldsBinder;
@@ -224,6 +228,7 @@ public class ArziFormComponent extends CustomComponent implements
 	
 	private BeanFieldGroup<MedicalHistory> medicalHistoryFieldsBinder;
 	
+	// Beans/Model objects
 	private Patient patient;
 	
 	private Arzi arzi;
@@ -452,6 +457,16 @@ public class ArziFormComponent extends CustomComponent implements
 	private void initForm() {
 		// Build the layout and elements
 		buildViewlayout();
+		
+		if (patient.getLocation() != null) {
+			Location ptntLocation = patient.getLocation();
+			
+			// Set the country, state and city for the patient based on the
+			// location.
+			country.select(ptntLocation.getCountry());
+			state.select(ptntLocation.getState());
+			city.select(ptntLocation.getCity());
+		}
 
 		// Bind the member fields to the model
 		bindFieldsToModel();
@@ -602,17 +617,17 @@ public class ArziFormComponent extends CustomComponent implements
 
 		// itsNumber
 		itsNumber = new TextField("Patient's ITS Number:");
-		itsNumber.setReadOnly(true);
 		itsNumber.setRequired(true);
 		itsNumber.setMaxLength(8);
 		itsNumber.setConverter(MedicalArziUtils.itsNumberConverter());
+		itsNumber.setReadOnly(true);
 		leftFormLayout.addComponent(itsNumber);
 
 		// gender
 		gender = new TextField("Gender:");
-		gender.setReadOnly(true);
 		gender.setWidth("300px");
 		gender.setConverter(new StringToLookupConverter());
+		gender.setReadOnly(true);
 		leftFormLayout.addComponent(gender);
 		
 		jamaat = new ComboBox("Jamaat Affiliation:");
@@ -643,8 +658,8 @@ public class ArziFormComponent extends CustomComponent implements
 
 		dob = new ArziDateField("Date of Birth:");
 		dob.setImmediate(true);
-		dob.setReadOnly(true);
 		dob.setDescription("Please enter the date in the dd/MM/yyy format.");
+		dob.setReadOnly(true);
 		rightFormLayout.addComponent(dob);		
 	}
 	
@@ -1060,6 +1075,16 @@ public class ArziFormComponent extends CustomComponent implements
 
 		buttonsLayout = new HorizontalLayout();
 		buttonsLayout.setId(MedicalArziConstants.ARZI_FORM_COMPONENT_BUTTON_LAYOUT_ID);
+		
+		// deleteBtn
+		deleteBtn = new Button(new ThemeResource("img/delete-arzi.png"));
+		deleteBtn.setId(MedicalArziConstants.ARZI_FORM_COMPONENT_DELETE_BUTTON_ID);
+		deleteBtn.addClickListener(this);
+		deleteBtn.setStyleName(Reindeer.BUTTON_LINK);
+		deleteBtn.setVisible(false);
+		buttonsLayout.addComponent(deleteBtn);
+		buttonsLayout.setExpandRatio(deleteBtn, 1.0f);
+		buttonsLayout.setComponentAlignment(deleteBtn, Alignment.MIDDLE_RIGHT);			
 
 		// saveBtn
 		saveBtn = new Button(new ThemeResource("img/save-arzi.png"));
@@ -1067,7 +1092,7 @@ public class ArziFormComponent extends CustomComponent implements
 		saveBtn.setStyleName(Reindeer.BUTTON_LINK);
 		buttonsLayout.addComponent(saveBtn);
 		buttonsLayout.setExpandRatio(saveBtn, 1.0f);
-		buttonsLayout.setComponentAlignment(saveBtn, Alignment.MIDDLE_RIGHT);
+		buttonsLayout.setComponentAlignment(saveBtn, Alignment.MIDDLE_CENTER);
 
 		// submitBtn
 		submitBtn = new Button(new ThemeResource("img/submit-arzi.png"));
@@ -1083,36 +1108,33 @@ public class ArziFormComponent extends CustomComponent implements
 
 	@Override
 	public void buttonClick(ClickEvent event) {
-		if (event.getButton().equals(saveBtn)
-				|| event.getButton().equals(submitBtn)) {
-
-			// Insert a new arzi into the database and change the status to
+		try {
+			String successMsg = null;
+			// Insert/ Update a new arzi into the database and change the status to
 			// save/submitted
-			try {
+			if (event.getButton().equals(saveBtn)
+					|| event.getButton().equals(submitBtn)) {
+
 				// FieldGroup buffered mode is on, so commit() is required.
 				// Throws CommitException
 				ptntFieldsBinder.commit();
-
 				Patient ptntInfo = ptntFieldsBinder.getItemDataSource()
 						.getBean();
 
 				// FieldGroup buffered mode is on, so commit() is required.
 				// Throws CommitException
 				arziFieldsBinder.commit();
-
 				Arzi arziInfo = arziFieldsBinder.getItemDataSource().getBean();
 				arziInfo.setItsNumber(ptntInfo.getItsNumber());
 				
-				medicalHistoryFieldsBinder.commit();
-
 				// FieldGroup buffered mode is on, so commit() is required.
-				// Throws CommitException				
+				// Throws CommitException
+				medicalHistoryFieldsBinder.commit();
 				MedicalHistory medHistInfo = medicalHistoryFieldsBinder
 						.getItemDataSource().getBean();
 
 				GregHijDate ghReqSubmitDt = getLookupService()
 						.getRequestedGregorianHijriCalendar(new Date());
-
 				arziInfo.setCurrentStatusDate(ghReqSubmitDt);
 
 				// Get the entire data for the GregHijDate based on the
@@ -1149,8 +1171,9 @@ public class ArziFormComponent extends CustomComponent implements
 				Integer selectedPrimLocOpt = (Integer)primaryLocationOption.getValue();
 				if (selectedPrimLocOpt.equals(PRIMARY_HOME_LOCATION_NO)) {
 					
-					logger.debug("The address entered for this arzi is not the primary address for the patient with  ITS number-> \""
-							+ ptntInfo.getItsNumber() + "\"");
+					logger.debug(
+							"The address entered for this arzi is not the primary address for the patient with  ITS number-> \""
+									+ ptntInfo.getItsNumber() + "\". Permenant address is not modified.");
 					
 					// Copy the address fields in the the Arzi bean
 					arziInfo.setTempHomeAddress1(ptntInfo.getHomeAddress1());
@@ -1167,10 +1190,27 @@ public class ArziFormComponent extends CustomComponent implements
 					ptntInfo.setZip(null);
 				}
 				
+				// Get the selected values from the widget since these are not
+				// mapped/bind with the bean
+				String selectedCity = (String) city.getValue();
+				String selectedState = (String) state.getValue();
+				String selectedCountry = (String) country.getValue();
+				
+				// Get the location based on the city, state and country
+				logger.debug("Get the location for patient with ITS number-> \"" + ptntInfo.getItsNumber()
+						+ "\" for country, state and city : (" + selectedCountry + ", " + selectedState + ", "
+						+ selectedCity + ") respectively.");
+
+				Location ptntLocation = getLookupService().getLocationForAddress(selectedCity, selectedState,
+						selectedCountry);
+				if (ptntLocation != null) {
+					ptntInfo.setLocation(ptntLocation);
+				}
+					
 				logger.debug("Updating the patient information for patient with  ITS number-> \""
 						+ ptntInfo.getItsNumber() + "\"");
 				
-				// Update the D_PTNT table
+				/***********Update the D_PTNT table with the updated patient information.***********/
 				getPatientService().updatePatientInfo(ptntInfo);
 				
 				// Check if the medical history already exists for the patient.
@@ -1179,12 +1219,20 @@ public class ArziFormComponent extends CustomComponent implements
 				// the patient.
 				MedicalHistory savedMedHistory = getPatientService()
 						.retreivePatientsMedicalHistory(ptntInfo.getItsNumber());
-
+				
+				/******* Insert/update the patient's medical history.*************/
 				if (savedMedHistory == null) {
 					medHistInfo.setItsNumber(ptntInfo.getItsNumber());
+					
+					logger.debug("Inserting the medical history for patient with ITS number-> \""
+							+ ptntInfo.getItsNumber() + "\"");
+				
 					getPatientService().savePatientsMedicalHistory(medHistInfo);
 					
 				} else {
+					logger.debug("Updating the medical history for patient with ITS number-> \""
+							+ ptntInfo.getItsNumber() + "\"");
+
 					getPatientService().updatePatientsMedicalHistory(
 							savedMedHistory);
 				}
@@ -1192,48 +1240,65 @@ public class ArziFormComponent extends CustomComponent implements
 				logger.debug("Inserting a new arzi for patient with ITS number-> \""
 						+ ptntInfo.getItsNumber() + "\"");
 
-				// Insert the new arzi for the patient
-				getPatientService().createNewArzi(arziInfo);
-
-				// Create a user friendly notification on success.
-				String successMsg = "The arzi for \""
-						+ MedicalArziUtils.constructPtntFullName(ptntInfo)
-						+ "\" is successfully created";
-
-				// Get the current view and set the selected tab to Inbox to
-				// display the newly saved/submitted arzi in the Inbox.
-				View currentView = UI.getCurrent().getNavigator()
-						.getCurrentView();
-
-				if (currentView instanceof MedicalArziLandingView) {
-					MedicalArziLandingView landingView = (MedicalArziLandingView) currentView;
+				/********** Insert/update the patient's arzi information.**************/
+				if(arzi.getArziId() != null) {
+					getPatientService().updateAnExistingArzi(arziInfo);
 					
-					// Once the new arzi is submitted, reconstruct the inbox tab to
-					// get the latest data and then switch the selection to the
-					// Inbox tab with the user friendly success message.
-					landingView.setRefreshInbox(true);
-
-					landingView.getTabSheet().setSelectedTab(
-							landingView.getInboxComponent());
+					// Create a user friendly notification on success.
+					successMsg = "The arzi for \""
+							+ MedicalArziUtils.constructPtntFullName(ptntInfo)
+							+ "\" is successfully updated!!";
+				} else {
+					// Insert the new arzi for the patient
+					getPatientService().createNewArzi(arziInfo);
+					
+					// Create a user friendly notification on success.
+					successMsg = "The arzi for \""
+							+ MedicalArziUtils.constructPtntFullName(ptntInfo)
+							+ "\" is successfully created!!";
 				}
-
-				MedicalArziUtils.createAndShowNotification(null, successMsg,
-						Type.HUMANIZED_MESSAGE, Position.TOP_LEFT,
-						"userFriendlyMsg",
-						MedicalArziConstants.USER_FRIENDLY_MSG_DELAY_MSEC);
-
-			} catch (CommitException ce) {
-				logger.error(ce);
-
-				String errorDescription = "Fields marked with asterisk (*) are required. "
-						+ "Please enter the required values and fix the errors before proceeding further.";
-
-				// Create an error notification if the required fields are not
-				// entered correctly.
-				MedicalArziUtils.createAndShowNotification(null,
-						errorDescription, Type.ERROR_MESSAGE,
-						Position.TOP_LEFT, "errorMsg", -1);
+			} else if (event.getButton().equals(deleteBtn)) {
+				// Deactivate the arzi
+				getPatientService().deactivateAnArziById(arzi.getArziId());
+	
+				successMsg = "The arzi \"" + arzi.getArziId() + "\" for \""
+						+ MedicalArziUtils.constructPtntFullName(patient)
+						+ "\" is successfully deleted.";
 			}
+			
+			// Get the current view and set the selected tab to Inbox to
+			// display the newly saved/submitted arzi in the Inbox.
+			View currentView = UI.getCurrent().getNavigator()
+					.getCurrentView();
+
+			if (currentView instanceof MedicalArziLandingView) {
+				MedicalArziLandingView landingView = (MedicalArziLandingView) currentView;
+				
+				// Once the new arzi is submitted, reconstruct the inbox tab to
+				// get the latest data and then switch the selection to the
+				// Inbox tab with the user friendly success message.
+				landingView.setRefreshInbox(true);
+
+				landingView.getTabSheet().setSelectedTab(
+						landingView.getInboxComponent());
+			}
+
+			MedicalArziUtils.createAndShowNotification(null, successMsg,
+					Type.HUMANIZED_MESSAGE, Position.TOP_LEFT,
+					"userFriendlyMsg",
+					MedicalArziConstants.USER_FRIENDLY_MSG_DELAY_MSEC);
+			
+		} catch (CommitException ce) {
+			logger.error(ce);
+
+			String errorDescription = "Fields marked with asterisk (*) are required. "
+					+ "Please enter the required values and fix the errors before proceeding further.";
+
+			// Create an error notification if the required fields are not
+			// entered correctly.
+			MedicalArziUtils.createAndShowNotification(null,
+					errorDescription, Type.ERROR_MESSAGE,
+					Position.TOP_LEFT, "errorMsg", -1);
 		}
 	}
 

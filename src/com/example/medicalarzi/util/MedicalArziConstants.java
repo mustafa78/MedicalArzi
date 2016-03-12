@@ -93,6 +93,12 @@ public interface MedicalArziConstants {
 	
 	final static public String ARZI_FORM_COMPONENT_BUTTON_LAYOUT_ID = "arziFormComponentButtonsLayout";
 	
+	final static public String ARZI_FORM_COMPONENT_SAVE_BUTTON_ID = "arziFormComponentSaveBtn";
+	
+	final static public String ARZI_FORM_COMPONENT_SUBMIT_BUTTON_ID = "arziFormComponentSubmitBtn";
+	
+	final static public String ARZI_FORM_COMPONENT_DELETE_BUTTON_ID = "arziFormComponentDeleteBtn";
+	
 	final static public String ARZI_FORM_COMPONENT_COUNTRY_COMBOBOX_ID = "arziFormComponentCountryCombobox";
 	
 	final static public String ARZI_FORM_COMPONENT_STATE_COMBOBOX_ID = "arziFormComponentStateCombobox";

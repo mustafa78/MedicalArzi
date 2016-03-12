@@ -167,7 +167,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		// Select the default body part as Other
 		//setDefaultBodyPart();
 
-		makeFieldsReadOnlyForNewArzi(true);
+		makeFieldsReadOnlyForArzi(true);
 
 		String patientName = MedicalArziUtils.constructPtntFullName(patient);
 
@@ -236,9 +236,6 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 			}
 		}
 	}
-	
-	
-	
 
 	/**
 	 * This method should first build the main layout, set the composition root
@@ -251,6 +248,11 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		setCompositionRoot(mainLayout);
 	}
 
+	/**
+	 * This method is responsible for building the main layout for the landing
+	 * view containing the header, main content area containing the tabsheets
+	 * with different tabs and the footer.
+	 */
 	private void buildMainLayout() {
 		// top-level component properties
 		setSizeFull();
@@ -348,7 +350,7 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 	 * 
 	 * @param boolean
 	 */
-	private void makeFieldsReadOnlyForNewArzi(boolean flag) {
+	public void makeFieldsReadOnlyForArzi(boolean flag) {
 		newArziComponent.getItsNumber().setReadOnly(true);
 
 		newArziComponent.getGender().setReadOnly(true);

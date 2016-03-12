@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.example.medicalarzi.dao.PatientMapper" >
-	<resultMap id="patientInfoLight" type="Patient" >
+	<resultMap id="patientInfo" type="Patient" >
 	    <id column="PTNT_ITS_NBR" property="itsNumber" jdbcType="INTEGER" />
 	    <result column="FIRST_NM" property="firstName" jdbcType="VARCHAR" />
 	    <result column="MDL_NM" property="middleName" jdbcType="VARCHAR" />
@@ -37,6 +37,8 @@
 			select="com.example.medicalarzi.dao.LookupMapper.selectJamaatById" />
 		<association property="location" column="locationId" javaType="Location" 
 			select="com.example.medicalarzi.dao.LookupMapper.selectLocationById"/>
+		<association property="medicalHistory" column="PTNT_ITS_NBR" javaType="MedicalHistory" 
+			select="retrievePtntMedicalHistory" />	
 		<collection column="PTNT_ITS_NBR" property="roles" ofType="SecurityRole" javaType="java.util.ArrayList" 
 			select="com.example.medicalarzi.dao.SecurityMapper.selectSecurityRolesForUser" />
   	</resultMap>
@@ -49,7 +51,7 @@
   		<result column="cholesterolInd" property="cholesterolInd" jdbcType="VARCHAR" javaType="BOOLEAN" />
   		<result column="atrialfibInd" property="atrialFibrillationInd" jdbcType="VARCHAR" javaType="BOOLEAN" />
   		<result column="diabetesInd" property="diabetesInd" jdbcType="VARCHAR" javaType="BOOLEAN" />
-  		<result column="diabetesType" property="diabetesType" jdbcType="VARCHAR" javaType="BOOLEAN" />
+  		<result column="diabetesType" property="diabetesType" jdbcType="VARCHAR" />
   		<result column="hyperTensionInd" property="hyperTensionInd" jdbcType="VARCHAR" javaType="BOOLEAN" />
   		<result column="thyroidDisId" property="thyroidDisorderInd" jdbcType="VARCHAR" javaType="BOOLEAN" />
   		<result column="cancerType" property="cancerType" jdbcType="VARCHAR" />
@@ -99,6 +101,7 @@
   		mhst.CHLSTRL_IND as "cholesterolInd",
   		mhst.AFIB_IND as "atrialfibInd",
   		mhst.DBTS_IND as "diabetesInd",
+  		mhst.DBTS_TYP as "diabetesType",
   		mhst.HYPR_TNSN_IND as "hypertensionId",
   		mhst.THYRD_DISORD_IND as "thyroidDisId",
   		mhst.CANCER_TYP as "cancerType",
@@ -185,6 +188,9 @@
 	      	<if test="heartDiseaseType != null" >
 	        	HEART_DIS_TYP,
 	      	</if>
+	      	<if test="otherInfo != null" >
+	        	OTH_INFO,
+	      	</if>
 	      	<if test="itsNumber != null" >
 	        	CREATE_USR_ID,
 	      	</if>
@@ -231,6 +237,9 @@
 	      	<if test="heartDiseaseType != null" >
 	        	#{heartDiseaseType,jdbcType=VARCHAR},
 	      	</if>
+	      	<if test="otherInfo != null" >
+	        	#{otherInfo,jdbcType=VARCHAR},
+	      	</if>
 	      	<if test="itsNumber != null" >
 	        	#{itsNumber,jdbcType=INTEGER},
 	      	</if>
@@ -257,6 +266,9 @@
       		</if>
       		<if test="homeAddress2 != null">
       			addr_ln_2 = #{homeAddress2,jdbcType=VARCHAR},
+      		</if>
+      		<if test="phoneNum != null">
+      			home_phn = #{phoneNum,jdbcType=VARCHAR},
       		</if>
       		<if test="location != null">
       			loc_id = #{location.locationId,jdbcType=VARCHAR},
@@ -334,7 +346,7 @@
 			from D_PTNT where PTNT_ITS_NBR=#{itsNumber,jdbcType=INTEGER} ]]>
 	</select>
 
-	<select id="retrievePatientInfo" resultMap="patientInfoLight">
+	<select id="retrievePatientInfo" resultMap="patientInfo">
 		select
 			<include refid="ptntColumnList" />
 		from D_PTNT
