@@ -71,9 +71,9 @@ public class ArziFormComponent extends CustomComponent implements
 	
 	private static final Integer PRIMARY_HOME_LOCATION_NO = 222;
 	
-	private static final Integer DIABETES_TYPE_1 = 1;
+	private static final String DIABETES_TYPE_1 = "1";
 	
-	private static final Integer DIABETES_TYPE_2 = 2;
+	private static final String DIABETES_TYPE_2 = "2";
 
 	// Main View Layout
 	private VerticalLayout viewLayout;
@@ -139,7 +139,9 @@ public class ArziFormComponent extends CustomComponent implements
 	
 	@PropertyId("diabetesInd")
 	private CheckBox diabetes;
-	private OptionGroup diabetesOption;
+	
+	@PropertyId("diabetesType")
+	private OptionGroup diabetesType;
 	
 	@PropertyId("hyperTensionInd")
 	private CheckBox hyperTension;
@@ -150,11 +152,11 @@ public class ArziFormComponent extends CustomComponent implements
 	@PropertyId("cancerInd")
 	private CheckBox cancer;
 	
-	@PropertyId("heartDiseaseInd")
-	private CheckBox heartDisease;
-	
 	@PropertyId("cancerType")
 	private TextField cancerType;
+	
+	@PropertyId("heartDiseaseInd")
+	private CheckBox heartDisease;
 	
 	@PropertyId("heartDiseaseType")
 	private TextField heartDiseaseType;
@@ -247,7 +249,7 @@ public class ArziFormComponent extends CustomComponent implements
 		// Initialize the arzi. Will be used to bind fields to model.
 		arzi = new Arzi();
 
-		initForm();
+		initializeComponent();
 	}
 
 	/**
@@ -259,7 +261,7 @@ public class ArziFormComponent extends CustomComponent implements
 		// bind fields to model.
 		this.patient = patient;
 
-		initForm();
+		initializeComponent();
 	}
 
 	/**
@@ -271,7 +273,7 @@ public class ArziFormComponent extends CustomComponent implements
 		// bind fields to model.
 		this.arzi = arzi;
 
-		initForm();
+		initializeComponent();
 	}
 
 	/**
@@ -288,7 +290,7 @@ public class ArziFormComponent extends CustomComponent implements
 		// bind fields to model.
 		this.arzi = arzi;
 
-		initForm();
+		initializeComponent();
 	}
 
 	/**
@@ -410,7 +412,7 @@ public class ArziFormComponent extends CustomComponent implements
 	}
 
 	public OptionGroup getDiabetesOption() {
-		return diabetesOption;
+		return diabetesType;
 	}
 
 	public CheckBox getCancer() {
@@ -454,25 +456,46 @@ public class ArziFormComponent extends CustomComponent implements
 	 * the form fields to the model.
 	 * 
 	 */
-	private void initForm() {
+	private void initializeComponent() {
 		// Build the layout and elements
 		buildViewlayout();
 		
+		// Bind the member fields to the model
+		bindFieldsToModel();
+
+		// Populate the fields with appropriate default values wherever
+		// applicable and necessary.
+		populateFields();
+
+		// The root component. Must be set
+		setCompositionRoot(viewLayout);		
+	}
+
+	/**
+	 * 
+	 */
+	private void populateFields() {
+		// Set the patient's location
 		if (patient.getLocation() != null) {
 			Location ptntLocation = patient.getLocation();
-			
+
 			// Set the country, state and city for the patient based on the
 			// location.
 			country.select(ptntLocation.getCountry());
 			state.select(ptntLocation.getState());
 			city.select(ptntLocation.getCity());
 		}
-
-		// Bind the member fields to the model
-		bindFieldsToModel();
-
-		// The root component. Must be set
-		setCompositionRoot(viewLayout);		
+		
+		// Set the indicators if the types are entered
+		MedicalHistory savedMedHist = patient.getMedicalHistory();
+		if(savedMedHist != null) {
+			if(savedMedHist.getCancerType() != null) {
+				cancer.setValue(true);
+			}
+			if(savedMedHist.getHeartDiseaseType() != null) {
+				heartDisease.setValue(true);
+			}
+		}
 	}
 
 
@@ -489,8 +512,7 @@ public class ArziFormComponent extends CustomComponent implements
 		// Add bean item that is bound.
 		ptntFieldsBinder.setItemDataSource(patient);
 		// Bind all the member fields whose type extends Field to the property
-		// id of the item.
-		// The mapping is done based on the @PropertyId annotation
+		// id of the item. The mapping is done based on the @PropertyId annotation
 		ptntFieldsBinder.bindMemberFields(this);
 		// Set the buffered mode on, if using the bean validation JSR-3.0 with
 		// vaadin. Does not work when fields are immediately updated with the
@@ -499,18 +521,12 @@ public class ArziFormComponent extends CustomComponent implements
 
 		/* Bind the arzi fields. */
 		arziFieldsBinder = new BeanFieldGroup<Arzi>(Arzi.class);
-		/**
-		 * =======>IMPORTANT: Binding for nested bean will work by switching
-		 * "setItemDataSource" and "bindMemberFields".
-		 * 
-		 * =======>First bindMembers then add dataSource.
-		 * **/
-		arziFieldsBinder.bindMemberFields(this);
 		arziFieldsBinder.setItemDataSource(arzi);
+		arziFieldsBinder.bindMemberFields(this);
 		arziFieldsBinder.setBuffered(true);
 		
 		/*Bind the medical history fields)*/
-		MedicalHistory medHist = new MedicalHistory();
+		MedicalHistory medHist = patient.getMedicalHistory();
 		medicalHistoryFieldsBinder= new BeanFieldGroup<MedicalHistory>(MedicalHistory.class);
 		medicalHistoryFieldsBinder.setItemDataSource(medHist);
 		medicalHistoryFieldsBinder.bindMemberFields(this);
@@ -620,7 +636,6 @@ public class ArziFormComponent extends CustomComponent implements
 		itsNumber.setRequired(true);
 		itsNumber.setMaxLength(8);
 		itsNumber.setConverter(MedicalArziUtils.itsNumberConverter());
-		itsNumber.setReadOnly(true);
 		leftFormLayout.addComponent(itsNumber);
 
 		// gender
@@ -1003,7 +1018,7 @@ public class ArziFormComponent extends CustomComponent implements
 		diabetesLayout.addComponent(diabetes);
 		// diabetesOption
 		buildDiabetesOptions();
-		diabetesLayout.addComponent(diabetesOption);
+		diabetesLayout.addComponent(diabetesType);
 		// Add the layout to the right form
 		rightFormLayout.addComponent(diabetesLayout);
 		
@@ -1054,18 +1069,18 @@ public class ArziFormComponent extends CustomComponent implements
 	 */
 	private void buildDiabetesOptions() {
 		// diabetesOptions
-		diabetesOption = new OptionGroup("<i>(Specify Type)</i>");
-		diabetesOption.setCaptionAsHtml(true);
+		diabetesType = new OptionGroup("<i>(Specify Type)</i>");
+		diabetesType.setCaptionAsHtml(true);
 		
-		diabetesOption.addItem(DIABETES_TYPE_1);
-		diabetesOption.setItemCaption(DIABETES_TYPE_1, "Type 1");
+		diabetesType.addItem(DIABETES_TYPE_1);
+		diabetesType.setItemCaption(DIABETES_TYPE_1, "Type 1");
 		
-		diabetesOption.addItem(DIABETES_TYPE_2);
-		diabetesOption.setItemCaption(DIABETES_TYPE_2, "Type 2");
+		diabetesType.addItem(DIABETES_TYPE_2);
+		diabetesType.setItemCaption(DIABETES_TYPE_2, "Type 2");
     
-		diabetesOption.setStyleName("horizontal");
-		diabetesOption.setStyleName("diabetesType", true);
-		diabetesOption.setVisible(false);
+		diabetesType.setStyleName("horizontal");
+		diabetesType.setStyleName("diabetesType", true);
+		diabetesType.setVisible(false);
 	}	
 
 	/**
@@ -1201,8 +1216,9 @@ public class ArziFormComponent extends CustomComponent implements
 						+ "\" for country, state and city : (" + selectedCountry + ", " + selectedState + ", "
 						+ selectedCity + ") respectively.");
 
-				Location ptntLocation = getLookupService().getLocationForAddress(selectedCity, selectedState,
-						selectedCountry);
+				Location ptntLocation = getLookupService()
+						.getLocationForAddress(selectedCity, selectedState,
+								selectedCountry);
 				if (ptntLocation != null) {
 					ptntInfo.setLocation(ptntLocation);
 				}
@@ -1403,11 +1419,11 @@ public class ArziFormComponent extends CustomComponent implements
 				// the patient to select, if the diabetes indicator is selected.
 				if (checkBox.getId().equals(MedicalArziConstants.ARZI_FORM_COMPONENT_MED_HIST_DIABETES_ID)) {
 					if (checkBox.getValue() != null && checkBox.getValue()) {
-						diabetesOption.setVisible(true);
-						diabetesOption.setRequired(true);
+						diabetesType.setVisible(true);
+						diabetesType.setRequired(true);
 					} else {
-						diabetesOption.setVisible(false);
-						diabetesOption.setRequired(false);
+						diabetesType.setVisible(false);
+						diabetesType.setRequired(false);
 					}
 				}
 			}

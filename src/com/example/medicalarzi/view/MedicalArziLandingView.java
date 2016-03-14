@@ -157,16 +157,6 @@ public class MedicalArziLandingView extends CustomComponent implements View,
 		// Initialize the components in the view
 		init();
 
-		newArziComponent.getItsNumber().setValue(
-				String.valueOf(patient.getItsNumber()));
-
-		// Select the default condition as Other
-		//setDefaultCondition();
-		// Select the default procedure as Other
-		//setDefaultProcedure();
-		// Select the default body part as Other
-		//setDefaultBodyPart();
-
 		makeFieldsReadOnlyForArzi(true);
 
 		String patientName = MedicalArziUtils.constructPtntFullName(patient);

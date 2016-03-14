@@ -34,7 +34,7 @@ public class MedicalHistory implements Serializable {
 
 	private Boolean diabetesInd;
 	
-	private Boolean diabetesType;
+	private String diabetesType;
 
 	private Boolean hyperTensionInd;
 
@@ -125,11 +125,11 @@ public class MedicalHistory implements Serializable {
 		return hyperTensionInd;
 	}
 
-	public Boolean getDiabetesType() {
+	public String getDiabetesType() {
 		return diabetesType;
 	}
 
-	public void setDiabetesType(Boolean diabetesType) {
+	public void setDiabetesType(String diabetesType) {
 		this.diabetesType = diabetesType;
 	}
 
