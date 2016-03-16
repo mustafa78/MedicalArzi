@@ -6,6 +6,7 @@ import java.util.Calendar;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Label;
@@ -49,7 +50,8 @@ public class ArziFooterComponent extends CustomComponent {
 
 		String currentYear = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
 
-		message = new Label("© Copyright " + currentYear + " - Anjuman-e-Ezzi, Washington DC developers. All rights reserved.");
+		message = new Label("Copyright " + currentYear + " - Anjuman-e-Ezzi, Washington DC developers. All rights reserved.");
+		message.setContentMode(ContentMode.HTML);
 		message.setStyleName("footer");
 		mainLayout.addComponent(message);
 		mainLayout.setComponentAlignment(message, Alignment.MIDDLE_CENTER);
