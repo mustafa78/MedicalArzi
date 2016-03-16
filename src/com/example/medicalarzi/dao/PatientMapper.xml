@@ -223,7 +223,7 @@
 	        	#{diabetesInd,jdbcType=VARCHAR,javaType=BOOLEAN},
 	      	</if>
 	      	<if test="diabetesType != null" >
-	        	#{diabetesType,jdbcType=VARCHAR,javaType=BOOLEAN},
+	        	#{diabetesType,jdbcType=VARCHAR},
 	      	</if>
 	      	<if test="hyperTensionInd != null" >
 	        	#{hyperTensionInd,jdbcType=VARCHAR,javaType=BOOLEAN},

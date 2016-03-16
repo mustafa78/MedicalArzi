@@ -62,15 +62,17 @@ public class ArziHeader implements Serializable {
 	 * primary location, all this information will be stored along with the arzi
 	 * and the primary location info in the Patient's table will not be updated.
 	 */
-	private String tempHomeAddress1;
-
-	private String tempHomeAddress2;
+	private Boolean primaryAddrInd;
 	
-	private String tempPhoneNum;
+	private String ptntHomeAddress1;
 
-	private Location tempLocation;
+	private String ptntHomeAddress2;
 	
-	private String tempZip;
+	private String ptntPhoneNum;
+	
+	private String ptntZip;
+	
+	private Location ptntLocation;
 	
 	private List<ArziComment> arziComments;
 	
@@ -251,44 +253,52 @@ public class ArziHeader implements Serializable {
 		this.doctorConsultNote = doctorConsultNote;
 	}
 
-	public String getTempHomeAddress1() {
-		return tempHomeAddress1;
+	public Boolean getPrimaryAddrInd() {
+		return primaryAddrInd;
 	}
 
-	public void setTempHomeAddress1(String tempHomeAddress1) {
-		this.tempHomeAddress1 = tempHomeAddress1;
+	public void setPrimaryAddrInd(Boolean primaryAddrInd) {
+		this.primaryAddrInd = primaryAddrInd;
 	}
 
-	public String getTempHomeAddress2() {
-		return tempHomeAddress2;
+	public String getPtntHomeAddress1() {
+		return ptntHomeAddress1;
 	}
 
-	public void setTempHomeAddress2(String tempHomeAddress2) {
-		this.tempHomeAddress2 = tempHomeAddress2;
-	}
-	
-	public String getTempPhoneNum() {
-		return tempPhoneNum;
+	public void setPtntHomeAddress1(String ptntHomeAddress1) {
+		this.ptntHomeAddress1 = ptntHomeAddress1;
 	}
 
-	public void setTempPhoneNum(String tempPhoneNum) {
-		this.tempPhoneNum = tempPhoneNum;
-	}
-	
-	public Location getTempLocation() {
-		return tempLocation;
+	public String getPtntHomeAddress2() {
+		return ptntHomeAddress2;
 	}
 
-	public void setTempLocation(Location tempLocation) {
-		this.tempLocation = tempLocation;
+	public void setPtntHomeAddress2(String ptntHomeAddress2) {
+		this.ptntHomeAddress2 = ptntHomeAddress2;
 	}
 
-	public String getTempZip() {
-		return tempZip;
+	public String getPtntPhoneNum() {
+		return ptntPhoneNum;
 	}
 
-	public void setTempZip(String tempZip) {
-		this.tempZip = tempZip;
+	public void setPtntPhoneNum(String ptntPhoneNum) {
+		this.ptntPhoneNum = ptntPhoneNum;
+	}
+
+	public Location getPtntLocation() {
+		return ptntLocation;
+	}
+
+	public void setPtntLocation(Location ptntLocation) {
+		this.ptntLocation = ptntLocation;
+	}
+
+	public String getPtntZip() {
+		return ptntZip;
+	}
+
+	public void setPtntZip(String ptntZip) {
+		this.ptntZip = ptntZip;
 	}
 
 	public List<ArziComment> getArziComments() {

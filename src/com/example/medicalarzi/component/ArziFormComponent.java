@@ -67,9 +67,9 @@ public class ArziFormComponent extends CustomComponent implements
 
 	private static Logger logger = LogManager.getLogger(ArziFormComponent.class);
 	
-	private static final Integer PRIMARY_HOME_LOCATION_YES = 111;
+	private static final String PRIMARY_HOME_LOCATION_YES = "Y";
 	
-	private static final Integer PRIMARY_HOME_LOCATION_NO = 222;
+	private static final String PRIMARY_HOME_LOCATION_NO = "N";
 	
 	private static final String DIABETES_TYPE_1 = "1";
 	
@@ -191,10 +191,10 @@ public class ArziFormComponent extends CustomComponent implements
 	/**Patient Address Info**/
 	private CustomFormComponent ptntAddrForm;
 	
-	@PropertyId("homeAddress1")
+	@PropertyId("ptntHomeAddress1")
 	private TextField addressLn1;
 
-	@PropertyId("homeAddress2")
+	@PropertyId("ptntHomeAddress2")
 	private TextField addressLn2;
 
 	private ComboBox city;
@@ -203,10 +203,10 @@ public class ArziFormComponent extends CustomComponent implements
 	
 	private ComboBox country;
 
-	@PropertyId("zip")
+	@PropertyId("ptntZip")
 	private TextField zip;
 	
-	@PropertyId("phoneNum")
+	@PropertyId("ptntPhoneNum")
 	private TextField phoneNum;
 	
 	// permanent address y/n
@@ -475,12 +475,38 @@ public class ArziFormComponent extends CustomComponent implements
 	 * 
 	 */
 	private void populateFields() {
-		// Set the patient's location
-		if (patient.getLocation() != null) {
-			Location ptntLocation = patient.getLocation();
-
-			// Set the country, state and city for the patient based on the
-			// location.
+		// Set the patient's ITS number
+		itsNumber.setValue(String.valueOf(patient.getItsNumber()));
+		
+		// Set the primary address flag based on the value stored in the
+		// F_ARZI_HDR table if in the edit/view mode. For the new arzi, this
+		// object would be null
+		if (arzi != null && arzi.getPrimaryAddrInd() != null) {
+			if (arzi.getPrimaryAddrInd()) {
+				primaryLocationOption.setValue(PRIMARY_HOME_LOCATION_YES);
+			} else {
+				primaryLocationOption.setValue(PRIMARY_HOME_LOCATION_NO);
+			}
+		}
+		
+		Location ptntLocation = null;
+		// For new arzi, copy the patient address information in the address fields
+		if (arzi != null && arzi.getArziId() == null) {
+			addressLn1.setValue(patient.getHomeAddress1());
+			addressLn2.setValue(patient.getHomeAddress2());
+			phoneNum.setValue(patient.getPhoneNum());
+			zip.setValue(patient.getZip());
+			
+			ptntLocation = patient.getLocation();
+		}
+		// For existing arzi, get the location from the arzi
+		else {
+			ptntLocation = arzi.getPtntLocation();
+		}
+		
+		// Set the country, state and city for the patient based on the
+		// location.
+		if (ptntLocation != null) {
 			country.select(ptntLocation.getCountry());
 			state.select(ptntLocation.getState());
 			city.select(ptntLocation.getCity());
@@ -527,6 +553,9 @@ public class ArziFormComponent extends CustomComponent implements
 		
 		/*Bind the medical history fields)*/
 		MedicalHistory medHist = patient.getMedicalHistory();
+		if(medHist == null) {
+			medHist = new MedicalHistory();
+		}
 		medicalHistoryFieldsBinder= new BeanFieldGroup<MedicalHistory>(MedicalHistory.class);
 		medicalHistoryFieldsBinder.setItemDataSource(medHist);
 		medicalHistoryFieldsBinder.bindMemberFields(this);
@@ -1176,34 +1205,7 @@ public class ArziFormComponent extends CustomComponent implements
 					arziInfo.setStatus(arziStatus);
 					arziInfo.setStatusChangeDate(ghReqSubmitDt);
 				}
-
 				arziInfo.setCurrentStatus(arziStatus);
-				
-				// If the entered patient is not the primary home location, then
-				// do not update the address information in the D_PTNT table but
-				// save the address in the F_ARZI_HDR table which is valid for
-				// that arzi only.
-				Integer selectedPrimLocOpt = (Integer)primaryLocationOption.getValue();
-				if (selectedPrimLocOpt.equals(PRIMARY_HOME_LOCATION_NO)) {
-					
-					logger.debug(
-							"The address entered for this arzi is not the primary address for the patient with  ITS number-> \""
-									+ ptntInfo.getItsNumber() + "\". Permenant address is not modified.");
-					
-					// Copy the address fields in the the Arzi bean
-					arziInfo.setTempHomeAddress1(ptntInfo.getHomeAddress1());
-					arziInfo.setTempHomeAddress2(ptntInfo.getHomeAddress2());
-					arziInfo.setTempLocation(ptntInfo.getLocation());
-					arziInfo.setTempZip(ptntInfo.getZip());
-
-					// Blank out the address info from the Patient bean as we do
-					// not want to update the patient's permenant address if
-					// this is not the primary location for the patient.
-					ptntInfo.setHomeAddress1(null);
-					ptntInfo.setHomeAddress2(null);
-					ptntInfo.setLocation(null);
-					ptntInfo.setZip(null);
-				}
 				
 				// Get the selected values from the widget since these are not
 				// mapped/bind with the bean
@@ -1227,6 +1229,23 @@ public class ArziFormComponent extends CustomComponent implements
 						+ ptntInfo.getItsNumber() + "\"");
 				
 				/***********Update the D_PTNT table with the updated patient information.***********/
+				// If the entered address is the primary home location, then
+				// update the address information in the D_PTNT table and also
+				// save the address in the F_ARZI_HDR table.
+				String selectedPrimLocOpt = (String)primaryLocationOption.getValue();
+				if (selectedPrimLocOpt.equals(PRIMARY_HOME_LOCATION_YES)) {
+					
+					logger.debug(
+							"The address entered for this arzi is the primary address for the patient with  ITS number-> \""
+									+ ptntInfo.getItsNumber() + "\". Permenant address is updated accordingly.");
+					
+					// Copy the address fields in the the Patient bean
+					ptntInfo.setHomeAddress1(arziInfo.getPtntHomeAddress1());
+					ptntInfo.setHomeAddress2(arziInfo.getPtntHomeAddress2());
+					ptntInfo.setLocation(arziInfo.getPtntLocation());
+					ptntInfo.setZip(arziInfo.getPtntZip());
+					ptntInfo.setPhoneNum(arziInfo.getPtntPhoneNum());
+				}				
 				getPatientService().updatePatientInfo(ptntInfo);
 				
 				// Check if the medical history already exists for the patient.

@@ -11,9 +11,11 @@
 	    <result column="arziSummary" property="arziSummary" jdbcType="VARCHAR" />
 	    <result column="drConsultNote" property="doctorConsultNote" jdbcType="VARCHAR" />
 	    <result column="activeInd" property="activeInd" jdbcType="VARCHAR" javaType="BOOLEAN" />
-	    <result column="addressLn1" property="tempHomeAddress1" jdbcType="VARCHAR" />
-	    <result column="addressLn2" property="tempHomeAddress2" jdbcType="VARCHAR" />
-	    <result column="zipCd" property="tempZip" jdbcType="VARCHAR" />	    
+	    <result column="primaryAddrInd" property="primaryAddrInd" jdbcType="VARCHAR" javaType="BOOLEAN" />
+	    <result column="addressLn1" property="ptntHomeAddress1" jdbcType="VARCHAR" />
+	    <result column="addressLn2" property="ptntHomeAddress2" jdbcType="VARCHAR" />
+	    <result column="phoneNum" property="ptntPhoneNum" jdbcType="VARCHAR" />
+	    <result column="zipCd" property="ptntZip" jdbcType="VARCHAR" />	    
 	    <result column="hdrCreateUserId" property="createdBy" jdbcType="VARCHAR" />
 	    <result column="hdrCreateTS" property="createdDate" jdbcType="TIMESTAMP" />
 	    <result column="hdrLastUpdUserId" property="updatedBy" jdbcType="VARCHAR" />
@@ -41,7 +43,7 @@
 			<id 	property="statusId" 	column="currentStatusId" />
 			<result property="statusDesc" 	column="currentStatusDesc" />
 		</association>
-		<association property="tempLocation" column="locationId" javaType="Location" 
+		<association property="ptntLocation" column="locationId" javaType="Location" 
 			select="com.example.medicalarzi.dao.LookupMapper.selectLocationById"/>
 		<association property="currentStatusDate" column="currStatusDtId" javaType="GregHijDate" 
 			select="com.example.medicalarzi.dao.LookupMapper.selectGregHijDateById" />
@@ -102,8 +104,10 @@
   		hdr.OTHR_BDY_PRT as "otherBdyPrt",
   		hdr.ARZI_SMRY as "arziSummary",
   		hdr.DR_CNSLT_NOTE as "drConsultNote",
+  		hdr.PRMY_ADDR_IND as "primaryAddrInd",
   		hdr.ADDR_LN_1 as "addressLn1",
   		hdr.ADDR_LN_2 as "addressLn2",
+  		hdr.PHN_NBR as "phoneNum",
   		hdr.LOC_ID as "locationId",
   		hdr.ZIP_CD as "zipCd",  		
   		hdr.ACTV_IND as "activeInd",
@@ -285,10 +289,12 @@
 				OTHR_BDY_PRT,
 				COND_STRT_DT_ID,
 				ARZI_SMRY,
+				PRMY_ADDR_IND,
 				ADDR_LN_1,
 				ADDR_LN_2,
 				LOC_ID,
 				ZIP_CD,
+				PHN_NBR,
 				CREATE_USR_ID,
 				CREATE_TS,
 				LST_UPDT_USR_ID,
@@ -307,10 +313,12 @@
 			#{otherBodyPart,jdbcType=VARCHAR},
 			#{conditionStartDate.gregorianDateId,jdbcType=INTEGER},
 			#{arziSummary,jdbcType=VARCHAR},
-			#{tempHomeAddress1,jdbcType=VARCHAR},
-			#{tempHomeAddress2,jdbcType=VARCHAR},
-			#{tempLocation.locationId,jdbcType=INTEGER},
-			#{tempZip,jdbcType=VARCHAR},
+			#{primaryAddrInd,jdbcType=VARCHAR,javaType=BOOLEAN},
+			#{ptntHomeAddress1,jdbcType=VARCHAR},
+			#{ptntHomeAddress2,jdbcType=VARCHAR},
+			#{ptntLocation.locationId,jdbcType=INTEGER},
+			#{ptntZip,jdbcType=VARCHAR},
+			#{ptntPhoneNum,jdbcType=VARCHAR},
 			#{itsNumber,jdbcType=INTEGER},
 			now(),
 			#{itsNumber,jdbcType=INTEGER},
@@ -411,6 +419,24 @@
       		<if test="currentStatus != null">
       			CURR_STATUS_ID = #{currentStatus.statusId,jdbcType=INTEGER},
       		</if>
+	      	<if test="primaryAddrInd != null" >
+	        	PRMY_ADDR_IND = #{primaryAddrInd,jdbcType=VARCHAR,javaType=BOOLEAN},
+	      	</if>      		
+       		<if test="ptntHomeAddress1 != null">
+      			ADDR_LN_1 = #{ptntHomeAddress1,jdbcType=VARCHAR},
+      		</if>
+      		<if test="ptntHomeAddress2 != null">
+      			ADDR_LN_2 = #{ptntHomeAddress2,jdbcType=VARCHAR},
+      		</if>
+      		<if test="ptntPhoneNum != null">
+      			PHN_NBR = #{ptntPhoneNum,jdbcType=VARCHAR},
+      		</if>
+      		<if test="ptntLocation != null and ptntLocation.locationId != null">
+      			LOC_ID = #{ptntLocation.locationId,jdbcType=VARCHAR},
+      		</if>
+      		<if test="ptntZip != null">
+      			ZIP_CD = #{ptntZip,jdbcType=VARCHAR},
+      		</if>     		
       		<if test="updatedBy != null">
       			LST_UPDT_USR_ID = #{updatedBy,jdbcType=VARCHAR},
       		</if>
