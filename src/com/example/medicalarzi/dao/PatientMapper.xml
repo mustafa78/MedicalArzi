@@ -307,7 +307,7 @@
       			DBTS_IND = #{diabetesInd,jdbcType=VARCHAR,javaType=BOOLEAN},
       		</if>
       		<if test="diabetesType != null">
-      			DBTS_TYP = #{diabetesType,jdbcType=VARCHAR,javaType=BOOLEAN},
+      			DBTS_TYP = #{diabetesType,jdbcType=VARCHAR},
       		</if>      		
       		<if test="hyperTensionInd != null">
       			HYPR_TNSN_IND = #{hyperTensionInd,jdbcType=VARCHAR,javaType=BOOLEAN},

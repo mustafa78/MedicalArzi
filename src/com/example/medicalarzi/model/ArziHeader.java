@@ -47,9 +47,9 @@ public class ArziHeader implements Serializable {
 	// These properties are initialized because when we are binding the
 	// properties to the UI widgets, the nested properties throw exceptions if
 	// the intermediate properties are null.
-	private GregHijDate requestSubmitDate = new GregHijDate();
+	private GregHijDate requestSubmitDate;
 
-	private GregHijDate currentStatusDate = new GregHijDate();
+	private GregHijDate currentStatusDate;
 
 	private GregHijDate conditionStartDate = new GregHijDate();
 	

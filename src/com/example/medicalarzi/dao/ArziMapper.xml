@@ -436,7 +436,13 @@
       		</if>
       		<if test="ptntZip != null">
       			ZIP_CD = #{ptntZip,jdbcType=VARCHAR},
-      		</if>     		
+      		</if> 
+       		<if test="currentStatusDate != null">
+      			CURR_STATUS_DT_ID = (select DT_ID from D_DATE where CAL_DT = #{currentStatusDate.gregorianCalDate,jdbcType=DATE}),
+      		</if>        		
+       		<if test="requestSubmitDate != null">
+      			RQST_SMT_DT_ID = (select DT_ID from D_DATE where CAL_DT = #{requestSubmitDate.gregorianCalDate,jdbcType=DATE}),
+      		</if>     		    		
       		<if test="updatedBy != null">
       			LST_UPDT_USR_ID = #{updatedBy,jdbcType=VARCHAR},
       		</if>

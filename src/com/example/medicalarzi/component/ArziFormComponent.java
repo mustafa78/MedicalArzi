@@ -547,8 +547,16 @@ public class ArziFormComponent extends CustomComponent implements
 
 		/* Bind the arzi fields. */
 		arziFieldsBinder = new BeanFieldGroup<Arzi>(Arzi.class);
-		arziFieldsBinder.setItemDataSource(arzi);
+		/**
+		 * =======>IMPORTANT: Binding for nested bean will work by switching
+		 * "setItemDataSource" and "bindMemberFields".
+		 * 
+		 * "Eg: conditionStartDate is not bound" if the order is switched
+		 * 
+		 * =======>First bindMembers then add dataSource.
+		 * **/
 		arziFieldsBinder.bindMemberFields(this);
+		arziFieldsBinder.setItemDataSource(arzi);		
 		arziFieldsBinder.setBuffered(true);
 		
 		/*Bind the medical history fields)*/
@@ -907,7 +915,7 @@ public class ArziFormComponent extends CustomComponent implements
 
 		// condition start date
 		conditionStartDate = new ArziDateField("Condition Start Date:");
-		conditionStartDate.setImmediate(true);
+		conditionStartDate.setImmediate(false);
 		conditionStartDate
 				.setDescription("Please enter the date in the dd/MM/yyy format.");
 		conditionStartDate.setRequired(true);
@@ -1194,14 +1202,17 @@ public class ArziFormComponent extends CustomComponent implements
 				if (event.getButton().equals(saveBtn)) {
 					arziStatus
 							.setStatusId(MedicalArziConstants.ARZI_DRAFT_STATUS);
-				} else {
+					
 					arziInfo.setRequestSubmitDate(ghReqSubmitDt);
+				} else {
 					
 					arziStatus
 							.setStatusId(MedicalArziConstants.ARZI_SUBMITTED_STATUS);
 					
+					arziInfo.setRequestSubmitDate(ghReqSubmitDt);
+					
 					// Needed for the entry in the detail table. Only after the
-					// arzi is submitted, the detail rable is updated.
+					// arzi is submitted, the detail table is updated.
 					arziInfo.setStatus(arziStatus);
 					arziInfo.setStatusChangeDate(ghReqSubmitDt);
 				}
@@ -1223,6 +1234,7 @@ public class ArziFormComponent extends CustomComponent implements
 								selectedCountry);
 				if (ptntLocation != null) {
 					ptntInfo.setLocation(ptntLocation);
+					arziInfo.setPtntLocation(ptntLocation);
 				}
 					
 				logger.debug("Updating the patient information for patient with  ITS number-> \""
