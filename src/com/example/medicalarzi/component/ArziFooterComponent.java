@@ -19,7 +19,7 @@ public class ArziFooterComponent extends CustomComponent {
 	 */
 	private static final long serialVersionUID = -4957349961029159181L;
 
-	public static Logger logger = LogManager.getLogger(ArziFooterComponent.class);
+	private static Logger logger = LogManager.getLogger(ArziFooterComponent.class);
 
 	private VerticalLayout mainLayout;
 
@@ -49,8 +49,15 @@ public class ArziFooterComponent extends CustomComponent {
 		mainLayout.setMargin(true);
 
 		String currentYear = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
+		
+		String content = "<span style=\"padding-left: 230px;\">Copyright " + currentYear
+				+ " - Anjuman-e-Ezzi, Washington DC developers. All rights reserved.</span> <br>"
+				+ "This site is under development and we are not liable for any information shared on this site. "
+				+ "You are solely responsible for any shared personal information. " + "Please use your discretion.";
+		
+		logger.debug("Footer content: " + content);
 
-		message = new Label("Copyright " + currentYear + " - Anjuman-e-Ezzi, Washington DC developers. All rights reserved.");
+		message = new Label(content);
 		message.setContentMode(ContentMode.HTML);
 		message.setStyleName("footer");
 		mainLayout.addComponent(message);

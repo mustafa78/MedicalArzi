@@ -185,7 +185,7 @@ public class SimpleLoginView extends CustomComponent implements View,
 		footer = new ArziFooterComponent();
 		footer.setImmediate(false);
 		footer.setWidthUndefined();
-		footer.setHeight("50px");
+		footer.setHeight("70px");
 		mainLayout.addComponent(footer);
 		mainLayout.setComponentAlignment(footer, Alignment.MIDDLE_CENTER);
 	}
