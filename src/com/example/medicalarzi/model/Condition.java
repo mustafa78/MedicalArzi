@@ -25,6 +25,8 @@ public class Condition implements Serializable {
 	private String conditionPrefixCd;
 
 	private String conditionName;
+	
+	private String specialityDesc;
 
 	private Boolean activeInd;
 
@@ -57,6 +59,14 @@ public class Condition implements Serializable {
 
 	public void setConditionName(String conditionName) {
 		this.conditionName = conditionName;
+	}
+
+	public String getSpecialityDesc() {
+		return specialityDesc;
+	}
+
+	public void setSpecialityDesc(String specialityDesc) {
+		this.specialityDesc = specialityDesc;
 	}
 
 	public String getCreatedBy() {

@@ -31,6 +31,7 @@
   		<id column="COND_ID" property="conditionId" jdbcType="INTEGER" />
 	    <result column="COND_PRFX_CD" property="conditionPrefixCd" jdbcType="VARCHAR" />
 	    <result column="COND_NM" property="conditionName" jdbcType="VARCHAR" />
+	    <result column="SPCL_DESC" property="specialityDesc" jdbcType="VARCHAR" />
 	    <result column="ACTV_IND" property="activeInd" jdbcType="VARCHAR" />
 	    <result column="CREATE_TS" property="createdDate" jdbcType="TIMESTAMP" />
 	    <result column="LST_UPDT_TS" property="updatedDate" jdbcType="TIMESTAMP" />
@@ -104,7 +105,7 @@
     	CREATE_TS, LST_UPDT_TS, CREATE_USR_ID, LST_UPDT_USR_ID
   	</sql>
   	<sql id="Condition_Column_List" >
-    	COND_ID, COND_PRFX_CD, COND_NM, ACTV_IND,
+    	COND_ID, COND_PRFX_CD, COND_NM, SPCL_DESC, ACTV_IND,
     	CREATE_TS, LST_UPDT_TS, CREATE_USR_ID, LST_UPDT_USR_ID
   	</sql>  	
   	<sql id="Procedure_Column_List" >
