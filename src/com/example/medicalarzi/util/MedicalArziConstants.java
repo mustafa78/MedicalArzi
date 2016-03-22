@@ -49,15 +49,15 @@ public interface MedicalArziConstants {
 	
 	final static public Integer MAP_GENDER_FEMALE_ID = 1006;
 	
-	final static public Integer SEARCH_PERIOD_LAST_7_DAYS_ID = 1007;
+	final static public Integer SEARCH_PERIOD_LAST_3_DAYS_ID = 1007;
 	
-	final static public Integer SEARCH_PERIOD_LAST_10_DAYS_ID = 1008;
+	final static public Integer SEARCH_PERIOD_3_TO_7_DAYS_ID = 1008;
 	
-	final static public Integer SEARCH_PERIOD_LAST_14_DAYS_ID = 1009;
+	final static public Integer SEARCH_PERIOD_7_TO_15_DAYS_ID = 1009;
 	
-	final static public Integer SEARCH_PERIOD_LAST_21_DAYS_ID = 1010;
+	final static public Integer SEARCH_PERIOD_15_TO_30_DAYS_ID = 1010;
 	
-	final static public Integer SEARCH_PERIOD_LAST_30_DAYS_ID = 1011;
+	final static public Integer SEARCH_PERIOD_30_DAYS_OR_OLDER_ID = 1011;
 	
 	// For sending email.
 	final static public String EMAIL_HOST = "EmailHost";

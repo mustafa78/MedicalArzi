@@ -159,17 +159,8 @@
   			<if test="itsNumber != null and itsNumber != ''">
 				AND ptnt.PTNT_ITS_NBR = #{itsNumber,jdbcType=INTEGER}
 			</if>
-			<if test="firstName != null and firstName != ''">
-				AND ptnt.FIRST_NM = #{firstName,jdbcType=VARCHAR}
-			</if>
-			<if test="lastName != null and lastName != ''">
-				AND ptnt.LAST_NM = #{lastName,jdbcType=VARCHAR}
-			</if>
 			<if test="jamaat != null and jamaat.jamaatId != null">
 				AND ptnt.JAMAAT_ID = #{jamaat.jamaatId,jdbcType=INTEGER}
-			</if>
-			<if test="arziType != null and arziType.arziTypeId != null">
-				AND hdr.ARZI_TYP_ID = #{arziType.arziTypeId,jdbcType=INTEGER}
 			</if>
 			<if test="bodyPart != null and bodyPart.bodyPartId != null">
 				AND hdr.BDY_PRT_ID = #{bodyPart.bodyPartId,jdbcType=INTEGER}
@@ -180,10 +171,10 @@
 			<if test="procedure != null and procedure.procedureId != null">
 				AND hdr.PROC_ID = #{procedure.procedureId,jdbcType=INTEGER}
 			</if>
-			<if test="currentDate != null and searchPeriodDate != null">
+			<if test="startDate != null and endDate != null">
 				<![CDATA[
-				AND hdr.CURR_STATUS_DT_ID >= #{searchPeriodDate.gregorianDateId,jdbcType=INTEGER}
-				AND hdr.CURR_STATUS_DT_ID <= #{currentDate.gregorianDateId,jdbcType=INTEGER}
+				AND hdr.CURR_STATUS_DT_ID >= #{startDate.gregorianDateId,jdbcType=INTEGER}
+				AND hdr.CURR_STATUS_DT_ID <= #{endDate.gregorianDateId,jdbcType=INTEGER}
 				]]>
 			</if>	
   		</where>

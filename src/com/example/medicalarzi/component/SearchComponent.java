@@ -14,7 +14,6 @@ import org.apache.logging.log4j.Logger;
 import com.example.medicalarzi.model.Arzi;
 import com.example.medicalarzi.model.ArziSearchCriteria;
 import com.example.medicalarzi.model.ArziSearchResult;
-import com.example.medicalarzi.model.ArziType;
 import com.example.medicalarzi.model.BodyPart;
 import com.example.medicalarzi.model.Condition;
 import com.example.medicalarzi.model.GregHijDate;
@@ -39,6 +38,7 @@ import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.navigator.View;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.Position;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -51,29 +51,29 @@ import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.HeaderCell;
 import com.vaadin.ui.Grid.HeaderRow;
 import com.vaadin.ui.Grid.SelectionMode;
+import com.vaadin.ui.HorizontalSplitPanel;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.VerticalSplitPanel;
 import com.vaadin.ui.renderers.DateRenderer;
 import com.vaadin.ui.themes.Reindeer;
 
-public class SearchComponent extends CustomComponent implements ClickListener, SelectionListener
-		 {
+public class SearchComponent extends CustomComponent implements ClickListener, SelectionListener {
 
 	private static final long serialVersionUID = -5883684094223685184L;
 
 	private static Logger logger = LogManager.getLogger(SearchComponent.class);
 
 	// Layout and components
-	private VerticalSplitPanel splitPanel;
+	private HorizontalSplitPanel splitPanel;
 
 	/**Top Layout components & buttons**/
 	private VerticalLayout topLayout;
 
-	private CustomFormComponent searchCriteria;
+	private FormLayout searchCriteriaForm;
 
 	private Button searchBtn;
 	
@@ -109,8 +109,8 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 	@PropertyId("jamaat")
 	private ComboBox jamaat;
 
-	@PropertyId("numberOfDays")
-	private ComboBox numOfDays;
+	@PropertyId("searchPeriod")
+	private ComboBox arziSubmitPeriod;
 
 	// Binding Fields
 	private BeanFieldGroup<ArziSearchCriteria> searchCriteriaFieldsBinder;
@@ -165,11 +165,11 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 		setSizeFull();
 
 		// common part: create layout
-		splitPanel = new VerticalSplitPanel();
+		splitPanel = new HorizontalSplitPanel();
 		splitPanel.setImmediate(false);
 		splitPanel.setLocked(true);
 		splitPanel.setSizeFull();
-		splitPanel.setSplitPosition(62, Unit.PERCENTAGE, true);
+		splitPanel.setSplitPosition(75, Unit.PERCENTAGE, true);
 		// Use a custom style
 		splitPanel.addStyleName("invisiblesplitter");
 
@@ -192,10 +192,18 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 		topLayout.setImmediate(false);
 		topLayout.setMargin(true);
 		topLayout.setSpacing(true);
+		
+		// criteriaHeading
+		Label criteriaHeading = new Label();
+		criteriaHeading.setCaption("Filter search results by:");
+		criteriaHeading.setCaptionAsHtml(true);
+		criteriaHeading.setStyleName("heading");
+		topLayout.addComponent(criteriaHeading);
+		topLayout.setExpandRatio(criteriaHeading, 0.2f);
 
 		// searchCriteria
 		buildSearchCriteria();
-		topLayout.addComponent(searchCriteria);
+		topLayout.addComponent(searchCriteriaForm);
 
 		// search
 		searchBtn = new Button(new ThemeResource("img/search.png"));
@@ -206,72 +214,50 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 		searchBtn.setClickShortcut(KeyCode.ENTER);
 		topLayout.addComponent(searchBtn);
 		topLayout.setComponentAlignment(searchBtn, Alignment.MIDDLE_CENTER);
+		
+		// search instructions
+		Label searchInstructions = new Label("* Click <i><b>Search</b></i> without entering any filter values to view all arzis");
+		searchInstructions.setContentMode(ContentMode.HTML);
+		searchInstructions.setWidthUndefined();
+		searchInstructions.setStyleName("instructionTxt");
+		topLayout.addComponent(searchInstructions);
+		topLayout.setExpandRatio(searchInstructions, 0.2f);
+		topLayout.setComponentAlignment(searchInstructions, Alignment.MIDDLE_CENTER);
 	}
 
 	private void buildSearchCriteria() {
-		// Search criteria customForm
-		searchCriteria = new CustomFormComponent();
-		searchCriteria.setImmediate(false);
-		searchCriteria.setSizeFull();
-		searchCriteria.setStyleName("customForm");
+		// Search criteria form
+		searchCriteriaForm = new FormLayout();
+		searchCriteriaForm.setImmediate(false);
+		searchCriteriaForm.setSizeFull();
+		searchCriteriaForm.setStyleName("customForm");
 
-		/**
-		 * Add the fields to the left FormLayout.
-		 * 
-		 */
-		FormLayout leftFormLayout = (FormLayout) MedicalArziUtils.findById(
-				searchCriteria,
-				MedicalArziConstants.CUSTOM_FORM_LEFTFORM_LAYOUT_ID);
+		// numOfDays
+		loadArziSubmitPeriods();
+		searchCriteriaForm.addComponent(arziSubmitPeriod);
+		
 		// itsNumber
 		itsNumber = new TextField("ITS Number:");
 		itsNumber.setMaxLength(8);
 		itsNumber.setNullRepresentation("");
 		itsNumber.setConverter(MedicalArziUtils.itsNumberConverter());
-		leftFormLayout.addComponent(itsNumber);
-
-		// lastName
-		lastName = new TextField("Surname/Last Name:");
-		lastName.setNullRepresentation("");
-		lastName.setWidth("300px");
-		leftFormLayout.addComponent(lastName);
+		searchCriteriaForm.addComponent(itsNumber);
 
 		// region
 		loadJamaats();
-		leftFormLayout.addComponent(jamaat);
-
-		// bodyPart
-		loadBodyParts();
-		leftFormLayout.addComponent(bodyPart);
-
-		loadNumberOfDays();
-		leftFormLayout.addComponent(numOfDays);
-
-		/**
-		 * Add the fields to the right FormLayout.
-		 * 
-		 */
-		FormLayout rightFormLayout = (FormLayout) MedicalArziUtils.findById(
-				searchCriteria,
-				MedicalArziConstants.CUSTOM_FORM_RIGHTFORM_LAYOUT_ID);
-
-		// firstName
-		firstName = new TextField("First Name:");
-		firstName.setNullRepresentation("");
-		firstName.setWidth("300px");
-		rightFormLayout.addComponent(firstName);
-
-		// bodyPart
-		loadArziTypes();
-		rightFormLayout.addComponent(arziType);
+		searchCriteriaForm.addComponent(jamaat);
 
 		// condition
 		loadConditions();
-		rightFormLayout.addComponent(condition);
+		searchCriteriaForm.addComponent(condition);
 
 		// procedure
 		loadProcedures();
-		rightFormLayout.addComponent(procedure);
-
+		searchCriteriaForm.addComponent(procedure);
+		
+		// bodyPart
+		loadBodyParts();
+		searchCriteriaForm.addComponent(bodyPart);
 	}
 
 	private void loadJamaats() {
@@ -285,18 +271,6 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 		jamaat.setItemCaptionMode(ItemCaptionMode.PROPERTY);
 		jamaat.setItemCaptionPropertyId("jamaatName");
 		jamaat.setRequired(false);
-	}
-
-	private void loadArziTypes() {
-		arziType = new ComboBox("Arzi Type:");
-		arziType.setContainerDataSource(MedicalArziUtils
-				.getContainer(ArziType.class));
-		arziType.addItems(ServiceLocator.getInstance().getLookupService()
-				.getListOfAllArziTypes());
-		arziType.setInputPrompt("Please select the arzi type.");
-		arziType.setItemCaptionMode(ItemCaptionMode.PROPERTY);
-		arziType.setItemCaptionPropertyId("arziTypeName");
-		arziType.setRequired(false);
 	}
 
 	private void loadConditions() {
@@ -336,16 +310,16 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 		procedure.setRequired(false);
 	}
 
-	private void loadNumberOfDays() {
-		numOfDays = new ComboBox("Search Period:");
-		numOfDays.setContainerDataSource(MedicalArziUtils
+	private void loadArziSubmitPeriods() {
+		arziSubmitPeriod = new ComboBox("Arzi Submit Date:");
+		arziSubmitPeriod.setContainerDataSource(MedicalArziUtils
 				.getContainer(Lookup.class));
-		numOfDays.addItems(ServiceLocator.getInstance().getLookupService()
+		arziSubmitPeriod.addItems(ServiceLocator.getInstance().getLookupService()
 				.getByLookupType(MedicalArziConstants.SEARCH_NUM_OF_DAYS));
-		numOfDays.setInputPrompt("Please select the number of days to search.");
-		numOfDays.setItemCaptionMode(ItemCaptionMode.PROPERTY);
-		numOfDays.setItemCaptionPropertyId("lookupValue");
-		numOfDays.setRequired(false);
+		arziSubmitPeriod.setInputPrompt("Please select the number of days to search.");
+		arziSubmitPeriod.setItemCaptionMode(ItemCaptionMode.PROPERTY);
+		arziSubmitPeriod.setItemCaptionPropertyId("lookupValue");
+		arziSubmitPeriod.setRequired(false);
 	}
 	
 	/**
@@ -538,47 +512,62 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 				userEnteredSearchCriteria = searchCriteriaFieldsBinder
 						.getItemDataSource().getBean();
 
-				Lookup searchPeriod = (Lookup) numOfDays.getValue();
+				Lookup searchPeriod = userEnteredSearchCriteria.getSearchPeriod(); //(Lookup) arziSubmitPeriod.getValue();
 
 				// If the user entered the number of days to search as one of
 				// the search criteria
 				if (searchPeriod != null) {
 
-					GregHijDate currentDate = ServiceLocator.getInstance()
-							.getLookupService()
-							.getRequestedGregorianHijriCalendar(new Date());
-
-					userEnteredSearchCriteria.setCurrentDate(currentDate);
-
 					// this would default to now
-					Calendar calendar = Calendar.getInstance();
+					Calendar startDate = Calendar.getInstance();
+					Calendar endDate = Calendar.getInstance();
 
 					// Subtract the number of days to get the range between
 					// current date and number of days selected as the criteria.
-					if (searchPeriod.getLookupId().intValue() == MedicalArziConstants.SEARCH_PERIOD_LAST_7_DAYS_ID) {
-						calendar.add(Calendar.DAY_OF_MONTH, -7);
-					} else if (searchPeriod.getLookupId().intValue() == MedicalArziConstants.SEARCH_PERIOD_LAST_10_DAYS_ID) {
-						calendar.add(Calendar.DAY_OF_MONTH, -10);
-					} else if (searchPeriod.getLookupId().intValue() == MedicalArziConstants.SEARCH_PERIOD_LAST_14_DAYS_ID) {
-						calendar.add(Calendar.DAY_OF_MONTH, -14);
-					} else if (searchPeriod.getLookupId().intValue() == MedicalArziConstants.SEARCH_PERIOD_LAST_21_DAYS_ID) {
-						calendar.add(Calendar.DAY_OF_MONTH, -21);
-					} else if (searchPeriod.getLookupId().intValue() == MedicalArziConstants.SEARCH_PERIOD_LAST_30_DAYS_ID) {
-						calendar.add(Calendar.DAY_OF_MONTH, -30);
+					if (searchPeriod.getLookupId().equals(MedicalArziConstants.SEARCH_PERIOD_LAST_3_DAYS_ID)) {
+
+						startDate.add(Calendar.DAY_OF_MONTH, -3);
+
+					} else if (searchPeriod.getLookupId().equals(MedicalArziConstants.SEARCH_PERIOD_3_TO_7_DAYS_ID)) {
+
+						startDate.add(Calendar.DAY_OF_MONTH, -7);
+
+						endDate.add(Calendar.DAY_OF_MONTH, -3);
+
+					} else if (searchPeriod.getLookupId().equals(MedicalArziConstants.SEARCH_PERIOD_7_TO_15_DAYS_ID)) {
+
+						startDate.add(Calendar.DAY_OF_MONTH, -15);
+
+						endDate.add(Calendar.DAY_OF_MONTH, -7);
+
+					} else if (searchPeriod.getLookupId().equals(MedicalArziConstants.SEARCH_PERIOD_15_TO_30_DAYS_ID)) {
+
+						startDate.add(Calendar.DAY_OF_MONTH, -30);
+
+						endDate.add(Calendar.DAY_OF_MONTH, -15);
+
+					} else if (searchPeriod.getLookupId()
+							.equals(MedicalArziConstants.SEARCH_PERIOD_30_DAYS_OR_OLDER_ID)) {
+
+						startDate.add(Calendar.DAY_OF_MONTH, -30);
 					}
+					
+					// Start Date
+					GregHijDate searchStartDate = ServiceLocator.getInstance().getLookupService()
+							.getRequestedGregorianHijriCalendar(startDate.getTime());
 
-					GregHijDate dateForSearchPeriod = ServiceLocator
-							.getInstance()
-							.getLookupService()
-							.getRequestedGregorianHijriCalendar(
-									calendar.getTime());
+					userEnteredSearchCriteria.setStartDate(searchStartDate);					
+					
+					// End Date
+					GregHijDate searchEndDate = ServiceLocator.getInstance().getLookupService()
+							.getRequestedGregorianHijriCalendar(endDate.getTime());
 
-					userEnteredSearchCriteria
-							.setSearchPeriodDate(dateForSearchPeriod);
+					userEnteredSearchCriteria.setEndDate(searchEndDate);					
+					
 				} else {
 					// Reset the criteria
-					userEnteredSearchCriteria.setCurrentDate(null);
-					userEnteredSearchCriteria.setSearchPeriodDate(null);
+					userEnteredSearchCriteria.setStartDate(null);
+					userEnteredSearchCriteria.setEndDate(null);
 				}
 				
 				// Populate and refresh the grid with the data based on the user

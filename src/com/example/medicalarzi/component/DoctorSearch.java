@@ -1,7 +1,6 @@
 package com.example.medicalarzi.component;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -33,12 +32,12 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.Grid.HeaderCell;
-import com.vaadin.ui.Grid.HeaderRow;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.Grid.HeaderCell;
+import com.vaadin.ui.Grid.HeaderRow;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
@@ -88,7 +87,7 @@ public class DoctorSearch extends CustomComponent implements ClickListener {
 	@PropertyId("jamaat")
 	private ComboBox jamaat;
 
-	@PropertyId("numberOfDays")
+	@PropertyId("searchPeriod")
 	private ComboBox numOfDays;
 
 	// Binding Fields
@@ -458,36 +457,56 @@ public class DoctorSearch extends CustomComponent implements ClickListener {
 				// the search criteria
 				if (searchPeriod != null) {
 
-					GregHijDate currentDate = ServiceLocator.getInstance()
-							.getLookupService()
-							.getRequestedGregorianHijriCalendar(new Date());
-
-					userEnteredSearchCriteria.setCurrentDate(currentDate);
-
 					// this would default to now
-					Calendar calendar = Calendar.getInstance();
+					Calendar startDate = Calendar.getInstance();
+					Calendar endDate = Calendar.getInstance();
 
-					// Subtract the number of days to get the
-					if (searchPeriod.getLookupId().intValue() == MedicalArziConstants.SEARCH_PERIOD_LAST_7_DAYS_ID) {
-						calendar.add(Calendar.DAY_OF_MONTH, -7);
-					} else if (searchPeriod.getLookupId().intValue() == MedicalArziConstants.SEARCH_PERIOD_LAST_10_DAYS_ID) {
-						calendar.add(Calendar.DAY_OF_MONTH, -10);
-					} else if (searchPeriod.getLookupId().intValue() == MedicalArziConstants.SEARCH_PERIOD_LAST_14_DAYS_ID) {
-						calendar.add(Calendar.DAY_OF_MONTH, -14);
-					} else if (searchPeriod.getLookupId().intValue() == MedicalArziConstants.SEARCH_PERIOD_LAST_21_DAYS_ID) {
-						calendar.add(Calendar.DAY_OF_MONTH, -21);
-					} else if (searchPeriod.getLookupId().intValue() == MedicalArziConstants.SEARCH_PERIOD_LAST_30_DAYS_ID) {
-						calendar.add(Calendar.DAY_OF_MONTH, -30);
+					// Subtract the number of days to get the range between
+					// current date and number of days selected as the criteria.
+					if (searchPeriod.getLookupId().equals(MedicalArziConstants.SEARCH_PERIOD_LAST_3_DAYS_ID)) {
+
+						startDate.add(Calendar.DAY_OF_MONTH, -3);
+
+					} else if (searchPeriod.getLookupId().equals(MedicalArziConstants.SEARCH_PERIOD_3_TO_7_DAYS_ID)) {
+
+						startDate.add(Calendar.DAY_OF_MONTH, -7);
+
+						endDate.add(Calendar.DAY_OF_MONTH, -3);
+
+					} else if (searchPeriod.getLookupId().equals(MedicalArziConstants.SEARCH_PERIOD_7_TO_15_DAYS_ID)) {
+
+						startDate.add(Calendar.DAY_OF_MONTH, -15);
+
+						endDate.add(Calendar.DAY_OF_MONTH, -7);
+
+					} else if (searchPeriod.getLookupId().equals(MedicalArziConstants.SEARCH_PERIOD_15_TO_30_DAYS_ID)) {
+
+						startDate.add(Calendar.DAY_OF_MONTH, -30);
+
+						endDate.add(Calendar.DAY_OF_MONTH, -15);
+
+					} else if (searchPeriod.getLookupId()
+							.equals(MedicalArziConstants.SEARCH_PERIOD_30_DAYS_OR_OLDER_ID)) {
+
+						startDate.add(Calendar.DAY_OF_MONTH, -30);
 					}
+					
+					// Start Date
+					GregHijDate searchStartDate = ServiceLocator.getInstance().getLookupService()
+							.getRequestedGregorianHijriCalendar(startDate.getTime());
 
-					GregHijDate dateForSearchPeriod = ServiceLocator
-							.getInstance()
-							.getLookupService()
-							.getRequestedGregorianHijriCalendar(
-									calendar.getTime());
+					userEnteredSearchCriteria.setStartDate(searchStartDate);					
+					
+					// End Date
+					GregHijDate searchEndDate = ServiceLocator.getInstance().getLookupService()
+							.getRequestedGregorianHijriCalendar(endDate.getTime());
 
-					userEnteredSearchCriteria
-							.setSearchPeriodDate(dateForSearchPeriod);
+					userEnteredSearchCriteria.setEndDate(searchEndDate);					
+					
+				} else {
+					// Reset the criteria
+					userEnteredSearchCriteria.setStartDate(null);
+					userEnteredSearchCriteria.setEndDate(null);
 				}
 
 				List<ArziSearchResult> searchResultList = reviewerService

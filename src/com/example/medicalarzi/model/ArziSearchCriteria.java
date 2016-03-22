@@ -35,11 +35,11 @@ public class ArziSearchCriteria implements Serializable {
 	
 	private Jamaat jamaat;
 	
-	private Lookup numberOfDays;
+	private Lookup searchPeriod;
 	
-	private GregHijDate currentDate;
+	private GregHijDate startDate;
 	
-	private GregHijDate searchPeriodDate;
+	private GregHijDate endDate;
 
 	/**
 	 * 
@@ -112,28 +112,28 @@ public class ArziSearchCriteria implements Serializable {
 		this.jamaat = jamaat;
 	}
 
-	public Lookup getNumberOfDays() {
-		return numberOfDays;
+	public Lookup getSearchPeriod() {
+		return searchPeriod;
 	}
 
-	public void setNumberOfDays(Lookup numberOfDays) {
-		this.numberOfDays = numberOfDays;
+	public void setSearchPeriod(Lookup searchPeriod) {
+		this.searchPeriod = searchPeriod;
 	}
 
-	public GregHijDate getCurrentDate() {
-		return currentDate;
+	public GregHijDate getStartDate() {
+		return startDate;
 	}
 
-	public void setCurrentDate(GregHijDate currentDate) {
-		this.currentDate = currentDate;
+	public void setStartDate(GregHijDate startDate) {
+		this.startDate = startDate;
 	}
 
-	public GregHijDate getSearchPeriodDate() {
-		return searchPeriodDate;
+	public GregHijDate getEndDate() {
+		return endDate;
 	}
 
-	public void setSearchPeriodDate(GregHijDate searchPeriodDate) {
-		this.searchPeriodDate = searchPeriodDate;
+	public void setEndDate(GregHijDate endDate) {
+		this.endDate = endDate;
 	}
 
 	@Override

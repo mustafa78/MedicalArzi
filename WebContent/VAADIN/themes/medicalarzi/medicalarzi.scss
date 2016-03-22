@@ -34,7 +34,7 @@ $v-error-indicator-color: #ed473b;
 
   	//Modify the existing classes (from the reindeer theme)
 	.v-tabsheet-tabsheetpanel {
-		background-color: #DAF1F2;
+		background-color: #DFEAF4; //#DAF1F2;
 	}
 
 	.v-caption, .v-captiontext, .v-checkbox, .v-radiobutton {
@@ -215,13 +215,15 @@ $v-error-indicator-color: #ed473b;
 	}
 	
 	/*Make the vertical splitter invisible for the Vertical Split Panel*/
-	.v-splitpanel-vsplitter-invisiblesplitter, .v-splitpanel-vsplitter-invisiblesplitter-locked {
+	.v-splitpanel-vsplitter-invisiblesplitter, .v-splitpanel-vsplitter-invisiblesplitter-locked,
+		.v-splitpanel-hsplitter-invisiblesplitter, .v-splitpanel-hsplitter-invisiblesplitter-locked {
     	height: 0px;
+    	width: 0px;
 	} 	
 	
-	/* Style the right container */
+	/* Style the right container */	
 	.invisiblesplitter .v-splitpanel-second-container {
-    	background: #B6C9D3;
+    	background: #ECF1F6; //#B6C9D3;
 	}
 
 	/*for the other info textarea component*/
@@ -237,9 +239,15 @@ $v-error-indicator-color: #ed473b;
 	}
 	
 	/*for the ptnt address instruction text*/
-	.v-caption-instructionTxt .v-captiontext {
+	.v-caption-instructionTxt .v-captiontext,
+	.v-label-instructionTxt {
 		margin-left: 10px;	
 		color: #6E646F;
+	}
+	
+	.v-label-instructionTxt {
+		margin-top: 10px;
+		font-size: 11px;
 	}
 	
 	/*for the primary location y/n section of the new arzi*/
@@ -279,7 +287,15 @@ $v-error-indicator-color: #ed473b;
 		margin-top: 10px;
 	}	
 	
-	.v-caption-diabetesType .v-captiontext, .v-caption-cancerType .v-captiontext, .v-caption-heartDiseaseType .v-captiontext {
+	.v-caption-diabetesType .v-captiontext, 
+	.v-caption-cancerType .v-captiontext, 
+	.v-caption-heartDiseaseType .v-captiontext {
 		margin-left: 10px;	
+	}
+	
+	/*for criteria heading*/
+	.v-caption-heading .v-captiontext {
+		margin-top: 20px;
+		font-size: 18px;
 	}
 }
