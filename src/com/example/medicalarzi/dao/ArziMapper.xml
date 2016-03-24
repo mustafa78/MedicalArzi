@@ -154,7 +154,7 @@
   	<sql id="arziSearchWhere">
   		<where>
   			AND 1=1
-  			AND hdr.CURR_STATUS_ID != 1000
+  			AND hdr.CURR_STATUS_ID = 1001
   			AND hdr.ACTV_IND = 'Y'
   			<if test="itsNumber != null and itsNumber != ''">
 				AND ptnt.PTNT_ITS_NBR = #{itsNumber,jdbcType=INTEGER}

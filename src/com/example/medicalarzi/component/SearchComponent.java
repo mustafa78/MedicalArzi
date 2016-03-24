@@ -32,6 +32,9 @@ import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.fieldgroup.PropertyId;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.data.util.filter.SimpleStringFilter;
+import com.vaadin.event.FieldEvents.TextChangeEvent;
+import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.SelectionEvent;
 import com.vaadin.event.SelectionEvent.SelectionListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
@@ -61,6 +64,11 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.renderers.DateRenderer;
 import com.vaadin.ui.themes.Reindeer;
 
+/**
+ * 
+ * @author mkanchwa
+ *
+ */
 public class SearchComponent extends CustomComponent implements ClickListener, SelectionListener {
 
 	private static final long serialVersionUID = -5883684094223685184L;
@@ -70,15 +78,15 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 	// Layout and components
 	private HorizontalSplitPanel splitPanel;
 
-	/**Top Layout components & buttons**/
-	private VerticalLayout topLayout;
+	/**Left Layout components & buttons**/
+	private VerticalLayout leftLayout;
 
 	private FormLayout searchCriteriaForm;
 
 	private Button searchBtn;
 	
 	/**Bottom Layout components & buttons**/
-	private VerticalLayout bottomLayout;
+	private VerticalLayout rightLayout;
 	
 	private Grid resultsGrid;
 	
@@ -169,41 +177,41 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 		splitPanel.setImmediate(false);
 		splitPanel.setLocked(true);
 		splitPanel.setSizeFull();
-		splitPanel.setSplitPosition(75, Unit.PERCENTAGE, true);
+		splitPanel.setSplitPosition(500f, Unit.PIXELS);
 		// Use a custom style
 		splitPanel.addStyleName("invisiblesplitter");
 
-		// topLayout
-		buildTopLayout();
-		splitPanel.addComponent(topLayout);
+		// leftLayout
+		buildLeftLayout();
+		splitPanel.addComponent(leftLayout);
 
 		// bottomLayout
-		buildBottomLayout();
-		splitPanel.addComponent(bottomLayout);
+		buildRightLayout();
+		splitPanel.addComponent(rightLayout);
 	}
 
 	/**
 	 * This method builds the top section of the split panel containing the
 	 * search criteria and the search button.
 	 */
-	private void buildTopLayout() {
+	private void buildLeftLayout() {
 		// common part: create layout
-		topLayout = new VerticalLayout();
-		topLayout.setImmediate(false);
-		topLayout.setMargin(true);
-		topLayout.setSpacing(true);
+		leftLayout = new VerticalLayout();
+		leftLayout.setImmediate(false);
+		leftLayout.setMargin(true);
+		leftLayout.setSpacing(true);
 		
 		// criteriaHeading
 		Label criteriaHeading = new Label();
 		criteriaHeading.setCaption("Filter search results by:");
 		criteriaHeading.setCaptionAsHtml(true);
 		criteriaHeading.setStyleName("heading");
-		topLayout.addComponent(criteriaHeading);
-		topLayout.setExpandRatio(criteriaHeading, 0.2f);
+		leftLayout.addComponent(criteriaHeading);
+		leftLayout.setExpandRatio(criteriaHeading, 0.2f);
 
 		// searchCriteria
 		buildSearchCriteria();
-		topLayout.addComponent(searchCriteriaForm);
+		leftLayout.addComponent(searchCriteriaForm);
 
 		// search
 		searchBtn = new Button(new ThemeResource("img/search.png"));
@@ -212,24 +220,24 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 		// Set the search button as the default button. Causes a click event for
 		// the button to be fired.
 		searchBtn.setClickShortcut(KeyCode.ENTER);
-		topLayout.addComponent(searchBtn);
-		topLayout.setComponentAlignment(searchBtn, Alignment.MIDDLE_CENTER);
+		leftLayout.addComponent(searchBtn);
+		leftLayout.setComponentAlignment(searchBtn, Alignment.MIDDLE_CENTER);
 		
 		// search instructions
 		Label searchInstructions = new Label("* Click <i><b>Search</b></i> without entering any filter values to view all arzis");
 		searchInstructions.setContentMode(ContentMode.HTML);
 		searchInstructions.setWidthUndefined();
 		searchInstructions.setStyleName("instructionTxt");
-		topLayout.addComponent(searchInstructions);
-		topLayout.setExpandRatio(searchInstructions, 0.2f);
-		topLayout.setComponentAlignment(searchInstructions, Alignment.MIDDLE_CENTER);
+		leftLayout.addComponent(searchInstructions);
+		leftLayout.setExpandRatio(searchInstructions, 0.2f);
+		leftLayout.setComponentAlignment(searchInstructions, Alignment.MIDDLE_CENTER);
 	}
 
 	private void buildSearchCriteria() {
 		// Search criteria form
 		searchCriteriaForm = new FormLayout();
-		searchCriteriaForm.setImmediate(false);
 		searchCriteriaForm.setSizeFull();
+		searchCriteriaForm.setImmediate(false);
 		searchCriteriaForm.setStyleName("customForm");
 
 		// numOfDays
@@ -260,6 +268,11 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 		searchCriteriaForm.addComponent(bodyPart);
 	}
 
+	/**
+	 * This method is responsible for loading all the jamaats from the fact
+	 * table. Instead of populating from the dimension table, get all the
+	 * distinct jamaats from the fact table.
+	 */
 	private void loadJamaats() {
 		jamaat = new ComboBox("Jamaat:");
 		jamaat.setImmediate(true);
@@ -323,30 +336,30 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 	}
 	
 	/**
-	 * This method builds the bottom section of the split panel containing the
+	 * This method builds the right section of the split panel containing the
 	 * results grid and assign button..
 	 */
-	private void buildBottomLayout() {
-		bottomLayout = new VerticalLayout();
-		bottomLayout.setSizeFull();
-		bottomLayout.setImmediate(false);
-		bottomLayout.setMargin(true);
-		bottomLayout.setSpacing(true);
+	private void buildRightLayout() {
+		rightLayout = new VerticalLayout();
+		rightLayout.setSizeFull();
+		rightLayout.setImmediate(false);
+		rightLayout.setMargin(true);
+		rightLayout.setSpacing(true);
 		
 		buildResultsGrid();
-		bottomLayout.addComponent(resultsGrid);
-		bottomLayout.setExpandRatio(resultsGrid, 2.0f);
+		rightLayout.addComponent(resultsGrid);
+		rightLayout.setExpandRatio(resultsGrid, 2.0f);
 	
 		// assignBtn
 		assignBtn = new Button(new ThemeResource("img/assign_me.png"));
 		assignBtn.addClickListener(this);
 		assignBtn.setStyleName(Reindeer.BUTTON_LINK);
-		bottomLayout.addComponent(assignBtn);
-		bottomLayout.setComponentAlignment(assignBtn, Alignment.MIDDLE_CENTER);
+		rightLayout.addComponent(assignBtn);
+		rightLayout.setComponentAlignment(assignBtn, Alignment.MIDDLE_CENTER);
 		
 		// The bottom layout should not be visible initially. It should only be
 		// visible only when the user clicks on the "Search" button.
-		bottomLayout.setVisible(false);
+		rightLayout.setVisible(false);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -370,32 +383,22 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 
 		// Add all the intermediate nested properties (which are also
 		// beans)
-		resultsContainer.addNestedContainerBean("patient.jamaat");
 		resultsContainer.addNestedContainerBean("arzi.requestSubmitDate");
 		resultsContainer.addNestedContainerBean("arzi.currentStatus");
-		resultsContainer.addNestedContainerBean("arzi.arziType");
-		resultsContainer.addNestedContainerBean("arzi.bodyPart");
 		resultsContainer.addNestedContainerBean("arzi.condition");
-		resultsContainer.addNestedContainerBean("arzi.conditionStartDate");
 		resultsContainer.addNestedContainerBean("arzi.procedure");
+		resultsContainer.addNestedContainerBean("arzi.bodyPart");
 
 		// Setting the grid columns
-		resultsGrid.setColumns("patient.itsNumber", "patient.firstName",
-				"patient.lastName", "patient.jamaat.jamaatName",
-				"patient.jamaat.jamiyatName", "arzi.arziId",
-				"arzi.arziType.arziTypeName", "arzi.currentStatus.statusDesc",
-				"arzi.requestSubmitDate.gregorianCalDate",
-				"arzi.bodyPart.bodyPartName", "arzi.condition.conditionName",
-				"arzi.otherCondition",
-				"arzi.conditionStartDate.gregorianCalDate",
-				"arzi.procedure.procedureName");
+		resultsGrid.setColumns("arzi.requestSubmitDate.gregorianCalDate", "arzi.arziId", "arzi.condition.conditionName",
+				"arzi.procedure.procedureName", "arzi.bodyPart.bodyPartName", "arzi.arziSummary");
 
 		resultsGrid.addSelectionListener(this);
 
 		// Customize the grid columns
 		customizeResultsGridColumns();
-
 	}
+
 
 	/**
 	 * This method is responsible for customizing all the grid columns like
@@ -404,92 +407,92 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 	 * 
 	 */
 	private void customizeResultsGridColumns() {
-		// Sets the converter on the ITS number to remove the grouping used.
-		resultsGrid.getColumn("patient.itsNumber").setMaximumWidth(100)
-				.setConverter(MedicalArziUtils.itsNumberConverter());
-		
-		resultsGrid.getColumn("patient.firstName").setMaximumWidth(110);
-		
-		resultsGrid.getColumn("patient.lastName").setMaximumWidth(110);
-
 		// Set Header captions
-		resultsGrid.getColumn("arzi.currentStatus.statusDesc")
-				.setHeaderCaption("Status");
+		resultsGrid.getColumn("arzi.requestSubmitDate.gregorianCalDate").setMaximumWidth(130)
+				.setHeaderCaption("Arzi Submit Date").setRenderer(new DateRenderer("%1$tb %1$td, %1$tY", Locale.ENGLISH));
 
-		resultsGrid
-				.getColumn("arzi.conditionStartDate.gregorianCalDate")
-				.setMaximumWidth(140)
-				.setHeaderCaption("Condition Start Date")
-				.setRenderer(
-						new DateRenderer("%1$tb %1$td, %1$tY", Locale.ENGLISH));
+		resultsGrid.getColumn("arzi.arziId").setHeaderCaption("Arzi ID").setMaximumWidth(70);
 
-		resultsGrid.getColumn("patient.jamaat.jamaatName").setHeaderCaption(
-				"Jamaat");
+		resultsGrid.getColumn("arzi.condition.conditionName").setHeaderCaption("Medical Condition").setMaximumWidth(270);
 
-		resultsGrid.getColumn("patient.jamaat.jamiyatName").setHeaderCaption(
-				"Jamiyat");
+		resultsGrid.getColumn("arzi.procedure.procedureName").setHeaderCaption("Medical Procedure").setMaximumWidth(290);
 
-		resultsGrid
-				.getColumn("arzi.requestSubmitDate.gregorianCalDate")
-				.setMaximumWidth(130)
-				.setHeaderCaption("Submit Date")
-				.setRenderer(
-						new DateRenderer("%1$tb %1$td, %1$tY", Locale.ENGLISH));
+		resultsGrid.getColumn("arzi.bodyPart.bodyPartName").setHeaderCaption("Body Part").setMaximumWidth(270);
 
-		resultsGrid.getColumn("arzi.arziType.arziTypeName").setHeaderCaption(
-				"Type");
-
-		resultsGrid.getColumn("arzi.bodyPart.bodyPartName").setHeaderCaption(
-				"Body Part");
-
-		resultsGrid.getColumn("arzi.condition.conditionName").setHeaderCaption(
-				"Condition");
-
-		resultsGrid.getColumn("arzi.procedure.procedureName").setHeaderCaption(
-				"Procedure");
+		resultsGrid.getColumn("arzi.arziSummary").setHeaderCaption("Arzi Summary");
 		
-		resultsGrid.getColumn("arzi.otherCondition").setMaximumWidth(150);
+		// groupGridColumns();
+		// filterGridData();
+	}
+	
+	private void filterGridData() {
+		HeaderRow filterRow = resultsGrid.appendHeaderRow();
+		
+		HeaderCell medicalConditionFilter = filterRow.getCell("arzi.condition.conditionName");
+		
+		TextField textField = new TextField();
+		textField.setImmediate(true);
+		//On Change of text, filter the data of the grid
+		textField.addTextChangeListener(getManufacturingFilterListener());
+		medicalConditionFilter.setComponent(textField);
+	}
+	
+	/**
+	 * Returns the TextChangeListener that gets triggered
+	 *
+	 * @return
+	 */
+	private TextChangeListener getManufacturingFilterListener() {
+		return new TextChangeListener() {
 
+			private static final long serialVersionUID = -2368474286053602744L;
+
+			@Override
+			public void textChange(TextChangeEvent event) {
+				// Get the user entered filter string (data)
+				String newValue = (String) event.getText();
+				
+				@SuppressWarnings("unchecked")
+				BeanItemContainer<ArziSearchResult> container = ((BeanItemContainer<ArziSearchResult>) resultsGrid
+						.getContainerDataSource());
+				// This is important, this removes the previous filter
+				// that was used to filter the container
+				container.removeContainerFilters("arzi.condition.conditionName");
+				if (null != newValue && !newValue.isEmpty()) {
+					container.addContainerFilter(
+							new SimpleStringFilter("arzi.condition.conditionName", newValue, true, false));
+				}
+				resultsGrid.recalculateColumnWidths();
+			}
+		};
+	}
+
+
+	/**
+	 * This method is responsible for grouping the similar columns for
+	 * readability.
+	 * 
+	 */
+	private void groupGridColumns() {
 		// This call prepends the header row to the existing grid
 		HeaderRow searchResultsHeader = resultsGrid.prependHeaderRow();
 
 		// Get hold of the columnID, mind you in my case this is a nestedID
 		// Join the arzi related cells
-		HeaderCell arziIdCell = searchResultsHeader
-				.getCell("arzi.arziId");
-		HeaderCell arziTypeCell = searchResultsHeader
-				.getCell("arzi.arziType.arziTypeName");
-		HeaderCell arziStatusCell = searchResultsHeader
-				.getCell("arzi.currentStatus.statusDesc");
-		HeaderCell arziSubmitDtCell = searchResultsHeader
-				.getCell("arzi.requestSubmitDate.gregorianCalDate");
-		searchResultsHeader.join(arziIdCell, arziTypeCell, arziStatusCell,
-				arziSubmitDtCell).setText("Arzi");
+		HeaderCell arziSubmitDtCell = searchResultsHeader.getCell("arzi.requestSubmitDate.gregorianCalDate");
+		HeaderCell arziIdCell = searchResultsHeader.getCell("arzi.arziId");
+		HeaderCell arziStatusCell = searchResultsHeader.getCell("arzi.currentStatus.statusDesc");
+		searchResultsHeader.join(arziSubmitDtCell, arziIdCell, arziStatusCell).setText("Arzi");
 
 		// Join the Medical info cells
-		HeaderCell bodyPartCell = searchResultsHeader
-				.getCell("arzi.bodyPart.bodyPartName");
-		HeaderCell condCell = searchResultsHeader
-				.getCell("arzi.condition.conditionName");
-		HeaderCell procCell = searchResultsHeader
-				.getCell("arzi.procedure.procedureName");
-		HeaderCell otherCondCell = searchResultsHeader
-				.getCell("arzi.otherCondition");
-		HeaderCell condStartDtCell = searchResultsHeader
-				.getCell("arzi.conditionStartDate.gregorianCalDate");
-		searchResultsHeader.join(bodyPartCell, condCell, procCell,
-				otherCondCell, condStartDtCell).setText("Medical Information");
+		HeaderCell condCell = searchResultsHeader.getCell("arzi.condition.conditionName");
+		HeaderCell procCell = searchResultsHeader.getCell("arzi.procedure.procedureName");
+		HeaderCell bodyPartCell = searchResultsHeader.getCell("arzi.bodyPart.bodyPartName");
+		searchResultsHeader.join(condCell, procCell, bodyPartCell).setText("Medical Information");
 
 		// Join the Patient info cells
-		HeaderCell itsNumCell = searchResultsHeader
-				.getCell("patient.itsNumber");
-		HeaderCell firstNameCell = searchResultsHeader
-				.getCell("patient.firstName");
-		HeaderCell lastNameCell = searchResultsHeader
-				.getCell("patient.lastName");
-		searchResultsHeader.join(itsNumCell, firstNameCell, lastNameCell)
-				.setText("Patient");
-
+		HeaderCell itsNumCell = searchResultsHeader.getCell("patient.itsNumber");
+		searchResultsHeader.join(itsNumCell).setText("Patient");
 	}
 
 	/**
@@ -694,7 +697,7 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 		if (searchResultList != null && searchResultList.isEmpty()) {
 			// Hide the bottom layout containing the grid and the
 			// "Assign" Button when the search yields 0 results.
-			bottomLayout.setVisible(false);
+			rightLayout.setVisible(false);
 			
 			String description = "No results found for the search criteria.";
 			
@@ -707,7 +710,7 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 			
 			// Display the bottom layout with the results in the grid
 			// and the "Assign" Button.
-			bottomLayout.setVisible(true);
+			rightLayout.setVisible(true);
 			
 			// "Assign Me" button should be disabled by default and
 			// should only be enabled when the user starts selecting
