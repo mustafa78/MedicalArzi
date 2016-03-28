@@ -73,21 +73,45 @@ public interface LookupService {
 	 * @return java.util.List
 	 */
 	public List<BodyPart> getListOfAllBodyParts();
+	
+	/**
+	 * This method is responsible for getting all the distinct body
+	 * parts from all the patient submitted arzis.
+	 * 
+	 * @return java.util.List<com.example.medicalarzi.model.BodyPart>
+	 */
+	public List<BodyPart> getListOfAllDistinctBodyPartsFromAllSubmittedArzis();	
 
 	/**
 	 * This method is responsible for getting all the medical conditions.
 	 * 
-	 * @return java.util.List
+	 * @return java.util.List<com.example.medicalarzi.model.Condition>
 	 */
 	public List<Condition> getListOfAllMedicalConditions();
+	
+	/**
+	 * This method is responsible for getting all the distinct medical
+	 * conditions from all the patient submitted arzis.
+	 * 
+	 * @return java.util.List<com.example.medicalarzi.model.Condition>
+	 */
+	public List<Condition> getListOfAllDistinctConditionsFromAllSubmittedArzis();
 
 	/**
 	 * This method is responsible for getting all the available medical
 	 * procedures.
 	 * 
-	 * @return java.util.List
+	 * @return java.util.List<com.example.medicalarzi.model.Procedure>
 	 */
 	public List<Procedure> getListOfAllMedicalProcedures();
+	
+	/**
+	 * This method is responsible for getting all the distinct medical
+	 * procedures from all the patient submitted arzis.
+	 * 
+	 * @return java.util.List<com.example.medicalarzi.model.Procedure>
+	 */
+	public List<Procedure> getListOfAllDistinctProceduresFromAllSubmittedArzis();	
 
 	/**
 	 * This method is responsible for getting all the possible arzi types.

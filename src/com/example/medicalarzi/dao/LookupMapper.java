@@ -90,24 +90,56 @@ public interface LookupMapper {
 	public int updateLookup(Lookup record);
 	
 	/**
+	 * This method is responsible for selecting all the medical conditions from
+	 * the dimension table.
 	 * 
 	 * @return java.util.List<com.example.medicalarzi.model.Condition>
 	 */
 	public List<Condition> selectAllMedicalConditions();
 	
 	/**
+	 * This method is responsible for selecting all the distinct conditions from
+	 * the fact table
+	 * 
+	 * @return java.util.List<com.example.medicalarzi.model.Condition>
+	 */
+	public List<Condition> selectAllDistinctCondsFromArzis();
+	
+	/**
+	 * This method is responsible for selecting all the medical procedures from
+	 * the dimension table.
 	 * 
 	 * @return java.util.List<com.example.medicalarzi.model.Procedure>
 	 */
 	public List<Procedure> selectAllMedicalProcedures();
 	
 	/**
+	 * This method is responsible for selecting all the distinct procedures from
+	 * the fact table
+	 * 
+	 * @return java.util.List<com.example.medicalarzi.model.Procedure>
+	 */
+	public List<Procedure> selectAllDistinctProcsFromArzis();
+	
+	/**
+	 * This method is responsible for selecting all the body parts from
+	 * the dimension table.
 	 * 
 	 * @return java.util.List<com.example.medicalarzi.model.BodyPart>
 	 */
 	public List<BodyPart> selectAllBodyParts();
 	
 	/**
+	 * This method is responsible for selecting all the distinct body parts from
+	 * the fact table
+	 * 
+	 * @return java.util.List<com.example.medicalarzi.model.BodyPart>
+	 */
+	public List<BodyPart> selectAllDistinctBdyPartsFromArzis();
+	
+	/**
+	 * This method is responsible for selecting all the arzi types from
+	 * the dimension table.
 	 * 
 	 * @return java.util.List<com.example.medicalarzi.model.ArziType>
 	 */

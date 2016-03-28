@@ -183,6 +183,17 @@
 	    where ACTV_IND = 'Y'
   	</select>
   	
+   	<!-- Select all the distinct body parts from the fact table -->
+  	<select id="selectAllDistinctBdyPartsFromArzis" resultMap="BodyPartResultMap">
+		select distinct
+		    <include refid="BodyPart_Column_List" />
+		from
+		    D_BDY_PRT bdyPrt
+		        JOIN
+		    F_ARZI_HDR hdr ON hdr.bdy_prt_id = bdyPrt.bdy_prt_id
+		order by bdyPrt.bdy_prt_id, bdyPrt.bdy_prt_nm; 	
+  	</select>   	
+  	
   	<!-- Select all conditions -->
   	<select id="selectAllMedicalConditions" resultMap="ConditionResultMap">
 	    select
@@ -191,12 +202,34 @@
 	    where ACTV_IND = 'Y'
   	</select>
   	
+   	<!-- Select all the distinct conditions from the fact table -->
+  	<select id="selectAllDistinctCondsFromArzis" resultMap="ConditionResultMap">
+		select distinct
+		    <include refid="Condition_Column_List" />
+		from
+		    D_COND cond
+		        JOIN
+		    F_ARZI_HDR hdr ON hdr.cond_id = cond.cond_id
+		order by cond.cond_id, cond.cond_nm; 	
+  	</select> 	
+  	
   	<!-- Select all procedure -->
   	<select id="selectAllMedicalProcedures" resultMap="ProcedureResultMap">
 	    select
 	    <include refid="Procedure_Column_List" />
 	    from D_PROC
 	    where ACTV_IND = 'Y'
+  	</select>
+  	
+  	<!-- Select all the distinct procedures from the fact table -->
+  	<select id="selectAllDistinctProcsFromArzis" resultMap="ProcedureResultMap">
+		select distinct
+		    <include refid="Procedure_Column_List" />
+		from
+		    D_PROC proc
+		        JOIN
+		    F_ARZI_HDR hdr ON hdr.proc_id = proc.proc_id
+		order by proc.proc_id , proc.proc_nm; 	
   	</select>
   	
   	<!-- Select all arzi types -->

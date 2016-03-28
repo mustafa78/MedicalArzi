@@ -179,4 +179,19 @@ public class LookupServiceImpl implements LookupService {
 		return lookupMapper.selectLocationById(locationId);
 	}
 
+	@Override
+	public List<BodyPart> getListOfAllDistinctBodyPartsFromAllSubmittedArzis() {
+		return lookupMapper.selectAllDistinctBdyPartsFromArzis();
+	}
+
+	@Override
+	public List<Condition> getListOfAllDistinctConditionsFromAllSubmittedArzis() {
+		return lookupMapper.selectAllDistinctCondsFromArzis();
+	}
+
+	@Override
+	public List<Procedure> getListOfAllDistinctProceduresFromAllSubmittedArzis() {
+		return lookupMapper.selectAllDistinctProcsFromArzis();
+	}
+
 }

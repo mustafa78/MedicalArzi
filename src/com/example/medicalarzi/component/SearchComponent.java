@@ -292,7 +292,7 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 		condition.setContainerDataSource(MedicalArziUtils
 				.getContainer(Condition.class));
 		condition.addItems(ServiceLocator.getInstance().getLookupService()
-				.getListOfAllMedicalConditions());
+				.getListOfAllDistinctConditionsFromAllSubmittedArzis());
 		condition.setInputPrompt("Please select the medical condition.");
 		condition.setItemCaptionMode(ItemCaptionMode.PROPERTY);
 		condition.setItemCaptionPropertyId("conditionName");
@@ -304,7 +304,7 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 		bodyPart.setContainerDataSource(MedicalArziUtils
 				.getContainer(BodyPart.class));
 		bodyPart.addItems(ServiceLocator.getInstance().getLookupService()
-				.getListOfAllBodyParts());
+				.getListOfAllDistinctBodyPartsFromAllSubmittedArzis());
 		bodyPart.setInputPrompt("Please select the body part.");
 		bodyPart.setItemCaptionMode(ItemCaptionMode.PROPERTY);
 		bodyPart.setItemCaptionPropertyId("bodyPartName");
@@ -316,7 +316,7 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 		procedure.setContainerDataSource(MedicalArziUtils
 				.getContainer(Procedure.class));
 		procedure.addItems(ServiceLocator.getInstance().getLookupService()
-				.getListOfAllMedicalProcedures());
+				.getListOfAllDistinctProceduresFromAllSubmittedArzis());
 		procedure.setInputPrompt("Please select the medical procedure.");
 		procedure.setItemCaptionMode(ItemCaptionMode.PROPERTY);
 		procedure.setItemCaptionPropertyId("procedureName");
@@ -425,6 +425,9 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 		// filterGridData();
 	}
 	
+	/**
+	 * 
+	 */
 	private void filterGridData() {
 		HeaderRow filterRow = resultsGrid.appendHeaderRow();
 		
