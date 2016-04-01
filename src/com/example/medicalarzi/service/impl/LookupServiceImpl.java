@@ -11,6 +11,7 @@ import org.apache.logging.log4j.core.Logger;
 
 import com.example.medicalarzi.dao.LookupMapper;
 import com.example.medicalarzi.dao.SecurityMapper;
+import com.example.medicalarzi.model.ArziSearchCriteria;
 import com.example.medicalarzi.model.ArziType;
 import com.example.medicalarzi.model.BodyPart;
 import com.example.medicalarzi.model.Condition;
@@ -28,13 +29,12 @@ import com.example.medicalarzi.service.LookupService;
  */
 public class LookupServiceImpl implements LookupService {
 
-	public static Logger logger = (Logger) LogManager
-			.getLogger(LookupServiceImpl.class);
+	public static Logger logger = (Logger) LogManager.getLogger(LookupServiceImpl.class);
 
 	private LookupMapper lookupMapper;
 
 	private SecurityMapper securityMapper;
-	
+
 	/**
 	 * @return the lookupMapper
 	 */
@@ -43,7 +43,8 @@ public class LookupServiceImpl implements LookupService {
 	}
 
 	/**
-	 * @param lookupMapper the lookupMapper to set
+	 * @param lookupMapper
+	 *            the lookupMapper to set
 	 */
 	public void setLookupMapper(LookupMapper lookupMapper) {
 		this.lookupMapper = lookupMapper;
@@ -57,7 +58,8 @@ public class LookupServiceImpl implements LookupService {
 	}
 
 	/**
-	 * @param securityMapper the securityMapper to set
+	 * @param securityMapper
+	 *            the securityMapper to set
 	 */
 	public void setSecurityMapper(SecurityMapper securityMapper) {
 		this.securityMapper = securityMapper;
@@ -70,7 +72,9 @@ public class LookupServiceImpl implements LookupService {
 		// TODO Auto-generated constructor stub
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.example.medicalarzi.service.LookupService#getListOfLookupTypes()
 	 */
 	@Override
@@ -78,16 +82,24 @@ public class LookupServiceImpl implements LookupService {
 		return lookupMapper.selectDistinctLookupTypes();
 	}
 
-	/* (non-Javadoc)
-	 * @see com.example.medicalarzi.service.LookupService#getByLookupId(java.lang.Long)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.example.medicalarzi.service.LookupService#getByLookupId(java.lang.
+	 * Long)
 	 */
 	@Override
 	public Lookup getByLookupId(Long lookupId) {
 		return lookupMapper.selectByLookupId(lookupId);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.example.medicalarzi.service.LookupService#getByLookupType(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.example.medicalarzi.service.LookupService#getByLookupType(java.lang.
+	 * String)
 	 */
 	@Override
 	public List<Lookup> getByLookupType(String lookupType) {
@@ -95,16 +107,24 @@ public class LookupServiceImpl implements LookupService {
 		return listOfLookups;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.example.medicalarzi.service.LookupService#getByLookupTypeValueSort(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.example.medicalarzi.service.LookupService#getByLookupTypeValueSort(
+	 * java.lang.String)
 	 */
 	@Override
 	public List<Lookup> getByLookupTypeValueSort(String lookupType) {
 		return lookupMapper.selectByLookupTypeValueSort(lookupType);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.example.medicalarzi.service.LookupService#updateLookup(com.example.medicalarzi.model.Lookup)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.example.medicalarzi.service.LookupService#updateLookup(com.example.
+	 * medicalarzi.model.Lookup)
 	 */
 	@Override
 	public void updateLookup(Lookup lookup) {
@@ -137,12 +157,12 @@ public class LookupServiceImpl implements LookupService {
 
 	@Override
 	public GregHijDate getRequestedGregorianHijriCalendar(Date calendarDate) {
-		 return lookupMapper.selectGregHijBasedOnCalDt(calendarDate);
+		return lookupMapper.selectGregHijBasedOnCalDt(calendarDate);
 	}
 
 	@Override
 	public List<Jamaat> getListOfAllJamaats() {
-		List<Jamaat> listOfJamaats =  lookupMapper.selectAllJamaats();
+		List<Jamaat> listOfJamaats = lookupMapper.selectAllJamaats();
 		return listOfJamaats;
 	}
 
@@ -162,16 +182,13 @@ public class LookupServiceImpl implements LookupService {
 	}
 
 	@Override
-	public List<String> getListOfAllCitiesForStateAndCountry(String state,
-			String country) {
+	public List<String> getListOfAllCitiesForStateAndCountry(String state, String country) {
 		return lookupMapper.selectAllCitiesByStateAndCountry(state, country);
 	}
 
 	@Override
-	public Location getLocationForAddress(String city, String state,
-			String country) {
-		return lookupMapper.selectLocationByCityStateAndCountry(city, state,
-				country);
+	public Location getLocationForAddress(String city, String state, String country) {
+		return lookupMapper.selectLocationByCityStateAndCountry(city, state, country);
 	}
 
 	@Override
@@ -194,4 +211,28 @@ public class LookupServiceImpl implements LookupService {
 		return lookupMapper.selectAllDistinctProcsFromArzis();
 	}
 
+	@Override
+	public List<Jamaat> getListOfAllDistinctJamaatsForAllPatients() {
+		return lookupMapper.selectAllDistinctPatientJamaats();
+	}
+
+	@Override
+	public List<BodyPart> getListOfAllDistinctBdyPartsBySearchCriteria(ArziSearchCriteria searchCriteria) {
+		return lookupMapper.selectAllDistinctBdyPartsBySearchCriteria(searchCriteria);
+	}
+
+	@Override
+	public List<Condition> getListOfAllDistinctConditionsBySearchCriteria(ArziSearchCriteria searchCriteria) {
+		return lookupMapper.selectAllDistinctCondsBySearchCriteria(searchCriteria);
+	}
+
+	@Override
+	public List<Procedure> getListOfAllDistinctProceduresBySearchCriteria(ArziSearchCriteria searchCriteria) {
+		return lookupMapper.selectAllDistinctProcsBySearchCriteria(searchCriteria);
+	}
+
+	@Override
+	public List<Jamaat> getListOfAllDistinctJamaatsBySearchCriteria(ArziSearchCriteria searchCriteria) {
+		return lookupMapper.selectAllDistinctJamaatsBySearchCriteria(searchCriteria);
+	}
 }

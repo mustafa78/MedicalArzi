@@ -101,16 +101,16 @@
     	CREATE_TS, LST_UPDT_TS, CREATE_USR_ID, LST_UPDT_USR_ID
   	</sql>
   	<sql id="BodyPart_Column_List" >
-    	BDY_PRT_ID, BDY_PRT_PRFX_CD, BDY_PRT_NM, ACTV_IND,
-    	CREATE_TS, LST_UPDT_TS, CREATE_USR_ID, LST_UPDT_USR_ID
+    	bdyPrt.BDY_PRT_ID, bdyPrt.BDY_PRT_PRFX_CD, bdyPrt.BDY_PRT_NM, bdyPrt.ACTV_IND,
+    	bdyPrt.CREATE_TS, bdyPrt.LST_UPDT_TS, bdyPrt.CREATE_USR_ID, bdyPrt.LST_UPDT_USR_ID
   	</sql>
   	<sql id="Condition_Column_List" >
-    	COND_ID, COND_PRFX_CD, COND_NM, SPCL_DESC, ACTV_IND,
-    	CREATE_TS, LST_UPDT_TS, CREATE_USR_ID, LST_UPDT_USR_ID
+    	cond.COND_ID, cond.COND_PRFX_CD, cond.COND_NM, cond.SPCL_DESC, cond.ACTV_IND,
+    	cond.CREATE_TS, cond.LST_UPDT_TS, cond.CREATE_USR_ID, cond.LST_UPDT_USR_ID
   	</sql>  	
   	<sql id="Procedure_Column_List" >
-    	PROC_ID, PROC_PRFX_CD, PROC_NM, ACTV_IND,
-    	CREATE_TS, LST_UPDT_TS, CREATE_USR_ID, LST_UPDT_USR_ID
+    	proc.PROC_ID, proc.PROC_PRFX_CD, proc.PROC_NM, proc.ACTV_IND,
+    	proc.CREATE_TS, proc.LST_UPDT_TS, proc.CREATE_USR_ID, proc.LST_UPDT_USR_ID
   	</sql>
   	<sql id="ArziType_Column_List" >
     	ARZI_TYP_ID, ARZI_TYP,
@@ -121,13 +121,41 @@
     	CREATE_TS, LST_UPDT_TS, CREATE_USR_ID, LST_UPDT_USR_ID
   	</sql>
   	<sql id="Jamaat_Column_List">
-		JAMAAT_ID, JAMAAT_NM, JAMIYAT_NM, REGION, COUNTRY,
-		CREATE_USR_ID, CREATE_TS, LST_UPDT_USR_ID, LST_UPDT_TS
+		jamaat.JAMAAT_ID, jamaat.JAMAAT_NM, jamaat.JAMIYAT_NM, jamaat.REGION, jamaat.COUNTRY,
+		jamaat.CREATE_USR_ID, jamaat.CREATE_TS, jamaat.LST_UPDT_USR_ID, jamaat.LST_UPDT_TS
 	</sql>
   	<sql id="Location_Column_List">
 		LOC_ID, CITY_NM, STATE_NM, CNTRY_NM,
 		CREATE_USR_ID, CREATE_TS, LST_UPDT_USR_ID, LST_UPDT_TS
 	</sql>
+  	<!-- where clause fragment for the arzi search which are not in draft status. 
+  		Part of it is in CDATA because of the ('>' & '<' )-->
+  	<sql id="searchCriteriaWhere">
+		AND 1=1
+		AND hdr.CURR_STATUS_ID = 1001
+		AND hdr.ACTV_IND = 'Y'
+		<if test="itsNumber != null and itsNumber != ''">
+			AND ptnt.PTNT_ITS_NBR = #{itsNumber,jdbcType=INTEGER}
+		</if>
+		<if test="jamaat != null and jamaat.jamaatId != null">
+			AND ptnt.JAMAAT_ID = #{jamaat.jamaatId,jdbcType=INTEGER}
+		</if>
+		<if test="bodyPart != null and bodyPart.bodyPartId != null">
+			AND hdr.BDY_PRT_ID = #{bodyPart.bodyPartId,jdbcType=INTEGER}
+		</if>
+		<if test="condition != null and condition.conditionId != null">
+			AND hdr.COND_ID = #{condition.conditionId,jdbcType=INTEGER}
+		</if>
+		<if test="procedure != null and procedure.procedureId != null">
+			AND hdr.PROC_ID = #{procedure.procedureId,jdbcType=INTEGER}
+		</if>
+		<if test="startDate != null and endDate != null">
+			<![CDATA[
+			AND hdr.CURR_STATUS_DT_ID >= #{startDate.gregorianDateId,jdbcType=INTEGER}
+			AND hdr.CURR_STATUS_DT_ID <= #{endDate.gregorianDateId,jdbcType=INTEGER}
+			]]>
+		</if>	
+  	</sql>	
 
   	<!-- Select Statements -->
   	<!--Get Distinct Lookup Types. -->
@@ -137,6 +165,7 @@
 	    where ACTIVE_IND = 'Y'
 	    order by LKUP_TYPE
   	</select>
+  	
   	<!--Get Lookups by Lookup Type. -->
   	<select id="selectByLookupType" resultMap="BaseResultMap">
 	    select
@@ -145,6 +174,7 @@
 	    where LKUP_TYPE = #{lookupType,jdbcType=VARCHAR} and ACTIVE_IND = 'Y'
 	    order by SORT_ORDER
   	</select>
+  	
 	<!--Get Lookups by Lookup Type.-->
    	<select id="selectByLookupTypeValueSort" resultMap="BaseResultMap" useCache="true">
 	    select
@@ -153,6 +183,7 @@
 	    where LKUP_TYPE = #{lookupType,jdbcType=VARCHAR} and ACTIVE_IND = 'Y'
 	    order by LKUP_VAL
   	</select>
+  	
 	<!--Get Lookups by Lookup Type.-->
   	<select id="selectByLookupTypeAndLookupValue" resultMap="BaseResultMap" useCache="true">
 	    select
@@ -160,6 +191,7 @@
 	    from D_LOOKUPS
 	    where LKUP_TYPE = #{lookupType,jdbcType=VARCHAR} and LKUP_VAL = #{lookupValue,jdbcType=VARCHAR}
   	</select>
+  	
 	<!--Get Lookups by Lookup ID.-->
  	<select id="selectByLookupId" resultMap="BaseResultMap" useCache="true">
 	    select
@@ -167,6 +199,7 @@
 	    from D_LOOKUPS
 	    where LKUP_ID = #{lookupId,jdbcType=INTEGER} and ACTIVE_IND = 'Y'
   	</select>
+  	
 	<!--Get Lookups by Lookup ID.-->
  	<select id="selectByLookupValue" resultMap="BaseResultMap" useCache="true">
 	    select
@@ -179,7 +212,7 @@
   	<select id="selectAllBodyParts" resultMap="BodyPartResultMap">
 	    select
 	    <include refid="BodyPart_Column_List" />
-	    from D_BDY_PRT
+	    from D_BDY_PRT bdyPrt
 	    where ACTV_IND = 'Y'
   	</select>
   	
@@ -189,16 +222,33 @@
 		    <include refid="BodyPart_Column_List" />
 		from
 		    D_BDY_PRT bdyPrt
-		        JOIN
+		        join
 		    F_ARZI_HDR hdr ON hdr.bdy_prt_id = bdyPrt.bdy_prt_id
 		order by bdyPrt.bdy_prt_id, bdyPrt.bdy_prt_nm; 	
-  	</select>   	
+  	</select>
+  	
+  	<!-- Select all the distinct body parts from the fact table -->
+  	<select id="selectAllDistinctBdyPartsBySearchCriteria" resultMap="BodyPartResultMap" 
+  		parameterType="ArziSearchCriteria">
+		select distinct
+		    <include refid="BodyPart_Column_List" />
+		from
+		    D_BDY_PRT bdyPrt
+		        join
+		    F_ARZI_HDR hdr ON hdr.bdy_prt_id = bdyPrt.bdy_prt_id
+		    	join 
+			D_PTNT ptnt on ptnt.PTNT_ITS_NBR = hdr.ITS_NBR
+		<where>
+			<include refid="searchCriteriaWhere" />
+		</where>
+		order by bdyPrt.bdy_prt_id, bdyPrt.bdy_prt_nm; 	
+  	</select>
   	
   	<!-- Select all conditions -->
   	<select id="selectAllMedicalConditions" resultMap="ConditionResultMap">
 	    select
 	    <include refid="Condition_Column_List" />
-	    from D_COND
+	    from D_COND cond
 	    where ACTV_IND = 'Y'
   	</select>
   	
@@ -208,16 +258,33 @@
 		    <include refid="Condition_Column_List" />
 		from
 		    D_COND cond
-		        JOIN
+		        join
 		    F_ARZI_HDR hdr ON hdr.cond_id = cond.cond_id
 		order by cond.cond_id, cond.cond_nm; 	
   	</select> 	
+  	
+   	<!-- Select all the distinct conditions from the fact table -->
+  	<select id="selectAllDistinctCondsBySearchCriteria" resultMap="ConditionResultMap" 
+  		parameterType="ArziSearchCriteria">
+		select distinct
+		    <include refid="Condition_Column_List" />
+		from
+		    D_COND cond
+		        join
+		    F_ARZI_HDR hdr ON hdr.cond_id = cond.cond_id
+		    	join 
+			D_PTNT ptnt on ptnt.PTNT_ITS_NBR = hdr.ITS_NBR
+		<where>
+			<include refid="searchCriteriaWhere" />	
+		</where>	    
+		order by cond.cond_id, cond.cond_nm; 	
+  	</select>   	
   	
   	<!-- Select all procedure -->
   	<select id="selectAllMedicalProcedures" resultMap="ProcedureResultMap">
 	    select
 	    <include refid="Procedure_Column_List" />
-	    from D_PROC
+	    from D_PROC proc
 	    where ACTV_IND = 'Y'
   	</select>
   	
@@ -227,10 +294,27 @@
 		    <include refid="Procedure_Column_List" />
 		from
 		    D_PROC proc
-		        JOIN
+		        join
 		    F_ARZI_HDR hdr ON hdr.proc_id = proc.proc_id
-		order by proc.proc_id , proc.proc_nm; 	
+		order by proc.proc_id, proc.proc_nm; 	
   	</select>
+  	
+  	<!-- Select all the distinct procedures from the fact table -->
+  	<select id="selectAllDistinctProcsBySearchCriteria" resultMap="ProcedureResultMap" 
+  		parameterType="ArziSearchCriteria">
+		select distinct
+		    <include refid="Procedure_Column_List" />
+		from
+		    D_PROC proc
+		        join
+		    F_ARZI_HDR hdr ON hdr.proc_id = proc.proc_id
+		    	join 
+			D_PTNT ptnt on ptnt.PTNT_ITS_NBR = hdr.ITS_NBR
+		<where>
+			<include refid="searchCriteriaWhere" />
+		</where>		    
+		order by proc.proc_id, proc.proc_nm; 	
+  	</select>  	
   	
   	<!-- Select all arzi types -->
   	<select id="selectAllArziTypes" resultMap="ArziTypeResultMap">
@@ -257,7 +341,7 @@
   	<select id="selectJamaatById" resultMap="JamaatResultMap" parameterType="Long">
 		select
 			<include refid="Jamaat_Column_List" />
-		from D_JAMAAT
+		from D_JAMAAT jamaat
 		where JAMAAT_ID = #{jamaatId,jdbcType=INTEGER}	
 	</select>
 	
@@ -265,8 +349,36 @@
 	<select id="selectAllJamaats" resultMap="JamaatResultMap">
 	    select
 	    <include refid="Jamaat_Column_List" />
-	    from D_JAMAAT
+	    from D_JAMAAT jamaat
   	</select>
+  	
+  	<!-- Select all the distinct jamaats from the fact table -->
+  	<select id="selectAllDistinctPatientJamaats" resultMap="JamaatResultMap">
+		select distinct
+		    <include refid="Jamaat_Column_List" />
+		from
+		    D_JAMAAT jamaat
+		        JOIN
+		    D_PTNT ptnt ON ptnt.jamaat_id = jamaat.jamaat_id
+		order by jamaat.jamaat_id, jamaat.jamaat_nm 			
+  	</select>  
+  	
+  	<!-- Select all the distinct jamaats from the fact table by the search criteria -->
+  	<select id="selectAllDistinctJamaatsBySearchCriteria" resultMap="JamaatResultMap" parameterType="ArziSearchCriteria">
+		select distinct
+		    <include refid="Jamaat_Column_List" />
+		from
+		    D_JAMAAT jamaat, 
+		    D_PTNT ptnt
+ 		    	join
+		    F_ARZI_HDR hdr ON hdr.its_nbr = ptnt.ptnt_its_nbr
+		<where>
+			<include refid="searchCriteriaWhere" />
+			AND
+			ptnt.jamaat_id = jamaat.jamaat_id
+		</where>
+		order by jamaat.jamaat_id, jamaat.jamaat_nm 
+  	</select>  	
   	
   	<!-- Select all the distinct countries from the D_LOCATION table -->
 	<select id="selectAllDistinctCountries" resultType="java.lang.String">

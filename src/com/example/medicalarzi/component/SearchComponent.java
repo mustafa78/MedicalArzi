@@ -250,21 +250,24 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 		itsNumber.setNullRepresentation("");
 		itsNumber.setConverter(MedicalArziUtils.itsNumberConverter());
 		searchCriteriaForm.addComponent(itsNumber);
-
-		// region
-		loadJamaats();
+		
+		// jamaat
+		loadJamaats(ServiceLocator.getInstance().getLookupService().getListOfAllDistinctJamaatsForAllPatients());
 		searchCriteriaForm.addComponent(jamaat);
 
 		// condition
-		loadConditions();
+		loadConditions(
+				ServiceLocator.getInstance().getLookupService().getListOfAllDistinctConditionsFromAllSubmittedArzis());
 		searchCriteriaForm.addComponent(condition);
 
 		// procedure
-		loadProcedures();
+		loadProcedures(
+				ServiceLocator.getInstance().getLookupService().getListOfAllDistinctProceduresFromAllSubmittedArzis());
 		searchCriteriaForm.addComponent(procedure);
 		
 		// bodyPart
-		loadBodyParts();
+		loadBodyParts(
+				ServiceLocator.getInstance().getLookupService().getListOfAllDistinctBodyPartsFromAllSubmittedArzis());
 		searchCriteriaForm.addComponent(bodyPart);
 	}
 
@@ -272,57 +275,70 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 	 * This method is responsible for loading all the jamaats from the fact
 	 * table. Instead of populating from the dimension table, get all the
 	 * distinct jamaats from the fact table.
+	 * 
+	 * @param jamaatList
 	 */
-	private void loadJamaats() {
+	private void loadJamaats(List<Jamaat> jamaatList) {
 		jamaat = new ComboBox("Jamaat:");
 		jamaat.setImmediate(true);
 		jamaat.setContainerDataSource(MedicalArziUtils
 				.getContainer(Jamaat.class));
-		jamaat.addItems(ServiceLocator.getInstance().getLookupService()
-				.getListOfAllJamaats());
+		jamaat.addItems(jamaatList);
 		jamaat.setInputPrompt("Please select your jamaat.");
 		jamaat.setItemCaptionMode(ItemCaptionMode.PROPERTY);
 		jamaat.setItemCaptionPropertyId("jamaatName");
 		jamaat.setRequired(false);
 	}
 
-	private void loadConditions() {
+	/**
+	 * 
+	 * @param conditionList
+	 */
+	private void loadConditions(List<Condition> conditionList) {
 		condition = new ComboBox("Medical Condition:");
 		condition.setImmediate(true);
 		condition.setContainerDataSource(MedicalArziUtils
 				.getContainer(Condition.class));
-		condition.addItems(ServiceLocator.getInstance().getLookupService()
-				.getListOfAllDistinctConditionsFromAllSubmittedArzis());
+		condition.addItems(conditionList);
 		condition.setInputPrompt("Please select the medical condition.");
 		condition.setItemCaptionMode(ItemCaptionMode.PROPERTY);
 		condition.setItemCaptionPropertyId("conditionName");
 		condition.setRequired(false);
 	}
 
-	private void loadBodyParts() {
+	/**
+	 * 
+	 * @param bodyPartList
+	 */
+	private void loadBodyParts(List<BodyPart> bodyPartList) {
 		bodyPart = new ComboBox("Body Part:");
 		bodyPart.setContainerDataSource(MedicalArziUtils
 				.getContainer(BodyPart.class));
-		bodyPart.addItems(ServiceLocator.getInstance().getLookupService()
-				.getListOfAllDistinctBodyPartsFromAllSubmittedArzis());
+		bodyPart.addItems(bodyPartList);
 		bodyPart.setInputPrompt("Please select the body part.");
 		bodyPart.setItemCaptionMode(ItemCaptionMode.PROPERTY);
 		bodyPart.setItemCaptionPropertyId("bodyPartName");
 		bodyPart.setRequired(false);
 	}
 
-	private void loadProcedures() {
+	/**
+	 * 
+	 * @param procedureList
+	 */
+	private void loadProcedures(List<Procedure> procedureList) {
 		procedure = new ComboBox("Medical Procedure:");
 		procedure.setContainerDataSource(MedicalArziUtils
 				.getContainer(Procedure.class));
-		procedure.addItems(ServiceLocator.getInstance().getLookupService()
-				.getListOfAllDistinctProceduresFromAllSubmittedArzis());
+		procedure.addItems(procedureList);
 		procedure.setInputPrompt("Please select the medical procedure.");
 		procedure.setItemCaptionMode(ItemCaptionMode.PROPERTY);
 		procedure.setItemCaptionPropertyId("procedureName");
 		procedure.setRequired(false);
 	}
 
+	/**
+	 * 
+	 */
 	private void loadArziSubmitPeriods() {
 		arziSubmitPeriod = new ComboBox("Arzi Submit Date:");
 		arziSubmitPeriod.setContainerDataSource(MedicalArziUtils
@@ -409,13 +425,16 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 	private void customizeResultsGridColumns() {
 		// Set Header captions
 		resultsGrid.getColumn("arzi.requestSubmitDate.gregorianCalDate").setMaximumWidth(130)
-				.setHeaderCaption("Arzi Submit Date").setRenderer(new DateRenderer("%1$tb %1$td, %1$tY", Locale.ENGLISH));
+				.setHeaderCaption("Arzi Submit Date")
+				.setRenderer(new DateRenderer("%1$tb %1$td, %1$tY", Locale.ENGLISH));
 
 		resultsGrid.getColumn("arzi.arziId").setHeaderCaption("Arzi ID").setMaximumWidth(70);
 
-		resultsGrid.getColumn("arzi.condition.conditionName").setHeaderCaption("Medical Condition").setMaximumWidth(270);
+		resultsGrid.getColumn("arzi.condition.conditionName").setHeaderCaption("Medical Condition")
+				.setMaximumWidth(270);
 
-		resultsGrid.getColumn("arzi.procedure.procedureName").setHeaderCaption("Medical Procedure").setMaximumWidth(290);
+		resultsGrid.getColumn("arzi.procedure.procedureName").setHeaderCaption("Medical Procedure")
+				.setMaximumWidth(290);
 
 		resultsGrid.getColumn("arzi.bodyPart.bodyPartName").setHeaderCaption("Body Part").setMaximumWidth(270);
 
@@ -430,12 +449,13 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 	 */
 	private void filterGridData() {
 		HeaderRow filterRow = resultsGrid.appendHeaderRow();
-		
+
 		HeaderCell medicalConditionFilter = filterRow.getCell("arzi.condition.conditionName");
-		
+
 		TextField textField = new TextField();
 		textField.setImmediate(true);
-		//On Change of text, filter the data of the grid
+
+		// On Change of text, filter the data of the grid
 		textField.addTextChangeListener(getManufacturingFilterListener());
 		medicalConditionFilter.setComponent(textField);
 	}
@@ -443,7 +463,7 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 	/**
 	 * Returns the TextChangeListener that gets triggered
 	 *
-	 * @return
+	 * @return com.vaadin.event.FieldEvents.TextChangeListener
 	 */
 	private TextChangeListener getManufacturingFilterListener() {
 		return new TextChangeListener() {
@@ -454,13 +474,15 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 			public void textChange(TextChangeEvent event) {
 				// Get the user entered filter string (data)
 				String newValue = (String) event.getText();
-				
+
 				@SuppressWarnings("unchecked")
 				BeanItemContainer<ArziSearchResult> container = ((BeanItemContainer<ArziSearchResult>) resultsGrid
 						.getContainerDataSource());
+				
 				// This is important, this removes the previous filter
 				// that was used to filter the container
 				container.removeContainerFilters("arzi.condition.conditionName");
+				
 				if (null != newValue && !newValue.isEmpty()) {
 					container.addContainerFilter(
 							new SimpleStringFilter("arzi.condition.conditionName", newValue, true, false));
@@ -579,6 +601,8 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 				// Populate and refresh the grid with the data based on the user
 				// entered search criteria.
 				refreshGridWithFreshData(userEnteredSearchCriteria);
+				
+				loadSearchCriteriaDropdownsBasedOnSearchResults(userEnteredSearchCriteria);
 
 			} catch (CommitException ce) {
 				logger.error(ce);
@@ -638,6 +662,8 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 				// Refresh the grid so that the latest status displayed in the
 				// grid after the reviewer has assigned arzi for review.
 				refreshGridWithFreshData(userEnteredSearchCriteria);	
+				
+				loadSearchCriteriaDropdownsBasedOnSearchResults(userEnteredSearchCriteria);
 
 				// Get the current view and set the selected tab to Inbox to
 				// display the newly saved/submitted arzi in the Inbox.
@@ -698,7 +724,7 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 		resultsContainer.removeAllItems();
 		
 		if (searchResultList != null && searchResultList.isEmpty()) {
-			// Hide the bottom layout containing the grid and the
+			// Hide the right layout containing the grid and the
 			// "Assign" Button when the search yields 0 results.
 			rightLayout.setVisible(false);
 			
@@ -711,7 +737,7 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 			// Add data to the container
 			resultsContainer.addAll(searchResultList);
 			
-			// Display the bottom layout with the results in the grid
+			// Display the right layout with the results in the grid
 			// and the "Assign" Button.
 			rightLayout.setVisible(true);
 			
@@ -721,6 +747,46 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 			assignBtn.setEnabled(false);
 		}
 	}
+	
+	/**
+	 * This method is responsible for loading all the criteria dropdowns based
+	 * on the user selected search criteria. Only the options applicable for the
+	 * search results are loaded and if the option itself is the search
+	 * criteria, then the user entered criteria is set after the new applicable
+	 * options are loaded.
+	 * 
+	 * @param userEnteredSearchCriteria
+	 */
+	private void loadSearchCriteriaDropdownsBasedOnSearchResults(ArziSearchCriteria userEnteredSearchCriteria) {
+		jamaat.removeAllItems();
+		jamaat.addItems(ServiceLocator.getInstance().getLookupService()
+				.getListOfAllDistinctJamaatsBySearchCriteria(userEnteredSearchCriteria));
+		if(userEnteredSearchCriteria.getJamaat() != null) {
+			jamaat.select(userEnteredSearchCriteria.getJamaat());
+		}
+
+		condition.removeAllItems();
+		condition.addItems(ServiceLocator.getInstance().getLookupService()
+				.getListOfAllDistinctConditionsBySearchCriteria(userEnteredSearchCriteria));
+		if(userEnteredSearchCriteria.getCondition() != null) {
+			condition.select(userEnteredSearchCriteria.getCondition());
+		}
+
+		procedure.removeAllItems();
+		procedure.addItems(ServiceLocator.getInstance().getLookupService()
+				.getListOfAllDistinctProceduresBySearchCriteria(userEnteredSearchCriteria));
+		if(userEnteredSearchCriteria.getProcedure() != null) {
+			procedure.select(userEnteredSearchCriteria.getProcedure());
+		}
+
+		bodyPart.removeAllItems();
+		bodyPart.addItems(ServiceLocator.getInstance().getLookupService()
+				.getListOfAllDistinctBdyPartsBySearchCriteria(userEnteredSearchCriteria));
+		if(userEnteredSearchCriteria.getBodyPart() != null) {
+			bodyPart.select(userEnteredSearchCriteria.getBodyPart());
+		}
+	}
+	
 
 	@Override
 	public void select(SelectionEvent event) {

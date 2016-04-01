@@ -6,6 +6,7 @@ package com.example.medicalarzi.service;
 import java.util.Date;
 import java.util.List;
 
+import com.example.medicalarzi.model.ArziSearchCriteria;
 import com.example.medicalarzi.model.ArziType;
 import com.example.medicalarzi.model.BodyPart;
 import com.example.medicalarzi.model.Condition;
@@ -81,6 +82,17 @@ public interface LookupService {
 	 * @return java.util.List<com.example.medicalarzi.model.BodyPart>
 	 */
 	public List<BodyPart> getListOfAllDistinctBodyPartsFromAllSubmittedArzis();	
+	
+	/**
+	 * This method is responsible for getting all the distinct body parts from
+	 * all the submitted arzis which are only applicable based on his other
+	 * selected search criteria .
+	 * 
+	 * @param searchCriteria
+	 * 
+	 * @return java.util.List<com.example.medicalarzi.model.BodyPart>
+	 */
+	public List<BodyPart> getListOfAllDistinctBdyPartsBySearchCriteria(ArziSearchCriteria searchCriteria);
 
 	/**
 	 * This method is responsible for getting all the medical conditions.
@@ -96,6 +108,17 @@ public interface LookupService {
 	 * @return java.util.List<com.example.medicalarzi.model.Condition>
 	 */
 	public List<Condition> getListOfAllDistinctConditionsFromAllSubmittedArzis();
+	
+	/**
+	 * This method is responsible for getting all the distinct conditions from
+	 * all the submitted arzis which are only applicable based on his other
+	 * selected search criteria .
+	 * 
+	 * @param searchCriteria
+	 * 
+	 * @return java.util.List<com.example.medicalarzi.model.Condition>
+	 */
+	public List<Condition> getListOfAllDistinctConditionsBySearchCriteria(ArziSearchCriteria searchCriteria);
 
 	/**
 	 * This method is responsible for getting all the available medical
@@ -111,7 +134,18 @@ public interface LookupService {
 	 * 
 	 * @return java.util.List<com.example.medicalarzi.model.Procedure>
 	 */
-	public List<Procedure> getListOfAllDistinctProceduresFromAllSubmittedArzis();	
+	public List<Procedure> getListOfAllDistinctProceduresFromAllSubmittedArzis();
+	
+	/**
+	 * This method is responsible for getting all the distinct procedures from
+	 * all the submitted arzis which are only applicable based on his other
+	 * selected search criteria .
+	 * 
+	 * @param searchCriteria
+	 * 
+	 * @return java.util.List<com.example.medicalarzi.model.Procedure>
+	 */
+	public List<Procedure> getListOfAllDistinctProceduresBySearchCriteria(ArziSearchCriteria searchCriteria);
 
 	/**
 	 * This method is responsible for getting all the possible arzi types.
@@ -133,9 +167,28 @@ public interface LookupService {
 	/**
 	 * This method is responsible for getting all the possible jamaats.
 	 * 
-	 * @return java.util.List
+	 * @return java.util.List<com.example.medicalarzi.model.Jamaat>
 	 */
 	public List<Jamaat> getListOfAllJamaats();
+	
+	/**
+	 * This method is responsible for getting all the distinct jamaats of all
+	 * the registered patients.
+	 * 
+	 * @return java.util.List<com.example.medicalarzi.model.Jamaat>
+	 */
+	public List<Jamaat> getListOfAllDistinctJamaatsForAllPatients();
+	
+	/**
+	 * This method is responsible for getting all the distinct jamaats from
+	 * all the submitted arzis which are only applicable based on his other
+	 * selected search criteria .
+	 * 
+	 * @param searchCriteria
+	 * 
+	 * @return java.util.List<com.example.medicalarzi.model.Jamaat>
+	 */
+	public List<Jamaat> getListOfAllDistinctJamaatsBySearchCriteria(ArziSearchCriteria searchCriteria);
 	
 	/**
 	 * This method is responsible for getting a security role based on the

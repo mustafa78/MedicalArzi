@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.example.medicalarzi.model.ArziSearchCriteria;
 import com.example.medicalarzi.model.ArziType;
 import com.example.medicalarzi.model.BodyPart;
 import com.example.medicalarzi.model.Condition;
@@ -99,11 +100,21 @@ public interface LookupMapper {
 	
 	/**
 	 * This method is responsible for selecting all the distinct conditions from
-	 * the fact table
+	 * the fact table.
 	 * 
 	 * @return java.util.List<com.example.medicalarzi.model.Condition>
 	 */
 	public List<Condition> selectAllDistinctCondsFromArzis();
+	
+	/**
+	 * This method is responsible for selecting all the distinct conditions from
+	 * the fact table based on the user entered search criteria.
+	 * 
+	 * @param searchCriteria
+	 * 
+	 * @return java.util.List<com.example.medicalarzi.model.Condition>
+	 */
+	public List<Condition> selectAllDistinctCondsBySearchCriteria(ArziSearchCriteria searchCriteria);
 	
 	/**
 	 * This method is responsible for selecting all the medical procedures from
@@ -122,6 +133,16 @@ public interface LookupMapper {
 	public List<Procedure> selectAllDistinctProcsFromArzis();
 	
 	/**
+	 * This method is responsible for selecting all the distinct procedures from
+	 * the fact table based on the user entered search criteria.
+	 * 
+	 * @param searchCriteria
+	 * 
+	 * @return java.util.List<com.example.medicalarzi.model.Procedure>
+	 */
+	public List<Procedure> selectAllDistinctProcsBySearchCriteria(ArziSearchCriteria searchCriteria);	
+	
+	/**
 	 * This method is responsible for selecting all the body parts from
 	 * the dimension table.
 	 * 
@@ -136,6 +157,16 @@ public interface LookupMapper {
 	 * @return java.util.List<com.example.medicalarzi.model.BodyPart>
 	 */
 	public List<BodyPart> selectAllDistinctBdyPartsFromArzis();
+	
+	/**
+	 * This method is responsible for selecting all the distinct body parts from
+	 * the fact table based on the user entered search criteria.
+	 * 
+	 * @param searchCriteria
+	 * 
+	 * @return java.util.List<com.example.medicalarzi.model.BodyPart>
+	 */
+	public List<BodyPart> selectAllDistinctBdyPartsBySearchCriteria(ArziSearchCriteria searchCriteria);		
 	
 	/**
 	 * This method is responsible for selecting all the arzi types from
@@ -168,9 +199,27 @@ public interface LookupMapper {
 	/**
 	 * This method is responsible for selecting all the available jamaats. 
 	 * 
-	 * @return com.example.medicalarzi.model.Jamaat
+	 * @return java.util.List<com.example.medicalarzi.model.Jamaat>
 	 */
 	public List<Jamaat> selectAllJamaats();
+	
+	/**
+	 * This method is responsible for selecting all the distinct jamaats from
+	 * the fact table
+	 * 
+	 * @return java.util.List<com.example.medicalarzi.model.Jamaat>
+	 */
+	public List<Jamaat> selectAllDistinctPatientJamaats();
+	
+	/**
+	 * This method is responsible for selecting all the distinct jamaats from
+	 * the fact table based on the user entered search criteria.
+	 * 
+	 * @param searchCriteria
+	 * 
+	 * @return java.util.List<com.example.medicalarzi.model.Jamaat>
+	 */
+	public List<Jamaat> selectAllDistinctJamaatsBySearchCriteria(ArziSearchCriteria searchCriteria);	
 	
 	/**
 	 * This method is responsible for selecting a particular jamaat based on the
