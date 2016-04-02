@@ -456,7 +456,7 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 		textField.setImmediate(true);
 
 		// On Change of text, filter the data of the grid
-		textField.addTextChangeListener(getManufacturingFilterListener());
+		textField.addTextChangeListener(getCondNameFilterListener());
 		medicalConditionFilter.setComponent(textField);
 	}
 	
@@ -465,7 +465,7 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 	 *
 	 * @return com.vaadin.event.FieldEvents.TextChangeListener
 	 */
-	private TextChangeListener getManufacturingFilterListener() {
+	private TextChangeListener getCondNameFilterListener() {
 		return new TextChangeListener() {
 
 			private static final long serialVersionUID = -2368474286053602744L;
@@ -528,17 +528,15 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 	 */
 	@Override
 	public void buttonClick(ClickEvent event) {
-
-		ArziSearchCriteria userEnteredSearchCriteria = null;
-		
-		if (event.getButton().equals(searchBtn)) {
-			try {
-				// FieldGroup buffered mode is on, so commit() is required.
-				// Throws CommitException
-				searchCriteriaFieldsBinder.commit();
-
-				userEnteredSearchCriteria = searchCriteriaFieldsBinder
-						.getItemDataSource().getBean();
+		try {
+			// FieldGroup buffered mode is on, so commit() is required.
+			// Throws CommitException
+			searchCriteriaFieldsBinder.commit();
+	
+			ArziSearchCriteria userEnteredSearchCriteria = searchCriteriaFieldsBinder
+					.getItemDataSource().getBean();		
+			
+			if (event.getButton().equals(searchBtn)) {
 
 				Lookup searchPeriod = userEnteredSearchCriteria.getSearchPeriod(); //(Lookup) arziSubmitPeriod.getValue();
 
@@ -603,97 +601,93 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 				refreshGridWithFreshData(userEnteredSearchCriteria);
 				
 				loadSearchCriteriaDropdownsBasedOnSearchResults(userEnteredSearchCriteria);
+			
+			} else if (event.getButton().equals(assignBtn)) {
 
-			} catch (CommitException ce) {
-				logger.error(ce);
-
-				String errorDescription = "Please fix the errors before proceeding further.";
-
-				// Create an error notification if the required fields are not
-				// entered correctly.
-				MedicalArziUtils.createAndShowNotification(null,
-						errorDescription, Type.ERROR_MESSAGE,
-						Position.TOP_LEFT, "errorMsg", -1);
-			}
-		} else if (event.getButton().equals(assignBtn)) {
-
-			if (!editedItems.isEmpty()) {
-
-				ReviewerService reviewSer = ServiceLocator.getInstance()
-						.getReviewerService();
-
-				// Get the patient information from the session. In this tab,
-				// the patient also has the reviewer role so that he/she is able
-				// to review all the submitted arzis and take appropriate
-				// action.
-				Patient patient = (Patient) MedicalArziUtils
-						.getSessionAttribute(MedicalArziConstants.SESS_ATTR_PTNT_INFO);
-
-				for (BeanItem<ArziSearchResult> arziSearchResult : editedItems) {
-					Arzi arzi = arziSearchResult.getBean().getArzi();
-
-					// For ArziHeader to update the arzi
-					Status arziStatus = new Status();
-					arziStatus
-							.setStatusId(MedicalArziConstants.ARZI_IN_PROCESS_STATUS);
-					arzi.setCurrentStatus(arziStatus);
-
-					GregHijDate currentDate = ServiceLocator.getInstance()
-							.getLookupService()
-							.getRequestedGregorianHijriCalendar(new Date());
-
-					arzi.setCurrentStatusDate(currentDate);
-
-					// For Arzi to create a new record in the detail table.
-					arzi.setStatusChangeDate(currentDate);
-
-					arzi.setStatus(arziStatus);
-
-					arzi.setReviewDate(currentDate);
-
-					// The patient is also the reviewer.
-					Long reviewerItsNumber = patient.getItsNumber();
-
-					arzi.setReviewerItsNumber(reviewerItsNumber);
-
-					reviewSer.assignArziForReview(arzi);
-				}
-				
-				// Refresh the grid so that the latest status displayed in the
-				// grid after the reviewer has assigned arzi for review.
-				refreshGridWithFreshData(userEnteredSearchCriteria);	
-				
-				loadSearchCriteriaDropdownsBasedOnSearchResults(userEnteredSearchCriteria);
-
-				// Get the current view and set the selected tab to Inbox to
-				// display the newly saved/submitted arzi in the Inbox.
-				View currentView = UI.getCurrent().getNavigator()
-						.getCurrentView();
-
-				if (currentView instanceof MedicalArziLandingView) {
+				if (!editedItems.isEmpty()) {
+	
+					ReviewerService reviewSer = ServiceLocator.getInstance()
+							.getReviewerService();
+	
+					// Get the patient information from the session. In this tab,
+					// the patient also has the reviewer role so that he/she is able
+					// to review all the submitted arzis and take appropriate
+					// action.
+					Patient patient = (Patient) MedicalArziUtils
+							.getSessionAttribute(MedicalArziConstants.SESS_ATTR_PTNT_INFO);
+	
+					for (BeanItem<ArziSearchResult> arziSearchResult : editedItems) {
+						Arzi arzi = arziSearchResult.getBean().getArzi();
+	
+						// For ArziHeader to update the arzi
+						Status arziStatus = new Status();
+						arziStatus
+								.setStatusId(MedicalArziConstants.ARZI_IN_PROCESS_STATUS);
+						arzi.setCurrentStatus(arziStatus);
+	
+						GregHijDate currentDate = ServiceLocator.getInstance().getLookupService()
+								.getRequestedGregorianHijriCalendar(new Date());
+	
+						arzi.setCurrentStatusDate(currentDate);
+	
+						// For Arzi to create a new record in the detail table.
+						arzi.setStatusChangeDate(currentDate);
+	
+						arzi.setStatus(arziStatus);
+	
+						arzi.setReviewDate(currentDate);
+	
+						// The patient is also the reviewer.
+						Long reviewerItsNumber = patient.getItsNumber();
+	
+						arzi.setReviewerItsNumber(reviewerItsNumber);
+	
+						reviewSer.assignArziForReview(arzi);
+					}
 					
-					MedicalArziLandingView landingView = (MedicalArziLandingView) currentView;
-
-					// Once the arzis are assigned, reconstruct the Pending
-					// Task tab to get the latest data and then switch the
-					// selection to the Pending Tasks tab with the user
-					// friendly success message.
-					landingView.setRefreshPendingTasks(true);
-
-					landingView.getTabSheet().setSelectedTab(
-							landingView.getPendingTasksComponent());
-
-					String successMsg = "\""
-							+ MedicalArziUtils.constructPtntFullName(patient)
-							+ "\" has been successfully assigned arzis to review.";
-
-					MedicalArziUtils.createAndShowNotification(null,
-							successMsg, Type.HUMANIZED_MESSAGE,
-							Position.TOP_LEFT, "userFriendlyMsg",
-							MedicalArziConstants.USER_FRIENDLY_MSG_DELAY_MSEC);
+					// Refresh the grid so that the latest status displayed in the
+					// grid after the reviewer has assigned arzi for review.
+					refreshGridWithFreshData(userEnteredSearchCriteria);	
+					
+					loadSearchCriteriaDropdownsBasedOnSearchResults(userEnteredSearchCriteria);
+	
+					// Get the current view and set the selected tab to Inbox to
+					// display the newly saved/submitted arzi in the Inbox.
+					View currentView = UI.getCurrent().getNavigator().getCurrentView();
+	
+					if (currentView instanceof MedicalArziLandingView) {
+						
+						MedicalArziLandingView landingView = (MedicalArziLandingView) currentView;
+	
+						// Once the arzis are assigned, reconstruct the Pending
+						// Task tab to get the latest data and then switch the
+						// selection to the Pending Tasks tab with the user
+						// friendly success message.
+						landingView.setRefreshPendingTasks(true);
+	
+						landingView.getTabSheet().setSelectedTab(
+								landingView.getPendingTasksComponent());
+	
+						String successMsg = "\""
+								+ MedicalArziUtils.constructPtntFullName(patient)
+								+ "\" has been successfully assigned arzis to review.";
+	
+						MedicalArziUtils.createAndShowNotification(null, successMsg, Type.HUMANIZED_MESSAGE,
+								Position.TOP_LEFT, "userFriendlyMsg",
+								MedicalArziConstants.USER_FRIENDLY_MSG_DELAY_MSEC);
+					}
 				}
 			}
+		} catch (CommitException ce) {
+			logger.error(ce);
 
+			String errorDescription = "Please fix the errors before proceeding further.";
+
+			// Create an error notification if the required fields are not
+			// entered correctly.
+			MedicalArziUtils.createAndShowNotification(null,
+					errorDescription, Type.ERROR_MESSAGE,
+					Position.TOP_LEFT, "errorMsg", -1);
 		}
 
 	}
@@ -722,6 +716,11 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 		 * BeanItemContainer::addAll method.
 		 */
 		resultsContainer.removeAllItems();
+		// We need to make this call because when the arzis are assigned, the
+		// status changes to "In Process", and if we do not clear this set, the
+		// editedItems still have reference to that item which is not part of
+		// the results grid anymore.
+		editedItems.clear();
 		
 		if (searchResultList != null && searchResultList.isEmpty()) {
 			// Hide the right layout containing the grid and the
