@@ -232,8 +232,14 @@
 		order by ptnt.LAST_NM, ptnt.FIRST_NM, hdr.ARZI_ID
 	</select>
 	
+	<!--
+		Reviewer(Doctor) should be able to see only arzis with the following statuses (In Process, More Info Requested, Info Received).
+		Arzis should be sorted in ascending order, based on following sort order:
+		 	(1) Arzi Submit Date. (Oldest on top, newest at the bottom)
+		 	(2)	Status Date. (Oldest on top, newest at the bottom) 
+	-->
 	<select id="selectArzisByReviewerItsNumber" resultMap="ArziSearchResultMap" parameterType="Long">
-		select
+		select distinct
 			ptnt.PTNT_ITS_NBR as "ptntItsNbr",
 			hdr.ARZI_ID as "arziId"
 		from 
@@ -243,9 +249,10 @@
 				left join 
 			 		F_ARZI_DTL dtl on hdr.ARZI_ID = dtl.ARZI_ID
 		where 
-			dtl.RVWR_ITS_NBR = #{reviewerItsNumber,jdbcType=INTEGER} and
-			dtl.STATUS_ID = 1002 and
-			hdr.CURR_STATUS_ID = 1002
+			dtl.RVWR_ITS_NBR = #{reviewerItsNumber,jdbcType=INTEGER}
+				and dtl.STATUS_ID in (1002, 1005, 1007)
+				and hdr.CURR_STATUS_ID in (1002, 1005, 1007)
+		order by hdr.RQST_SMT_DT_ID, dtl.STATUS_CHG_DT_ID
 	</select>
 	
 	<select id="selectCommentsByArziId" resultMap="ArziCommentResultMap">

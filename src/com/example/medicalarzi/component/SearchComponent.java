@@ -382,6 +382,7 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
 	private void buildResultsGrid() {
 		resultsGrid = new Grid();
 		resultsGrid.setSizeFull();
+		resultsGrid.setStyleName("wrapLine");
 		resultsGrid.setImmediate(false);
 		
 		// Sets the Multi selection mode for this grid.
@@ -849,16 +850,14 @@ public class SearchComponent extends CustomComponent implements ClickListener, S
      * @return a collection of BeanItems for given itemIds
      */
 	@SuppressWarnings({ "unchecked" })
-	private Collection<BeanItem<ArziSearchResult>> getItemIds(
-			Set<Object> itemIds) {
-		
+	private Collection<BeanItem<ArziSearchResult>> getItemIds(Set<Object> itemIds) {
+
 		Set<BeanItem<ArziSearchResult>> items = new HashSet<BeanItem<ArziSearchResult>>();
-		
+
 		for (Object id : itemIds) {
-			items.add((BeanItem<ArziSearchResult>) resultsGrid
-					.getContainerDataSource().getItem(id));
+			items.add((BeanItem<ArziSearchResult>) resultsGrid.getContainerDataSource().getItem(id));
 		}
-		
+
 		return items;
 	}
 

@@ -123,8 +123,9 @@ public class PendingTasksComponent extends CustomComponent implements
 	private void buildPendingTasksGrid() {
 
 		pendingTasksGrid = new Grid();
-
 		pendingTasksGrid.setSizeFull();
+		pendingTasksGrid.setStyleName("wrapLine");
+		pendingTasksGrid.setImmediate(false);
 
 		// Set the selection mode.
 		pendingTasksGrid.setSelectionMode(SelectionMode.MULTI);
@@ -142,25 +143,18 @@ public class PendingTasksComponent extends CustomComponent implements
 
 		// Add all the intermediate nested properties (which are also
 		// beans)
-		pendingTasksContainer.addNestedContainerBean("patient.jamaat");
 		pendingTasksContainer.addNestedContainerBean("arzi.requestSubmitDate");
 		pendingTasksContainer.addNestedContainerBean("arzi.currentStatus");
-		pendingTasksContainer.addNestedContainerBean("arzi.arziType");
-		pendingTasksContainer.addNestedContainerBean("arzi.bodyPart");
+		pendingTasksContainer.addNestedContainerBean("arzi.statusChangeDate");
 		pendingTasksContainer.addNestedContainerBean("arzi.condition");
-		pendingTasksContainer.addNestedContainerBean("arzi.conditionStartDate");
 		pendingTasksContainer.addNestedContainerBean("arzi.procedure");
+		pendingTasksContainer.addNestedContainerBean("arzi.bodyPart");
 
 		// Setting the grid columns
-		pendingTasksGrid.setColumns("patient.itsNumber", "patient.firstName",
-				"patient.lastName", "patient.jamaat.jamaatName",
-				"patient.jamaat.jamiyatName", "arzi.arziId",
-				"arzi.arziType.arziTypeName", "arzi.currentStatus.statusDesc",
-				"arzi.requestSubmitDate.gregorianCalDate",
-				"arzi.bodyPart.bodyPartName", "arzi.condition.conditionName",
-				"arzi.otherCondition",
-				"arzi.conditionStartDate.gregorianCalDate",
-				"arzi.procedure.procedureName");
+		pendingTasksGrid.setColumns("arzi.requestSubmitDate.gregorianCalDate", "arzi.arziId",
+				"arzi.currentStatus.statusDesc", "arzi.statusChangeDate.gregorianCalDate",
+				"arzi.condition.conditionName", "arzi.procedure.procedureName", "arzi.bodyPart.bodyPartName",
+				"arzi.arziSummary");
 
 		pendingTasksGrid.addSelectionListener(this);
 		pendingTasksGrid.addItemClickListener(this);
@@ -171,9 +165,7 @@ public class PendingTasksComponent extends CustomComponent implements
 		// Get the patient information from the session. In this tab, the
 		// patient also has the reviewer role so that he/she is able to review
 		// all the submitted arzis and take appropriate action.
-		patient = (Patient) MedicalArziUtils
-				.getSessionAttribute(MedicalArziConstants.SESS_ATTR_PTNT_INFO);
-
+		patient = (Patient) MedicalArziUtils.getSessionAttribute(MedicalArziConstants.SESS_ATTR_PTNT_INFO);
 
 		// Populate the grid with data
 		refreshGridWithFreshData();
@@ -186,52 +178,34 @@ public class PendingTasksComponent extends CustomComponent implements
 	 * 
 	 */
 	private void customizeResultsGridColumns() {
-		// Sets the converter on the ITS number to remove the grouping used.
-		pendingTasksGrid.getColumn("patient.itsNumber").setMaximumWidth(100)
-				.setConverter(MedicalArziUtils.itsNumberConverter());
-
-		pendingTasksGrid.getColumn("patient.firstName").setMaximumWidth(110);
-
-		pendingTasksGrid.getColumn("patient.lastName").setMaximumWidth(110);
-
 		// Set Header captions
-		pendingTasksGrid.getColumn("arzi.currentStatus.statusDesc")
-				.setHeaderCaption("Status");
+		pendingTasksGrid.getColumn("arzi.currentStatus.statusDesc").setHeaderCaption("Status");
 
-		pendingTasksGrid
-				.getColumn("arzi.conditionStartDate.gregorianCalDate")
-				.setMaximumWidth(140)
-				.setHeaderCaption("Condition Start Date")
-				.setRenderer(
-						new DateRenderer("%1$tb %1$td, %1$tY", Locale.ENGLISH));
+		pendingTasksGrid.getColumn("arzi.arziId").setHeaderCaption("Arzi ID").setMaximumWidth(70);
 
-		pendingTasksGrid.getColumn("patient.jamaat.jamaatName")
-				.setHeaderCaption("Jamaat");
+		pendingTasksGrid.getColumn("arzi.requestSubmitDate.gregorianCalDate").setMaximumWidth(130)
+				.setHeaderCaption("Arzi Submit Date").setRenderer(new DateRenderer("%1$tb %1$td, %1$tY", Locale.ENGLISH));
 
-		pendingTasksGrid.getColumn("patient.jamaat.jamiyatName")
-				.setHeaderCaption("Jamiyat");
+		pendingTasksGrid.getColumn("arzi.statusChangeDate.gregorianCalDate").setMaximumWidth(130)
+				.setHeaderCaption("Status Date").setRenderer(new DateRenderer("%1$tb %1$td, %1$tY", Locale.ENGLISH));
 
-		pendingTasksGrid
-				.getColumn("arzi.requestSubmitDate.gregorianCalDate")
-				.setMaximumWidth(130)
-				.setHeaderCaption("Submit Date")
-				.setRenderer(
-						new DateRenderer("%1$tb %1$td, %1$tY", Locale.ENGLISH));
+		pendingTasksGrid.getColumn("arzi.condition.conditionName").setHeaderCaption("Medical Condition")
+				.setMaximumWidth(270);
 
-		pendingTasksGrid.getColumn("arzi.arziType.arziTypeName")
-				.setHeaderCaption("Type");
+		pendingTasksGrid.getColumn("arzi.procedure.procedureName").setHeaderCaption("Medical Procedure")
+				.setMaximumWidth(290);
 
-		pendingTasksGrid.getColumn("arzi.bodyPart.bodyPartName")
-				.setHeaderCaption("Body Part");
+		pendingTasksGrid.getColumn("arzi.bodyPart.bodyPartName").setHeaderCaption("Body Part").setMaximumWidth(270);
+		
+		pendingTasksGrid.getColumn("arzi.arziSummary").setHeaderCaption("Arzi Summary");
 
-		pendingTasksGrid.getColumn("arzi.condition.conditionName")
-				.setHeaderCaption("Condition");
+		//groupResultsGridColumns();
+	}
 
-		pendingTasksGrid.getColumn("arzi.procedure.procedureName")
-				.setHeaderCaption("Procedure");
-
-		pendingTasksGrid.getColumn("arzi.otherCondition").setMaximumWidth(150);
-
+	/**
+	 * This method is responsible for grouping the related results grid columns.
+	 */
+	private void groupResultsGridColumns() {
 		// This call prepends the header row to the existing grid
 		HeaderRow searchResultsHeader = pendingTasksGrid.prependHeaderRow();
 
@@ -270,7 +244,6 @@ public class PendingTasksComponent extends CustomComponent implements
 				.getCell("patient.lastName");
 		searchResultsHeader.join(itsNumCell, firstNameCell, lastNameCell)
 				.setText("Patient");
-
 	}
 	
 	/**
@@ -362,10 +335,6 @@ public class PendingTasksComponent extends CustomComponent implements
 
 		reviewArziComponent.getAddressLn2().setReadOnly(true);
 
-		//reviewArziComponent.getCity().setReadOnly(true);
-
-		//reviewArziComponent.getCountryState().setReadOnly(true);
-
 		reviewArziComponent.getZip().setReadOnly(true);
 
 		reviewArziComponent.getJamaat().setReadOnly(true);
@@ -383,7 +352,6 @@ public class PendingTasksComponent extends CustomComponent implements
 
 		if (reviewArziComponent.getOtherCondition() != null)
 			reviewArziComponent.getOtherCondition().setReadOnly(true);
-
 	}
 
 	@Override

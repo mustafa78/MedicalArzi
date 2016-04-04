@@ -298,4 +298,10 @@ $v-error-indicator-color: #ed473b;
 		margin-top: 20px;
 		font-size: 18px;
 	}
+	
+	.wrapLine, .wrapLine .v-grid-cell {
+		word-wrap: break-word; /* IE  */
+		white-space: -moz-pre-wrap; /* Firefox */
+		white-space: pre-wrap; /* Chrome */
+	}
 }
