@@ -14,6 +14,7 @@ import com.example.medicalarzi.model.Jamaat;
 import com.example.medicalarzi.model.Location;
 import com.example.medicalarzi.model.Lookup;
 import com.example.medicalarzi.model.Procedure;
+import com.example.medicalarzi.model.Status;
 
 /**
  * The SQL mappers xml should have the table names in CAPS as it is not working
@@ -89,6 +90,24 @@ public interface LookupMapper {
 	 * @return int
 	 */
 	public int updateLookup(Lookup record);
+	
+	/**
+	 * This method is responsible for selecting all the arzi statuses from the
+	 * dimension table.
+	 * 
+	 * @return java.util.List<com.example.medicalarzi.model.Status>
+	 */
+	public List<Status> selectAllArziStatuses();
+	
+	/**
+	 * This method is responsible for getting the arzi status based on the
+	 * status id.
+	 * 
+	 * @param statusId
+	 * 
+	 * @return com.example.medicalarzi.model.Status
+	 */
+	public Status selectArziStatusById(@Param("statusId") Long statusId);
 	
 	/**
 	 * This method is responsible for selecting all the medical conditions from

@@ -15,9 +15,17 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
  */
 public class Status implements Serializable {
 
+	private static final long serialVersionUID = -6327353038180403874L;
+	
 	private Long statusId;
 
 	private String statusDesc;
+	
+	private String statusFrom;
+	
+	private String statusTo;
+	
+	private String statusLongDesc;
 
 	private String createdBy;
 
@@ -30,13 +38,8 @@ public class Status implements Serializable {
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = -6327353038180403874L;
-
-	/**
-	 *
-	 */
 	public Status() {
-		// TODO Auto-generated constructor stub
+
 	}
 
 	public Long getStatusId() {
@@ -53,6 +56,30 @@ public class Status implements Serializable {
 
 	public void setStatusDesc(String statusDesc) {
 		this.statusDesc = statusDesc;
+	}
+
+	public String getStatusFrom() {
+		return statusFrom;
+	}
+
+	public void setStatusFrom(String statusFrom) {
+		this.statusFrom = statusFrom;
+	}
+
+	public String getStatusTo() {
+		return statusTo;
+	}
+
+	public void setStatusTo(String statusTo) {
+		this.statusTo = statusTo;
+	}
+
+	public String getStatusLongDesc() {
+		return statusLongDesc;
+	}
+
+	public void setStatusLongDesc(String statusLongDesc) {
+		this.statusLongDesc = statusLongDesc;
 	}
 
 	public String getCreatedBy() {

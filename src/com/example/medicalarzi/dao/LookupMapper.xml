@@ -93,6 +93,17 @@
 	    <result column="CREATE_TS" property="createdDate" jdbcType="TIMESTAMP" />
 	    <result column="LST_UPDT_USR_ID" property="updatedBy" jdbcType="VARCHAR" />
 	    <result column="LST_UPDT_TS" property="updatedDate" jdbcType="TIMESTAMP" />
+  	</resultMap>
+  	<resultMap type="Status" id="StatusResultMap">
+  		<id column="STATUS_ID" property="statusId" jdbcType="INTEGER" />
+  		<result column="STATUS_DESC" property="statusDesc" jdbcType="VARCHAR" />
+  		<result column="STATUS_FROM" property="statusFrom" jdbcType="VARCHAR" />
+  		<result column="STATUS_TO" property="statusTo" jdbcType="VARCHAR" />
+  		<result column="STATUS_LONG_DESC" property="statusLongDesc" jdbcType="VARCHAR" />
+  		<result column="CREATE_USR_ID" property="createdBy" jdbcType="VARCHAR" />
+	    <result column="CREATE_TS" property="createdDate" jdbcType="TIMESTAMP" />
+	    <result column="LST_UPDT_USR_ID" property="updatedBy" jdbcType="VARCHAR" />
+	    <result column="LST_UPDT_TS" property="updatedDate" jdbcType="TIMESTAMP" />  		
   	</resultMap>  	
 
 	<!-- SQL fragments -->
@@ -128,6 +139,10 @@
 		LOC_ID, CITY_NM, STATE_NM, CNTRY_NM,
 		CREATE_USR_ID, CREATE_TS, LST_UPDT_USR_ID, LST_UPDT_TS
 	</sql>
+  	<sql id="Status_Column_List">
+		STATUS_ID, STATUS_DESC, STATUS_FROM, STATUS_TO, STATUS_LONG_DESC,
+		CREATE_USR_ID, CREATE_TS, LST_UPDT_USR_ID, LST_UPDT_TS
+	</sql>	
   	<!-- where clause fragment for the arzi search which are not in draft status. 
   		Part of it is in CDATA because of the ('>' & '<' )-->
   	<sql id="searchCriteriaWhere">
@@ -208,6 +223,23 @@
 	    where LKUP_VALUE = #{lookupValue,jdbcType=VARCHAR} and ACTIVE_IND = 'Y'
   	</select>
   	
+  	<!-- Select all arzi statuses -->
+  	<select id="selectAllArziStatuses" resultMap="StatusResultMap">
+	    select
+	    <include refid="Status_Column_List" />
+	    from D_STATUS status
+  	</select>  	
+  	
+  	<!-- Select the arzi status by id -->
+  	<select id="selectArziStatusById" resultMap="StatusResultMap">
+	    select
+	    	<include refid="Status_Column_List" />
+	    from 
+	    	D_STATUS
+	    where
+	    	STATUS_ID = #{statusId,jdbcType=INTEGER}
+  	</select>
+  	  	
   	<!-- Select all body parts -->
   	<select id="selectAllBodyParts" resultMap="BodyPartResultMap">
 	    select
