@@ -967,6 +967,7 @@ public class ArziFormComponent extends CustomComponent implements
 		arziSummary.setWidth(67, Unit.PERCENTAGE);
 		arziSummary.setWordwrap(true);
 		arziSummary.setMaxLength(4000);
+		arziSummary.setRequired(true);
 		arziSummary.setStyleName("arziDetails-arziSmry");
 		arziDetailsLayout.addComponent(arziSummary);
 	}
