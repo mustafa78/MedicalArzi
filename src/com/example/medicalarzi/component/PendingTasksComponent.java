@@ -262,7 +262,19 @@ public class PendingTasksComponent extends CustomComponent implements
 		List<ArziSearchResult> pendingTaskList = reviewerService
 				.retrieveArzisAssignedToReviewer(reviewerItsNumber);
 
+		/**
+		 * Update the Grid with fresh data. Two step process of
+		 * replacing bean items. (1) First remove all BeanItem objects
+		 * with Container::removeAllItems method. (2) Then add
+		 * replacement BeanItem objects with the
+		 * BeanItemContainer::addAll method.
+		 */
 		pendingTasksContainer.removeAllItems();
+		// We need to make this call because when the arzis are withdrawn, the
+		// status changes to "In Process", and if we do not clear this set, the
+		// editedItems still have reference to that item which is not part of
+		// the results grid anymore.
+		editedItems.clear();		
 
 		if (pendingTaskList != null && pendingTaskList.isEmpty()) {
 			
