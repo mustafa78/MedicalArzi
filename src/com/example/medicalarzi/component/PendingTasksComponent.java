@@ -336,34 +336,50 @@ public class PendingTasksComponent extends CustomComponent implements
 	 */
 	private void makeFieldsReadOnlyWhenReviewing(
 			ArziFormComponent reviewArziComponent) {
-		// Patient's profile information set to read only.
-		reviewArziComponent.getItsNumber().setReadOnly(true);
-
-		reviewArziComponent.getGender().setReadOnly(true);
-
-		reviewArziComponent.getDob().setReadOnly(true);
-
-		reviewArziComponent.getAddressLn1().setReadOnly(true);
-
-		reviewArziComponent.getAddressLn2().setReadOnly(true);
-
-		reviewArziComponent.getZip().setReadOnly(true);
-
-		reviewArziComponent.getJamaat().setReadOnly(true);
-
-		// Patient's arzi information set to read only.
+		/***Patient's arzi information set to read only.****/
 		reviewArziComponent.getArziType().setReadOnly(true);
-
 		reviewArziComponent.getBodyPart().setReadOnly(true);
-
+		if(reviewArziComponent.getOtherBodyPart() != null) {
+			reviewArziComponent.getOtherBodyPart().setReadOnly(true);
+		}
 		reviewArziComponent.getProcedure().setReadOnly(true);
-
+		if(reviewArziComponent.getOtherProcedure() != null) {
+			reviewArziComponent.getOtherProcedure().setReadOnly(true);
+		}
 		reviewArziComponent.getCondition().setReadOnly(true);
-
-		reviewArziComponent.getConditionStartDate().setReadOnly(true);
-
-		if (reviewArziComponent.getOtherCondition() != null)
+		if (reviewArziComponent.getOtherCondition() != null) {
 			reviewArziComponent.getOtherCondition().setReadOnly(true);
+		}
+		reviewArziComponent.getConditionStartDate().setReadOnly(true);
+		reviewArziComponent.getArziSummary().setReadOnly(true);
+		
+		/***Patient's medical history set to read only.**/
+		reviewArziComponent.getAsthma().setReadOnly(true);
+		reviewArziComponent.getDiabetes().setReadOnly(true);
+		reviewArziComponent.getDiabetesOption().setReadOnly(true);
+		reviewArziComponent.getCholesterol().setReadOnly(true);
+		reviewArziComponent.getThyroidDisorder().setReadOnly(true);
+		reviewArziComponent.getAtrialFibrillation().setReadOnly(true);
+		reviewArziComponent.getHyperTension().setReadOnly(true);
+		reviewArziComponent.getCancer().setReadOnly(true);
+		reviewArziComponent.getCancerType().setReadOnly(true);
+		reviewArziComponent.getHeartDisease().setReadOnly(true);
+		reviewArziComponent.getHeartDiseaseType().setReadOnly(true);
+		reviewArziComponent.getOtherProblems().setReadOnly(true);
+		
+		/***Patient's profile information set to read only.**/
+		reviewArziComponent.getItsNumber().setReadOnly(true);
+		reviewArziComponent.getGender().setReadOnly(true);
+		reviewArziComponent.getDob().setReadOnly(true);
+		reviewArziComponent.getAddressLn1().setReadOnly(true);
+		reviewArziComponent.getAddressLn2().setReadOnly(true);
+		reviewArziComponent.getZip().setReadOnly(true);
+		reviewArziComponent.getJamaat().setReadOnly(true);
+		reviewArziComponent.getCity().setReadOnly(true);
+		reviewArziComponent.getCountryState().setReadOnly(true);
+		reviewArziComponent.getCountry().setReadOnly(true);
+		reviewArziComponent.getPhoneNum().setReadOnly(true);
+		reviewArziComponent.getPrimaryLocationOption().setReadOnly(true);
 	}
 
 	@Override
